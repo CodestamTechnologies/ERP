@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   DashboardIcon, 
@@ -16,8 +16,7 @@ import {
   OrderIcon,
   PaymentIcon,
   WarningIcon,
-  UserIcon,
-  ThemeIcon
+  UserIcon
 } from './Icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp, faGoogle } from '@fortawesome/free-brands-svg-icons';
@@ -100,7 +99,8 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
     window.addEventListener('mousedown', onClick);
     return () => window.removeEventListener('mousedown', onClick);
   }, [toolMenu]);
-  const [customTools, setCustomTools] = useState([
+  
+  const [customTools] = useState([
     {
       id: 'hub-track-pro',
       name: 'Hub track pro',
@@ -347,20 +347,6 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
     }
   };
 
-  const generateRandomColor = () => {
-    const colors = [
-      'from-blue-500 to-cyan-500',
-      'from-purple-500 to-pink-500',
-      'from-green-500 to-teal-500',
-      'from-orange-500 to-red-500',
-      'from-indigo-500 to-purple-500',
-      'from-pink-500 to-rose-500',
-      'from-teal-500 to-green-500',
-      'from-yellow-500 to-orange-500'
-    ];
-    return colors[Math.floor(Math.random() * colors.length)];
-  };
-
   const handleAddTool = () => {
     const tool = availableTools.find((item) => item.id === selectedToolId);
     if (tool && !menuItems.some(item => item.id === tool.id)) {
@@ -378,8 +364,6 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
       setShowAddToolModal(false);
     }
   };
-
-  // No key press needed for select
 
   return (
     <>
@@ -512,7 +496,7 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
                                 <div className="w-2 h-2 bg-blue-500 rounded-full ml-2"></div>
                               )}
                             </div>
-                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                            <p className="text-sm text-gray-600 mt-1 overflow-hidden" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                               {notification.message}
                             </p>
                             <p className="text-xs text-gray-500 mt-2">{notification.time}</p>
@@ -586,7 +570,7 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
                     {isCustom && (
                       <div
                         className="ml-1 mr-2"
-                        ref={el => (buttonRefs.current[item.id] = el)}
+                        ref={el => { buttonRefs.current[item.id] = el; }}
                       >
                         <button
                           tabIndex={0}
@@ -620,8 +604,15 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
             {/* My Tools Dropdown Section */}
             <div className="pt-4 mt-4 border-t border-white/20">
               <button
-                onClick={() => setShowMyTools(!showMyTools)}
+                onClick={e => {
+                  setShowMyTools(!showMyTools);
+                  if (!showMyTools) {
+                    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                    setToolMenuPosition({ top: rect.bottom + 4, left: rect.left });
+                  }
+                }}
                 className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-white/80 hover:bg-white/5 hover:text-white transition-colors rounded-lg"
+                id="my-tools-toggle-btn"
               >
                 <span className="text-xs font-semibold text-white/60 uppercase tracking-wider">My Tools</span>
                 <svg 
@@ -633,17 +624,27 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-              
-              {showMyTools && (
-                <div className="mt-2 pl-4 h-24 overflow-y-auto space-y-1 pr-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+              {/* Use Portal for My Tools dropdown on desktop */}
+              {showMyTools && toolMenuPosition && typeof window !== 'undefined' && createPortal(
+                <div
+                  className="fixed z-[9999] mt-2 pl-4 h-40 overflow-y-auto space-y-1 pr-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent bg-white border border-gray-300 rounded shadow"
+                  style={{
+                    top: toolMenuPosition.top,
+                    left: toolMenuPosition.left,
+                    width: '230px',
+                  }}
+                >
                   {customTools.map((tool) => (
                     <button
                       key={tool.id}
-                      onClick={() => onViewChange(tool.id)}
+                      onClick={() => {
+                        onViewChange(tool.id);
+                        setShowMyTools(false);
+                      }}
                       className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                         activeView === tool.id
-                          ? 'bg-white/10 text-white border-r-2 border-white'
-                          : 'text-white/80 hover:bg-white/5 hover:text-white'
+                          ? 'bg-white/10 text-blue-800 border-r-2 border-blue-800'
+                          : 'text-gray-900 hover:bg-blue-50 hover:text-blue-800'
                       }`}
                     >
                       <div className="flex items-center space-x-3">
@@ -654,30 +655,79 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
                       </div>
                     </button>
                   ))}
-                </div>
+                </div>,
+                document.body
               )}
             </div>
+
+            {/* Socials Section */}
+            <div className="pt-4 mt-4 border-t border-white/20">
+              <div className="flex items-center justify-between px-3 mb-3">
+                <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wider">
+                  Socials
+                </h3>
+              </div>
+              
+              <div className="space-y-2 px-3">
+                <button
+                  onClick={() => onViewChange('whatsapp')}
+                  className={`w-full flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
+                    activeView === 'whatsapp'
+                      ? 'bg-white/10 text-white border-r-2 border-white'
+                      : 'text-white/80 hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <FontAwesomeIcon icon={faWhatsapp} className="w-4 h-4 text-green-400" />
+                    <span>WhatsApp</span>
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => onViewChange('gmail')}
+                  className={`w-full flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
+                    activeView === 'gmail'
+                      ? 'bg-white/10 text-white border-r-2 border-white'
+                      : 'text-white/80 hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <FontAwesomeIcon icon={faGoogle} className="w-4 h-4 text-red-400" />
+                    <span>Gmail</span>
+                  </div>
+                </button>
+              </div>
+              </div>
           </nav>
 
-          {/* WhatsApp & Gmail Buttons (Horizontal) */}
-          <div className="px-4 pt-3 flex flex-row space-x-2" style={{ backgroundColor: '#1e2155' }}>
-            <button
-              onClick={() => window.open('https://wa.me/', '_blank')}
-              className="flex-1 py-2 bg-green-500 hover:bg-green-700 text-white text-lg font-semibold rounded transition-colors flex items-center justify-center"
-              aria-label="WhatsApp"
-            >
-              <FontAwesomeIcon icon={faWhatsapp} />
-            </button>
-            <button
-              onClick={() => window.open('mailto:', '_blank')}
-              className="flex-1 py-2 bg-red-500 hover:bg-red-700 text-white text-lg font-semibold rounded transition-colors flex items-center justify-center"
-              aria-label="Gmail"
-            >
-              <FontAwesomeIcon icon={faGoogle} />
-            </button>
-          </div>
-          {/* Connect Your Domain Button */}
+          {/* TODO and Calendar Buttons */}
           <div className="px-4 pt-3" style={{ backgroundColor: '#1e2155' }}>
+            <div className="flex space-x-2 mb-3">
+              <button
+                onClick={() => onViewChange('todo')}
+                className={`flex-1 py-2 text-white text-sm font-semibold rounded transition-colors shadow ${
+                  activeView === 'todo'
+                    ? 'bg-purple-600 hover:bg-purple-700'
+                    : 'bg-purple-500 hover:bg-purple-600'
+                }`}
+              >
+                TODO
+              </button>
+              <button
+                onClick={() => onViewChange('calendar')}
+                className={`flex-1 py-2 text-white text-sm font-semibold rounded transition-colors shadow ${
+                  activeView === 'calendar'
+                    ? 'bg-orange-600 hover:bg-orange-700'
+                    : 'bg-orange-500 hover:bg-orange-600'
+                }`}
+              >
+                Calendar
+              </button>
+            </div>
+          </div>
+
+          {/* Connect Your Domain Button */}
+          <div className="px-4" style={{ backgroundColor: '#1e2155' }}>
             <button
               onClick={() => onViewChange('connect-domain')}
               className="w-full mb-3 py-2 bg-blue-500 hover:bg-blue-700 text-white text-sm font-semibold rounded transition-colors shadow"
@@ -840,7 +890,7 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
                                   <div className="w-2 h-2 bg-blue-500 rounded-full ml-1"></div>
                                 )}
                               </div>
-                              <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                              <p className="text-xs text-gray-600 mt-1 overflow-hidden" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                                 {notification.message}
                               </p>
                               <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
@@ -968,25 +1018,85 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
                 </div>
               )}
             </div>
+
+            {/* Socials Section - Mobile */}
+            <div className="pt-4 mt-4 border-t border-white/20">
+              <div className="flex items-center justify-between px-3 mb-3">
+                <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wider">
+                  Socials
+                </h3>
+              </div>
+              
+              <div className="space-y-2 px-3">
+                <button
+                  onClick={() => {
+                    onViewChange('whatsapp');
+                    onClose();
+                  }}
+                  className={`w-full flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
+                    activeView === 'whatsapp'
+                      ? 'bg-white/10 text-white'
+                      : 'text-white/80 hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <FontAwesomeIcon icon={faWhatsapp} className="w-4 h-4 text-green-400" />
+                    <span>WhatsApp</span>
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => {
+                    onViewChange('gmail');
+                    onClose();
+                  }}
+                  className={`w-full flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
+                    activeView === 'gmail'
+                      ? 'bg-white/10 text-white'
+                      : 'text-white/80 hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <FontAwesomeIcon icon={faGoogle} className="w-4 h-4 text-red-400" />
+                    <span>Gmail</span>
+                  </div>
+                </button>
+                </div>
+            </div>
           </nav>
 
-          {/* WhatsApp & Gmail Buttons - Mobile (Horizontal) */}
-          <div className="px-4 pt-3 flex flex-row space-x-2" style={{ backgroundColor: '#1e2155' }}>
-            <button
-              onClick={() => window.open('https://wa.me/', '_blank')}
-              className="flex-1 py-2 bg-green-500 hover:bg-green-700 text-white text-lg font-semibold rounded transition-colors flex items-center justify-center"
-              aria-label="WhatsApp"
-            >
-              <FontAwesomeIcon icon={faWhatsapp} />
-            </button>
-            <button
-              onClick={() => window.open('mailto:', '_blank')}
-              className="flex-1 py-2 bg-red-500 hover:bg-red-700 text-white text-lg font-semibold rounded transition-colors flex items-center justify-center"
-              aria-label="Gmail"
-            >
-              <FontAwesomeIcon icon={faGoogle} />
-            </button>
+          {/* TODO and Calendar Buttons - Mobile */}
+          <div className="px-4 pt-3" style={{ backgroundColor: '#1e2155' }}>
+            <div className="flex space-x-2 mb-3">
+              <button
+                onClick={() => {
+                  onViewChange('todo');
+                  onClose();
+                }}
+                className={`flex-1 py-2 text-white text-sm font-semibold rounded transition-colors shadow ${
+                  activeView === 'todo'
+                    ? 'bg-purple-600 hover:bg-purple-700'
+                    : 'bg-purple-500 hover:bg-purple-600'
+                }`}
+              >
+                TODO
+              </button>
+              <button
+                onClick={() => {
+                  onViewChange('calendar');
+                  onClose();
+                }}
+                className={`flex-1 py-2 text-white text-sm font-semibold rounded transition-colors shadow ${
+                  activeView === 'calendar'
+                    ? 'bg-orange-600 hover:bg-orange-700'
+                    : 'bg-orange-500 hover:bg-orange-600'
+                }`}
+              >
+                Calendar
+              </button>
+            </div>
           </div>
+
           {/* Connect Your Domain Button - Mobile */}
           <div className="px-4 pt-3" style={{ backgroundColor: '#1e2155' }}>
             <button
@@ -997,7 +1107,6 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
               className="w-full mb-3 py-2 bg-blue-500 hover:bg-blue-700 text-white text-sm font-semibold rounded transition-colors shadow"
             >
               Connect your domain
-            
             </button>
           </div>
           
@@ -1076,7 +1185,7 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
           </div>
         </div>
       )}
-    {toolMenu && toolMenuPosition && createPortal(
+      {toolMenu && toolMenuPosition && createPortal(
         <div
           id="overlay-tool-dropdown"
           className="fixed z-[9999] w-40 bg-white rounded shadow border border-gray-200 py-1"
