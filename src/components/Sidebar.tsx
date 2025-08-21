@@ -15,7 +15,8 @@ import {
   OrderIcon,
   PaymentIcon,
   WarningIcon,
-  UserIcon
+  UserIcon,
+  ThemeIcon
 } from './Icons';
 
 interface SidebarProps {
@@ -30,6 +31,7 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
   const [notificationFilter, setNotificationFilter] = useState('all');
   const [departmentFilter, setDepartmentFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
+  const [showMyTools, setShowMyTools] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
 
   // Close notifications when clicking outside
@@ -224,22 +226,28 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
     { id: 'finance', name: 'Finance', icon: <FinanceIcon size={20} />, badge: null },
     { id: 'reports', name: 'Reports', icon: <ReportsIcon size={20} />, badge: null },
     { id: 'ai-insights', name: 'AI Insights', icon: <AIInsightsIcon size={20} />, badge: 'NEW' },
-    { id: 'settings', name: 'Settings', icon: <SettingsIcon size={20} />, badge: null },
   ];
 
   return (
     <>
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex lg:flex-shrink-0">
-        <div className="flex flex-col w-64 bg-white border-r border-gray-200">
+        <div className="flex flex-col w-64 border-r border-gray-200" style={{ backgroundColor: '#1e2155' }}>
           {/* Logo */}
-          <div className="flex items-center justify-between h-16 px-4 bg-blue-600">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                <span className="text-blue-600 font-bold text-lg">C</span>
+          <div className="flex items-center h-16 px-4" style={{ backgroundColor: '#1e2155' }}>
+            <div className="flex items-center space-x-2 flex-1">
+              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center p-1">
+                <img 
+                  src="/images/logo.png" 
+                  alt="Codestam Logo" 
+                  className="w-full h-full object-contain"
+                />
               </div>
               <span className="text-white font-bold text-xl">Codestam</span>
             </div>
+            
+            {/* Vertical Separator */}
+            <div className="h-8 w-px bg-white/30 mx-3"></div>
             
             {/* Notification Bell */}
             <div className="relative" ref={notificationRef}>
@@ -377,43 +385,176 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2">
-            {menuItems.map((item) => (
+          <nav className="flex-1 px-4 py-6" style={{ backgroundColor: '#1e2155' }}>
+            {/* Tools Section Header */}
+            <div className="flex items-center justify-between px-3 mb-3">
+              <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wider">
+                Tools
+              </h3>
               <button
-                key={item.id}
-                onClick={() => onViewChange(item.id)}
-                className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  activeView === item.id
-                    ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
+                onClick={() => {
+                  // Add new tool functionality
+                  const newToolName = prompt('Enter new tool name:');
+                  if (newToolName) {
+                    // Here you would typically add the new tool to your state/data
+                    console.log('Adding new tool:', newToolName);
+                  }
+                }}
+                className="p-1 text-white/40 hover:text-white/80 hover:bg-white/10 rounded transition-colors"
+                title="Add new tool"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={5} d="M12 4v16m8-8H4" />
+                </svg>
+              </button>
+            </div>
+            
+            {/* Main Menu Items with Scroll */}
+            <div className="max-h-64 overflow-y-auto space-y-2 pr-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+              {menuItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => onViewChange(item.id)}
+                  className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                    activeView === item.id
+                      ? 'bg-white/10 text-white border-r-2 border-white'
+                      : 'text-white/80 hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <span>{item.icon}</span>
+                    <span>{item.name}</span>
+                  </div>
+                  {item.badge && (
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      item.badge === 'NEW' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+            
+            {/* My Tools Dropdown Section */}
+            <div className="pt-4 mt-4 border-t border-white/20">
+              <button
+                onClick={() => setShowMyTools(!showMyTools)}
+                className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-white/80 hover:bg-white/5 hover:text-white transition-colors rounded-lg"
               >
                 <div className="flex items-center space-x-3">
-                  <span>{item.icon}</span>
-                  <span>{item.name}</span>
+                  <div className="w-5 h-5 bg-gradient-to-r from-blue-500 to-purple-500 rounded flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">T</span>
+                  </div>
+                  <span className="text-xs font-semibold uppercase tracking-wider">My Tools</span>
                 </div>
-                {item.badge && (
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    item.badge === 'NEW' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {item.badge}
-                  </span>
-                )}
+                <svg 
+                  className={`w-4 h-4 transition-transform ${showMyTools ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
               </button>
-            ))}
+              
+              {showMyTools && (
+                <div className="mt-2 space-y-1 pl-4">
+                  <button
+                    onClick={() => onViewChange('hub-track-pro')}
+                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                      activeView === 'hub-track-pro'
+                        ? 'bg-white/10 text-white border-r-2 border-white'
+                        : 'text-white/80 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-4 h-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">H</span>
+                      </div>
+                      <span>Hub track pro</span>
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={() => onViewChange('goku')}
+                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                      activeView === 'goku'
+                        ? 'bg-white/10 text-white border-r-2 border-white'
+                        : 'text-white/80 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-4 h-4 bg-gradient-to-r from-orange-500 to-red-500 rounded flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">G</span>
+                      </div>
+                      <span>GOKU</span>
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={() => onViewChange('gama')}
+                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                      activeView === 'gama'
+                        ? 'bg-white/10 text-white border-r-2 border-white'
+                        : 'text-white/80 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-4 h-4 bg-gradient-to-r from-green-500 to-teal-500 rounded flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">G</span>
+                      </div>
+                      <span>GAMA</span>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
           </nav>
 
+          {/* Connect Your Domain Button */}
+          <div className="px-4 pt-3" style={{ backgroundColor: '#1e2155' }}>
+            <button
+              onClick={() => onViewChange('connect-domain')}
+              className="w-full mb-3 py-2 bg-blue-500 hover:bg-blue-700 text-white text-sm font-semibold rounded transition-colors shadow"
+            >
+              Connect your domain
+            </button>
+          </div>
+          {/* Settings and Theme Icons */}
+          <div className="px-4 py-3 border-t border-white/20" style={{ backgroundColor: '#1e2155' }}>
+            <div className="flex items-center justify-center space-x-4">
+              <button
+                onClick={() => onViewChange('settings')}
+                className={`p-2 rounded-lg transition-colors ${
+                  activeView === 'settings'
+                    ? 'bg-white/10 text-white'
+                    : 'text-white/80 hover:bg-white/5 hover:text-white'
+                }`}
+                title="Settings"
+              >
+                <SettingsIcon size={20} />
+              </button>
+              <button
+                className="p-2 rounded-lg text-white/80 hover:bg-white/5 hover:text-white transition-colors"
+                title="Toggle Theme"
+              >
+                <ThemeIcon size={20} />
+              </button>
+            </div>
+          </div>
+
           {/* User Profile */}
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-4 border-t border-white/20" style={{ backgroundColor: '#1e2155' }}>
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                 <span className="text-white text-sm font-medium">A</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">Admin User</p>
-                <p className="text-xs text-gray-500 truncate">admin@codestam.com</p>
+                <p className="text-sm font-medium text-white truncate">Admin User</p>
+                <p className="text-xs text-white/60 truncate">admin@codestam.com</p>
               </div>
             </div>
           </div>
@@ -421,25 +562,33 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
       </div>
 
       {/* Mobile Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white transform transition-transform duration-300 ease-in-out lg:hidden ${
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:hidden ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      }`} style={{ backgroundColor: '#1e2155' }}>
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-between h-16 px-4 bg-blue-600">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                <span className="text-blue-600 font-bold text-lg">C</span>
+          <div className="flex items-center h-16 px-4" style={{ backgroundColor: '#1e2155' }}>
+            <div className="flex items-center space-x-2 flex-1">
+              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center p-1">
+                <img 
+                  src="/images/logo.png" 
+                  alt="Codestam Logo" 
+                  className="w-full h-full object-contain"
+                />
               </div>
               <span className="text-white font-bold text-xl">Codestam</span>
             </div>
+            
+            {/* Vertical Separator */}
+            <div className="h-8 w-px bg-white/30 mx-2"></div>
             
             <div className="flex items-center space-x-2">
               {/* Notification Bell for Mobile */}
               <div className="relative">
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className="relative p-1 text-white hover:text-gray-200 transition-colors bg-blue-700 rounded"
+                  className="relative p-1 text-white hover:text-gray-200 transition-colors rounded"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 19V20H3V19L5 17V11C5 7.9 7 5.2 10 4.3V4C10 2.9 10.9 2 12 2S14 2.9 14 4V4.3C17 5.2 19 7.9 19 11V17L21 19ZM12 22C10.9 22 10 21.1 10 20H14C14 21.1 13.1 22 12 22Z"/>
@@ -587,46 +736,194 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2">
-            {menuItems.map((item) => (
+          <nav className="flex-1 px-4 py-6" style={{ backgroundColor: '#1e2155' }}>
+            {/* Tools Section Header - Mobile */}
+            <div className="flex items-center justify-between px-3 mb-3">
+              <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wider">
+                Tools
+              </h3>
               <button
-                key={item.id}
                 onClick={() => {
-                  onViewChange(item.id);
-                  onClose();
+                  // Add new tool functionality
+                  const newToolName = prompt('Enter new tool name:');
+                  if (newToolName) {
+                    // Here you would typically add the new tool to your state/data
+                    console.log('Adding new tool:', newToolName);
+                  }
                 }}
-                className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  activeView === item.id
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
+                className="p-1 text-white/40 hover:text-white/80 hover:bg-white/10 rounded transition-colors"
+                title="Add new tool"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              </button>
+            </div>
+            
+            {/* Main Menu Items with Scroll - Mobile */}
+            <div className="max-h-64 overflow-y-auto space-y-2 pr-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+              {menuItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    onViewChange(item.id);
+                    onClose();
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                    activeView === item.id
+                      ? 'bg-white/10 text-white'
+                      : 'text-white/80 hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <span>{item.icon}</span>
+                    <span>{item.name}</span>
+                  </div>
+                  {item.badge && (
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      item.badge === 'NEW' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+            
+            {/* My Tools Dropdown Section - Mobile */}
+            <div className="pt-4 mt-4 border-t border-white/20">
+              <button
+                onClick={() => setShowMyTools(!showMyTools)}
+                className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-white/80 hover:bg-white/5 hover:text-white transition-colors rounded-lg"
               >
                 <div className="flex items-center space-x-3">
-                  <span>{item.icon}</span>
-                  <span>{item.name}</span>
+                  <div className="w-5 h-5 bg-gradient-to-r from-blue-500 to-purple-500 rounded flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">T</span>
+                  </div>
+                  <span className="text-xs font-semibold uppercase tracking-wider">My Tools</span>
                 </div>
-                {item.badge && (
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    item.badge === 'NEW' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {item.badge}
-                  </span>
-                )}
+                <svg 
+                  className={`w-4 h-4 transition-transform ${showMyTools ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
               </button>
-            ))}
+              
+              {showMyTools && (
+                <div className="mt-2 space-y-1 pl-4">
+                  <button
+                    onClick={() => {
+                      onViewChange('hub-track-pro');
+                      onClose();
+                    }}
+                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                      activeView === 'hub-track-pro'
+                        ? 'bg-white/10 text-white'
+                        : 'text-white/80 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-4 h-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">H</span>
+                      </div>
+                      <span>Hub track pro</span>
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      onViewChange('goku');
+                      onClose();
+                    }}
+                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                      activeView === 'goku'
+                        ? 'bg-white/10 text-white'
+                        : 'text-white/80 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-4 h-4 bg-gradient-to-r from-orange-500 to-red-500 rounded flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">G</span>
+                      </div>
+                      <span>GOKU</span>
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      onViewChange('gama');
+                      onClose();
+                    }}
+                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                      activeView === 'gama'
+                        ? 'bg-white/10 text-white'
+                        : 'text-white/80 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-4 h-4 bg-gradient-to-r from-green-500 to-teal-500 rounded flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">G</span>
+                      </div>
+                      <span>GAMA</span>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
           </nav>
 
+          {/* Connect Your Domain Button - Mobile */}
+          <div className="px-4 pt-3" style={{ backgroundColor: '#1e2155' }}>
+            <button
+              onClick={() => {
+                onViewChange('connect-domain');
+                onClose();
+              }}
+              className="w-full mb-3 py-2 bg-blue-500 hover:bg-blue-700 text-white text-sm font-semibold rounded transition-colors shadow"
+            >
+              Connect your domain
+            </button>
+          </div>
+          {/* Settings and Theme Icons */}
+          <div className="px-4 py-3 border-t border-white/20" style={{ backgroundColor: '#1e2155' }}>
+            <div className="flex items-center justify-center space-x-4">
+              <button
+                onClick={() => {
+                  onViewChange('settings');
+                  onClose();
+                }}
+                className={`p-2 rounded-lg transition-colors ${
+                  activeView === 'settings'
+                    ? 'bg-white/10 text-white'
+                    : 'text-white/80 hover:bg-white/5 hover:text-white'
+                }`}
+                title="Settings"
+              >
+                <SettingsIcon size={20} />
+              </button>
+              <button
+                className="p-2 rounded-lg text-white/80 hover:bg-white/5 hover:text-white transition-colors"
+                title="Toggle Theme"
+              >
+                <ThemeIcon size={20} />
+              </button>
+            </div>
+          </div>
+
           {/* User Profile */}
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-4 border-t border-white/20" style={{ backgroundColor: '#1e2155' }}>
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                 <span className="text-white text-sm font-medium">A</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">Admin User</p>
-                <p className="text-xs text-gray-500 truncate">admin@codestam.com</p>
+                <p className="text-sm font-medium text-white truncate">Admin User</p>
+                <p className="text-xs text-white/60 truncate">admin@codestam.com</p>
               </div>
             </div>
           </div>
