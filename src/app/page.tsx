@@ -8,10 +8,21 @@ import Customers from '@/components/Customers';
 import Suppliers from '@/components/Suppliers';
 import Sales from '@/components/Sales';
 import AIInsights from '@/components/AIInsights';
+import HubTrackPro from '@/components/HubTrackPro';
+import RightStickyPanel from '@/components/RightStickyPanel';
 
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeView, setActiveView] = useState('dashboard');
+
+  const handleSettingsClick = () => {
+    setActiveView('settings');
+  };
+
+  const handleThemeToggle = () => {
+    // Theme toggle logic can be implemented here
+    console.log('Theme toggled');
+  };
 
   const renderActiveView = () => {
     switch (activeView) {
@@ -31,6 +42,8 @@ export default function Home() {
         return <div className="p-6"><h1 className="text-2xl font-bold">Reports - Coming Soon</h1></div>;
       case 'ai-insights':
         return <AIInsights />;
+      case 'hub-track-pro':
+        return <HubTrackPro />;
       case 'settings':
         return <div className="p-6"><h1 className="text-2xl font-bold">Settings - Coming Soon</h1></div>;
       default:
@@ -56,6 +69,8 @@ export default function Home() {
         return 'Reports';
       case 'ai-insights':
         return 'AI Insights';
+      case 'hub-track-pro':
+        return 'Hub Track Pro';
       case 'settings':
         return 'Settings';
       default:
@@ -96,6 +111,12 @@ export default function Home() {
           {renderActiveView()}
         </main>
       </div>
+
+      {/* Right Sticky Panel */}
+      <RightStickyPanel 
+        onSettingsClick={handleSettingsClick}
+        onThemeToggle={handleThemeToggle}
+      />
 
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (

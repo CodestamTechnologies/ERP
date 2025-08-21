@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   DashboardIcon, 
   SalesIcon, 
@@ -18,6 +19,8 @@ import {
   UserIcon,
   ThemeIcon
 } from './Icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWhatsapp, faGoogle } from '@fortawesome/free-brands-svg-icons';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -32,6 +35,133 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
   const [departmentFilter, setDepartmentFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [showMyTools, setShowMyTools] = useState(false);
+  const [showAddToolModal, setShowAddToolModal] = useState(false);
+  const [selectedToolId, setSelectedToolId] = useState<string>('hub-track-pro');
+
+  // Define available tool presets
+  const availableTools = [
+    {
+      id: 'hub-track-pro',
+      name: 'Hub track pro',
+      icon: 'H',
+      color: 'from-purple-500 to-pink-500'
+    },
+    {
+      id: 'goku',
+      name: 'GOKU',
+      icon: 'G',
+      color: 'from-orange-500 to-red-500'
+    },
+    {
+      id: 'gama',
+      name: 'GAMA',
+      icon: 'G',
+      color: 'from-green-500 to-teal-500'
+    },
+    {
+      id: 'x-tool',
+      name: 'X Tool',
+      icon: 'X',
+      color: 'from-blue-500 to-cyan-500'
+    },
+    {
+      id: 'alpha-tool',
+      name: 'Alpha Tool',
+      icon: 'A',
+      color: 'from-yellow-500 to-orange-500'
+    }
+  ];
+  const [menuItems, setMenuItems] = useState([
+    { id: 'dashboard', name: 'Dashboard', icon: <DashboardIcon size={20} />, badge: null },
+    { id: 'sales', name: 'Sales', icon: <SalesIcon size={20} />, badge: '12' },
+    { id: 'inventory', name: 'Inventory', icon: <InventoryIcon size={20} />, badge: null },
+    { id: 'customers', name: 'Customers', icon: <CustomersIcon size={20} />, badge: '3' },
+    { id: 'suppliers', name: 'Suppliers', icon: <SuppliersIcon size={20} />, badge: null },
+    { id: 'finance', name: 'Finance', icon: <FinanceIcon size={20} />, badge: null },
+    { id: 'reports', name: 'Reports', icon: <ReportsIcon size={20} />, badge: null },
+    { id: 'ai-insights', name: 'AI Insights', icon: <AIInsightsIcon size={20} />, badge: 'NEW' },
+  ]);
+
+  const [toolMenu, setToolMenu] = useState<string | null>(null);
+  const [toolMenuPosition, setToolMenuPosition] = useState<{top: number, left: number} | null>(null);
+  const builtinIds = ['dashboard','sales','inventory','customers','suppliers','finance','reports','ai-insights'];
+  const buttonRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Close overlay on outside click
+  useEffect(() => {
+    if (!toolMenu) return;
+    function onClick(e: MouseEvent) {
+      // if click happens outside dropdown
+      const dropdown = document.getElementById('overlay-tool-dropdown');
+      if (dropdown && !dropdown.contains(e.target as Node)) {
+        setToolMenu(null);
+      }
+    }
+    window.addEventListener('mousedown', onClick);
+    return () => window.removeEventListener('mousedown', onClick);
+  }, [toolMenu]);
+  const [customTools, setCustomTools] = useState([
+    {
+      id: 'hub-track-pro',
+      name: 'Hub track pro',
+      icon: 'H',
+      color: 'from-purple-500 to-pink-500'
+    },
+    {
+      id: 'goku',
+      name: 'GOKU',
+      icon: 'G',
+      color: 'from-orange-500 to-red-500'
+    },
+    {
+      id: 'gama',
+      name: 'GAMA',
+      icon: 'G',
+      color: 'from-green-500 to-teal-500'
+    },
+    {
+      id: 'alpha-tool-custom',
+      name: 'Alpha Tool',
+      icon: 'A',
+      color: 'from-blue-500 to-cyan-500'
+    },
+    {
+      id: 'beta-tool',
+      name: 'Beta Tool',
+      icon: 'B',
+      color: 'from-yellow-500 to-orange-500'
+    },
+    {
+      id: 'gamma-tool',
+      name: 'Gamma Tool',
+      icon: 'G',
+      color: 'from-indigo-500 to-purple-500'
+    },
+    {
+      id: 'delta-tool',
+      name: 'Delta Tool',
+      icon: 'D',
+      color: 'from-pink-500 to-rose-500'
+    },
+    {
+      id: 'epsilon-tool',
+      name: 'Epsilon Tool',
+      icon: 'E',
+      color: 'from-teal-500 to-green-500'
+    },
+    {
+      id: 'zeta-tool',
+      name: 'Zeta Tool',
+      icon: 'Z',
+      color: 'from-red-500 to-pink-500'
+    },
+    {
+      id: 'theta-tool',
+      name: 'Theta Tool',
+      icon: 'T',
+      color: 'from-cyan-500 to-blue-500'
+    }
+  ]);
   const notificationRef = useRef<HTMLDivElement>(null);
 
   // Close notifications when clicking outside
@@ -217,16 +347,39 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
     }
   };
 
-  const menuItems = [
-    { id: 'dashboard', name: 'Dashboard', icon: <DashboardIcon size={20} />, badge: null },
-    { id: 'sales', name: 'Sales', icon: <SalesIcon size={20} />, badge: '12' },
-    { id: 'inventory', name: 'Inventory', icon: <InventoryIcon size={20} />, badge: null },
-    { id: 'customers', name: 'Customers', icon: <CustomersIcon size={20} />, badge: '3' },
-    { id: 'suppliers', name: 'Suppliers', icon: <SuppliersIcon size={20} />, badge: null },
-    { id: 'finance', name: 'Finance', icon: <FinanceIcon size={20} />, badge: null },
-    { id: 'reports', name: 'Reports', icon: <ReportsIcon size={20} />, badge: null },
-    { id: 'ai-insights', name: 'AI Insights', icon: <AIInsightsIcon size={20} />, badge: 'NEW' },
-  ];
+  const generateRandomColor = () => {
+    const colors = [
+      'from-blue-500 to-cyan-500',
+      'from-purple-500 to-pink-500',
+      'from-green-500 to-teal-500',
+      'from-orange-500 to-red-500',
+      'from-indigo-500 to-purple-500',
+      'from-pink-500 to-rose-500',
+      'from-teal-500 to-green-500',
+      'from-yellow-500 to-orange-500'
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+
+  const handleAddTool = () => {
+    const tool = availableTools.find((item) => item.id === selectedToolId);
+    if (tool && !menuItems.some(item => item.id === tool.id)) {
+      const newTool = {
+        id: tool.id,
+        name: tool.name,
+        icon: (
+          <div className={`w-5 h-5 bg-gradient-to-r ${tool.color} rounded flex items-center justify-center`}>
+            <span className="text-white text-xs font-bold">{tool.icon}</span>
+          </div>
+        ),
+        badge: null
+      };
+      setMenuItems([...menuItems, newTool]);
+      setShowAddToolModal(false);
+    }
+  };
+
+  // No key press needed for select
 
   return (
     <>
@@ -392,50 +545,76 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
                 Tools
               </h3>
               <button
-                onClick={() => {
-                  // Add new tool functionality
-                  const newToolName = prompt('Enter new tool name:');
-                  if (newToolName) {
-                    // Here you would typically add the new tool to your state/data
-                    console.log('Adding new tool:', newToolName);
-                  }
-                }}
+                onClick={() => setShowAddToolModal(true)}
                 className="p-1 text-white/40 hover:text-white/80 hover:bg-white/10 rounded transition-colors"
                 title="Add new tool"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={5} d="M12 4v16m8-8H4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
               </button>
             </div>
             
             {/* Main Menu Items with Scroll */}
             <div className="max-h-64 overflow-y-auto space-y-2 pr-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
-              {menuItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => onViewChange(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    activeView === item.id
-                      ? 'bg-white/10 text-white border-r-2 border-white'
-                      : 'text-white/80 hover:bg-white/5 hover:text-white'
-                  }`}
-                >
-                  <div className="flex items-center space-x-3">
-                    <span>{item.icon}</span>
-                    <span>{item.name}</span>
+              {menuItems.map((item) => {
+                const isCustom = !builtinIds.includes(item.id);
+                return (
+                  <div key={item.id} className="relative group flex items-center">
+                    <button
+                      onClick={() => onViewChange(item.id)}
+                      className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                        activeView === item.id
+                          ? 'bg-white/10 text-white border-r-2 border-white'
+                          : 'text-white/80 hover:bg-white/5 hover:text-white'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <span>{item.icon}</span>
+                        <span>{item.name}</span>
+                      </div>
+                      {item.badge && (
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          item.badge === 'NEW'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                    {isCustom && (
+                      <div
+                        className="ml-1 mr-2"
+                        ref={el => (buttonRefs.current[item.id] = el)}
+                      >
+                        <button
+                          tabIndex={0}
+                          className="p-1 rounded-full hover:bg-white/15 focus:bg-white/20 focus:outline-none"
+                          aria-label="Tool actions"
+                          onClick={e => {
+                            e.stopPropagation();
+                            const el = buttonRefs.current[item.id];
+                            if (el) {
+                              const rect = el.getBoundingClientRect();
+                              setToolMenu(item.id);
+                              setToolMenuPosition({ top: rect.bottom + 4, left: rect.left });
+                            } else {
+                              setToolMenu(item.id);
+                            }
+                          }}
+                        >
+                          <svg className="w-4 h-4 text-white/80" fill="currentColor" viewBox="0 0 20 20">
+                            <circle cx="4" cy="10" r="1.2"/>
+                            <circle cx="10" cy="10" r="1.2"/>
+                            <circle cx="16" cy="10" r="1.2"/>
+                          </svg>
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  {item.badge && (
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      item.badge === 'NEW' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              ))}
+                );
+              })}
             </div>
             
             {/* My Tools Dropdown Section */}
@@ -444,12 +623,7 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
                 onClick={() => setShowMyTools(!showMyTools)}
                 className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-white/80 hover:bg-white/5 hover:text-white transition-colors rounded-lg"
               >
-                <div className="flex items-center space-x-3">
-                  <div className="w-5 h-5 bg-gradient-to-r from-blue-500 to-purple-500 rounded flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">T</span>
-                  </div>
-                  <span className="text-xs font-semibold uppercase tracking-wider">My Tools</span>
-                </div>
+                <span className="text-xs font-semibold text-white/60 uppercase tracking-wider">My Tools</span>
                 <svg 
                   className={`w-4 h-4 transition-transform ${showMyTools ? 'rotate-180' : ''}`} 
                   fill="none" 
@@ -461,59 +635,47 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
               </button>
               
               {showMyTools && (
-                <div className="mt-2 space-y-1 pl-4">
-                  <button
-                    onClick={() => onViewChange('hub-track-pro')}
-                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      activeView === 'hub-track-pro'
-                        ? 'bg-white/10 text-white border-r-2 border-white'
-                        : 'text-white/80 hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">H</span>
+                <div className="mt-2 pl-4 h-24 overflow-y-auto space-y-1 pr-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                  {customTools.map((tool) => (
+                    <button
+                      key={tool.id}
+                      onClick={() => onViewChange(tool.id)}
+                      className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                        activeView === tool.id
+                          ? 'bg-white/10 text-white border-r-2 border-white'
+                          : 'text-white/80 hover:bg-white/5 hover:text-white'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-4 h-4 bg-gradient-to-r ${tool.color} rounded flex items-center justify-center`}>
+                          <span className="text-white text-xs font-bold">{tool.icon}</span>
+                        </div>
+                        <span>{tool.name}</span>
                       </div>
-                      <span>Hub track pro</span>
-                    </div>
-                  </button>
-                  
-                  <button
-                    onClick={() => onViewChange('goku')}
-                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      activeView === 'goku'
-                        ? 'bg-white/10 text-white border-r-2 border-white'
-                        : 'text-white/80 hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 bg-gradient-to-r from-orange-500 to-red-500 rounded flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">G</span>
-                      </div>
-                      <span>GOKU</span>
-                    </div>
-                  </button>
-                  
-                  <button
-                    onClick={() => onViewChange('gama')}
-                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      activeView === 'gama'
-                        ? 'bg-white/10 text-white border-r-2 border-white'
-                        : 'text-white/80 hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 bg-gradient-to-r from-green-500 to-teal-500 rounded flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">G</span>
-                      </div>
-                      <span>GAMA</span>
-                    </div>
-                  </button>
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
           </nav>
 
+          {/* WhatsApp & Gmail Buttons (Horizontal) */}
+          <div className="px-4 pt-3 flex flex-row space-x-2" style={{ backgroundColor: '#1e2155' }}>
+            <button
+              onClick={() => window.open('https://wa.me/', '_blank')}
+              className="flex-1 py-2 bg-green-500 hover:bg-green-700 text-white text-lg font-semibold rounded transition-colors flex items-center justify-center"
+              aria-label="WhatsApp"
+            >
+              <FontAwesomeIcon icon={faWhatsapp} />
+            </button>
+            <button
+              onClick={() => window.open('mailto:', '_blank')}
+              className="flex-1 py-2 bg-red-500 hover:bg-red-700 text-white text-lg font-semibold rounded transition-colors flex items-center justify-center"
+              aria-label="Gmail"
+            >
+              <FontAwesomeIcon icon={faGoogle} />
+            </button>
+          </div>
           {/* Connect Your Domain Button */}
           <div className="px-4 pt-3" style={{ backgroundColor: '#1e2155' }}>
             <button
@@ -523,29 +685,7 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
               Connect your domain
             </button>
           </div>
-          {/* Settings and Theme Icons */}
-          <div className="px-4 py-3 border-t border-white/20" style={{ backgroundColor: '#1e2155' }}>
-            <div className="flex items-center justify-center space-x-4">
-              <button
-                onClick={() => onViewChange('settings')}
-                className={`p-2 rounded-lg transition-colors ${
-                  activeView === 'settings'
-                    ? 'bg-white/10 text-white'
-                    : 'text-white/80 hover:bg-white/5 hover:text-white'
-                }`}
-                title="Settings"
-              >
-                <SettingsIcon size={20} />
-              </button>
-              <button
-                className="p-2 rounded-lg text-white/80 hover:bg-white/5 hover:text-white transition-colors"
-                title="Toggle Theme"
-              >
-                <ThemeIcon size={20} />
-              </button>
-            </div>
-          </div>
-
+          
           {/* User Profile */}
           <div className="p-4 border-t border-white/20" style={{ backgroundColor: '#1e2155' }}>
             <div className="flex items-center space-x-3">
@@ -743,14 +883,7 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
                 Tools
               </h3>
               <button
-                onClick={() => {
-                  // Add new tool functionality
-                  const newToolName = prompt('Enter new tool name:');
-                  if (newToolName) {
-                    // Here you would typically add the new tool to your state/data
-                    console.log('Adding new tool:', newToolName);
-                  }
-                }}
+                onClick={() => setShowAddToolModal(true)}
                 className="p-1 text-white/40 hover:text-white/80 hover:bg-white/10 rounded transition-colors"
                 title="Add new tool"
               >
@@ -798,12 +931,7 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
                 onClick={() => setShowMyTools(!showMyTools)}
                 className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-white/80 hover:bg-white/5 hover:text-white transition-colors rounded-lg"
               >
-                <div className="flex items-center space-x-3">
-                  <div className="w-5 h-5 bg-gradient-to-r from-blue-500 to-purple-500 rounded flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">T</span>
-                  </div>
-                  <span className="text-xs font-semibold uppercase tracking-wider">My Tools</span>
-                </div>
+                <span className="text-xs font-semibold text-white/60 uppercase tracking-wider">My Tools</span>
                 <svg 
                   className={`w-4 h-4 transition-transform ${showMyTools ? 'rotate-180' : ''}`} 
                   fill="none" 
@@ -815,68 +943,50 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
               </button>
               
               {showMyTools && (
-                <div className="mt-2 space-y-1 pl-4">
-                  <button
-                    onClick={() => {
-                      onViewChange('hub-track-pro');
-                      onClose();
-                    }}
-                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      activeView === 'hub-track-pro'
-                        ? 'bg-white/10 text-white'
-                        : 'text-white/80 hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">H</span>
+                <div className="mt-2 pl-4 h-24 overflow-y-auto space-y-1 pr-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                  {customTools.map((tool) => (
+                    <button
+                      key={tool.id}
+                      onClick={() => {
+                        onViewChange(tool.id);
+                        onClose();
+                      }}
+                      className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                        activeView === tool.id
+                          ? 'bg-white/10 text-white'
+                          : 'text-white/80 hover:bg-white/5 hover:text-white'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-4 h-4 bg-gradient-to-r ${tool.color} rounded flex items-center justify-center`}>
+                          <span className="text-white text-xs font-bold">{tool.icon}</span>
+                        </div>
+                        <span>{tool.name}</span>
                       </div>
-                      <span>Hub track pro</span>
-                    </div>
-                  </button>
-                  
-                  <button
-                    onClick={() => {
-                      onViewChange('goku');
-                      onClose();
-                    }}
-                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      activeView === 'goku'
-                        ? 'bg-white/10 text-white'
-                        : 'text-white/80 hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 bg-gradient-to-r from-orange-500 to-red-500 rounded flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">G</span>
-                      </div>
-                      <span>GOKU</span>
-                    </div>
-                  </button>
-                  
-                  <button
-                    onClick={() => {
-                      onViewChange('gama');
-                      onClose();
-                    }}
-                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      activeView === 'gama'
-                        ? 'bg-white/10 text-white'
-                        : 'text-white/80 hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 bg-gradient-to-r from-green-500 to-teal-500 rounded flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">G</span>
-                      </div>
-                      <span>GAMA</span>
-                    </div>
-                  </button>
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
           </nav>
 
+          {/* WhatsApp & Gmail Buttons - Mobile (Horizontal) */}
+          <div className="px-4 pt-3 flex flex-row space-x-2" style={{ backgroundColor: '#1e2155' }}>
+            <button
+              onClick={() => window.open('https://wa.me/', '_blank')}
+              className="flex-1 py-2 bg-green-500 hover:bg-green-700 text-white text-lg font-semibold rounded transition-colors flex items-center justify-center"
+              aria-label="WhatsApp"
+            >
+              <FontAwesomeIcon icon={faWhatsapp} />
+            </button>
+            <button
+              onClick={() => window.open('mailto:', '_blank')}
+              className="flex-1 py-2 bg-red-500 hover:bg-red-700 text-white text-lg font-semibold rounded transition-colors flex items-center justify-center"
+              aria-label="Gmail"
+            >
+              <FontAwesomeIcon icon={faGoogle} />
+            </button>
+          </div>
           {/* Connect Your Domain Button - Mobile */}
           <div className="px-4 pt-3" style={{ backgroundColor: '#1e2155' }}>
             <button
@@ -887,34 +997,10 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
               className="w-full mb-3 py-2 bg-blue-500 hover:bg-blue-700 text-white text-sm font-semibold rounded transition-colors shadow"
             >
               Connect your domain
+            
             </button>
           </div>
-          {/* Settings and Theme Icons */}
-          <div className="px-4 py-3 border-t border-white/20" style={{ backgroundColor: '#1e2155' }}>
-            <div className="flex items-center justify-center space-x-4">
-              <button
-                onClick={() => {
-                  onViewChange('settings');
-                  onClose();
-                }}
-                className={`p-2 rounded-lg transition-colors ${
-                  activeView === 'settings'
-                    ? 'bg-white/10 text-white'
-                    : 'text-white/80 hover:bg-white/5 hover:text-white'
-                }`}
-                title="Settings"
-              >
-                <SettingsIcon size={20} />
-              </button>
-              <button
-                className="p-2 rounded-lg text-white/80 hover:bg-white/5 hover:text-white transition-colors"
-                title="Toggle Theme"
-              >
-                <ThemeIcon size={20} />
-              </button>
-            </div>
-          </div>
-
+          
           {/* User Profile */}
           <div className="p-4 border-t border-white/20" style={{ backgroundColor: '#1e2155' }}>
             <div className="flex items-center space-x-3">
@@ -929,6 +1015,84 @@ const Sidebar = ({ isOpen, onClose, activeView, onViewChange }: SidebarProps) =>
           </div>
         </div>
       </div>
+
+      {/* Add Tool Modal */}
+      {showAddToolModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Add New Tool</h3>
+                <button
+                  onClick={() => {
+                    setShowAddToolModal(false);
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select a Tool
+                </label>
+                <div className="grid gap-2">
+                  {availableTools.map((tool) => (
+                    <button
+                      key={tool.id}
+                      onClick={() => setSelectedToolId(tool.id)}
+                      className={`flex items-center px-3 py-2 rounded border transition-colors w-full text-left ${selectedToolId === tool.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white hover:bg-gray-50'}`}
+                    >
+                      <div className={`w-5 h-5 bg-gradient-to-r ${tool.color} rounded flex items-center justify-center mr-3`}>
+                        <span className="text-white text-xs font-bold">{tool.icon}</span>
+                      </div>
+                      <span className="font-medium">{tool.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => {
+                    setShowAddToolModal(false);
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddTool}
+                  disabled={!selectedToolId || menuItems.some(item => item.id === selectedToolId)}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-md transition-colors"
+                >
+                  Add Tool
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    {toolMenu && toolMenuPosition && createPortal(
+        <div
+          id="overlay-tool-dropdown"
+          className="fixed z-[9999] w-40 bg-white rounded shadow border border-gray-200 py-1"
+          style={{ top: toolMenuPosition.top, left: toolMenuPosition.left, minWidth: 160 }}
+        >
+          <button
+            className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            onClick={() => { alert('Option 1'); setToolMenu(null); }}
+          >Option 1</button>
+          <button
+            className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            onClick={() => { alert('Option 2'); setToolMenu(null); }}
+          >Option 2</button>
+        </div>,
+        document.body
+      )}
     </>
   );
 };
