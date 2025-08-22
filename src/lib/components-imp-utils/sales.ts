@@ -1,3 +1,4 @@
+// lib/utils/sales.ts
 import { cn } from '@/lib/utils';
 
 export const getStatusColor = (status: string): string => {
@@ -61,4 +62,28 @@ export const formatIndianCurrency = (amount: number): string => {
 
 export const getInitials = (name: string): string => {
   return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+};
+
+export const getPeriodDates = (period: string): { start: Date; end: Date } => {
+  const end = new Date();
+  const start = new Date();
+  
+  switch (period) {
+    case '7days':
+      start.setDate(start.getDate() - 7);
+      break;
+    case '30days':
+      start.setDate(start.getDate() - 30);
+      break;
+    case '90days':
+      start.setDate(start.getDate() - 90);
+      break;
+    case '1year':
+      start.setFullYear(start.getFullYear() - 1);
+      break;
+    default:
+      start.setDate(start.getDate() - 30);
+  }
+  
+  return { start, end };
 };

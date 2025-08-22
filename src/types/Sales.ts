@@ -1,3 +1,4 @@
+// types/Sales.ts
 export interface SalesStat {
   name: string;
   value: string;
@@ -36,6 +37,8 @@ export interface SalesOrder {
   discount: number;
   tax: number;
   shippingCost: number;
+  createdAt?: any;
+  updatedAt?: any;
 }
 
 export interface SalesTeamMember {
@@ -49,19 +52,30 @@ export interface SalesTeamMember {
   conversion: number;
   rating: number;
   status: string;
+  createdAt?: any;
+  updatedAt?: any;
 }
 
 export interface Activity {
-  id: number;
+  id: string;
   type: string;
   message: string;
   time: string;
   icon: React.ReactNode;
   priority: string;
+  createdAt?: any;
 }
 
 export interface QuickAction {
   name: string;
   icon: React.ReactNode;
   color: string;
+}
+
+export interface SalesData {
+  stats: SalesStat[];
+  channels: SalesChannel[];
+  orders: SalesOrder[];
+  team: SalesTeamMember[];
+  activities: Activity[];
 }
