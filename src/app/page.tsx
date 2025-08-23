@@ -10,6 +10,9 @@ import Sales from '@/components/Sales';
 import AIInsights from '@/components/AIInsights';
 import HubTrackPro from '@/components/HubTrackPro';
 import WhatsApp from '@/components/WhatsApp';
+import Todo from '@/components/Todo';
+import Calendar from '@/components/Calendar';
+import Reports from '@/components/Reports';
 import RightStickyPanel from '@/components/RightStickyPanel';
 
 export default function Home() {
@@ -40,13 +43,17 @@ export default function Home() {
       case 'finance':
         return <div className="p-6"><h1 className="text-2xl font-bold">Finance - Coming Soon</h1></div>;
       case 'reports':
-        return <div className="p-6"><h1 className="text-2xl font-bold">Reports - Coming Soon</h1></div>;
+        return <Reports />;
       case 'ai-insights':
         return <AIInsights />;
       case 'hub-track-pro':
         return <HubTrackPro />;
       case 'whatsapp':
         return <WhatsApp />;
+      case 'todo':
+        return <Todo />;
+      case 'calendar':
+        return <Calendar />;
       case 'gmail':
         return (
           <div className="p-6">
@@ -110,13 +117,17 @@ export default function Home() {
       case 'finance':
         return 'Finance';
       case 'reports':
-        return 'Reports';
+        return 'Business Reports & Analytics';
       case 'ai-insights':
         return 'AI Insights';
       case 'hub-track-pro':
         return 'Hub Track Pro';
       case 'whatsapp':
         return 'WhatsApp Business';
+      case 'todo':
+        return 'Task Management';
+      case 'calendar':
+        return 'Business Calendar';
       case 'gmail':
         return 'Gmail Integration';
       case 'settings':

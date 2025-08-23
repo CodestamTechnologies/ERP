@@ -29,6 +29,7 @@ import {
 import { SalesIcon, ChartIcon, AIInsightsIcon, OrderIcon, CustomersIcon } from './Icons';
 import { useState, useMemo } from 'react';
 import { SalesOrder, SalesTeamMember, Activity } from '@/types/Sales';
+import { testFirebaseConnection, initializeSampleData } from '@/lib/firebase/test-connection';
 import {
   LineChart,
   Line,

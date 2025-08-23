@@ -38,9 +38,10 @@ export const useSales = () => {
         const ordersData = await getOrders({
           status: selectedStatus === 'all' ? undefined : selectedStatus
         });
-        setOrders(ordersData);
+        setOrders(ordersData || []);
       } catch (error) {
         console.error('Error loading orders:', error);
+        setOrders([]);
       } finally {
         setLoading(prev => ({ ...prev, orders: false }));
       }
@@ -55,9 +56,10 @@ export const useSales = () => {
       try {
         setLoading(prev => ({ ...prev, team: true }));
         const teamData = await getSalesTeam();
-        setTeamMembers(teamData);
+        setTeamMembers(teamData || []);
       } catch (error) {
         console.error('Error loading team members:', error);
+        setTeamMembers([]);
       } finally {
         setLoading(prev => ({ ...prev, team: false }));
       }
@@ -68,12 +70,22 @@ export const useSales = () => {
 
   // Load activities (realtime)
   useEffect(() => {
-    const unsubscribe = getActivities((activitiesData) => {
-      setActivities(activitiesData);
-      setLoading(prev => ({ ...prev, activities: false }));
-    });
+    try {
+      const unsubscribe = getActivities((activitiesData) => {
+        setActivities(activitiesData || []);
+        setLoading(prev => ({ ...prev, activities: false }));
+      });
 
-    return () => unsubscribe();
+      return () => {
+        if (typeof unsubscribe === 'function') {
+          unsubscribe();
+        }
+      };
+    } catch (error) {
+      console.error('Error setting up activities listener:', error);
+      setActivities([]);
+      setLoading(prev => ({ ...prev, activities: false }));
+    }
   }, []);
 
   // Filter orders based on search term
@@ -148,7 +160,11 @@ export const useSales = () => {
   const handleAddOrder = async (orderData: Omit<SalesOrder, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
       await addOrder(orderData);
-      // Orders will be refreshed via the useEffect
+      // Refresh orders
+      const updatedOrders = await getOrders({
+        status: selectedStatus === 'all' ? undefined : selectedStatus
+      });
+      setOrders(updatedOrders || []);
     } catch (error) {
       console.error('Error adding order:', error);
       throw error;
@@ -162,7 +178,7 @@ export const useSales = () => {
       const updatedOrders = await getOrders({
         status: selectedStatus === 'all' ? undefined : selectedStatus
       });
-      setOrders(updatedOrders);
+      setOrders(updatedOrders || []);
     } catch (error) {
       console.error('Error updating order:', error);
       throw error;
@@ -176,7 +192,7 @@ export const useSales = () => {
       const updatedOrders = await getOrders({
         status: selectedStatus === 'all' ? undefined : selectedStatus
       });
-      setOrders(updatedOrders);
+      setOrders(updatedOrders || []);
     } catch (error) {
       console.error('Error deleting order:', error);
       throw error;
@@ -188,7 +204,7 @@ export const useSales = () => {
       await addTeamMember(memberData);
       // Refresh team members
       const updatedTeam = await getSalesTeam();
-      setTeamMembers(updatedTeam);
+      setTeamMembers(updatedTeam || []);
     } catch (error) {
       console.error('Error adding team member:', error);
       throw error;
@@ -200,7 +216,7 @@ export const useSales = () => {
       await updateTeamMember(id, updates);
       // Refresh team members
       const updatedTeam = await getSalesTeam();
-      setTeamMembers(updatedTeam);
+      setTeamMembers(updatedTeam || []);
     } catch (error) {
       console.error('Error updating team member:', error);
       throw error;
@@ -212,7 +228,7 @@ export const useSales = () => {
       await deleteTeamMember(id);
       // Refresh team members
       const updatedTeam = await getSalesTeam();
-      setTeamMembers(updatedTeam);
+      setTeamMembers(updatedTeam || []);
     } catch (error) {
       console.error('Error deleting team member:', error);
       throw error;
