@@ -23,7 +23,7 @@ import {
   getImpactColor, 
   getStatusColor 
 } from '@/lib/components-imp-utils/aiInsights';
-import { AIInsightsIcon } from '@/components/Icons';
+import { AIInsightsIcon } from '../components/Icons';
 
 const AIInsights = () => {
   const {
