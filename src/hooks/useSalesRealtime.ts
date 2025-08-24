@@ -1,4 +1,4 @@
-// hooks/useSales.ts
+// hooks/useSalesRealtime.ts
 import { useState, useEffect, useCallback } from 'react';
 import { 
   getOrdersRealtime, 
@@ -16,7 +16,7 @@ import {
 } from '@/lib/firebase/database/useSalesRealtime';
 import { SalesOrder, SalesTeamMember, Activity } from '@/types/Sales';
 
-export const useSales = () => {
+export const useSalesRealtime = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPeriod, setSelectedPeriod] = useState('30days');
@@ -146,30 +146,13 @@ export const useSales = () => {
     return matchesSearch;
   });
 
-  // Calculate sales stats based on orders data
-  const calculateSalesStats = () => {
-    const now = new Date();
-    let startDate: Date;
-    
-    switch (selectedPeriod) {
-      case '7days':
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        break;
-      case '90days':
-        startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
-        break;
-      case '1year':
-        startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-        break;
-      case '30days':
-      default:
-        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        break;
-    }
+  // Calculate sales stats based on filtered period data
+  const calculateSalesStats = useCallback(() => {
+    const { startDate, endDate } = getDateRange();
     
     const periodOrders = orders.filter(order => {
       const orderDate = new Date(order.date);
-      return orderDate >= startDate && orderDate <= now;
+      return orderDate >= startDate && orderDate <= endDate;
     });
     
     const totalRevenue = periodOrders.reduce((sum, order) => sum + order.amount, 0);
@@ -177,7 +160,6 @@ export const useSales = () => {
     const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
     
     // Calculate conversion rate (this would normally come from leads data)
-    // For demo purposes, we'll use a fixed value or calculate from some other metric
     const conversionRate = 3.8;
     
     // Calculate changes (this would normally compare with previous period)
@@ -196,7 +178,7 @@ export const useSales = () => {
       avgOrderValueChange,
       conversionRateChange
     };
-  };
+  }, [orders, getDateRange]);
 
   const salesStats = calculateSalesStats();
 
