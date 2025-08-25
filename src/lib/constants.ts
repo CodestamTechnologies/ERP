@@ -28,19 +28,19 @@ export const ROUTES = {
   FINANCE: '/finance',
   FINANCE_INVOICES: '/finance/invoices',
   FINANCE_EXPENSES: '/finance/expenses',
-  FINANCE_REPORTS: '/finance/reports',
+  FINANCE_REPORTS: '/reports',
   
   // Sales Routes
   SALES: '/sales',
   SALES_LEADS: '/sales/leads',
-  SALES_CUSTOMERS: '/sales/customers',
+  SALES_CUSTOMERS: '/customers',
   SALES_ORDERS: '/sales/orders',
   
   // Inventory Routes
   INVENTORY: '/inventory',
   INVENTORY_PRODUCTS: '/inventory/products',
   INVENTORY_STOCK: '/inventory/stock',
-  INVENTORY_SUPPLIERS: '/inventory/suppliers',
+  INVENTORY_SUPPLIERS: '/suppliers',
   
   // Settings Routes
   SETTINGS: '/settings',

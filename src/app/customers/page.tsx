@@ -8,48 +8,111 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useSuppliers } from '@/hooks/useSupplier';
+import { useCustomers } from '@/hooks/useCustomer';
 import { 
-  SUPPLIER_STATS, 
-  SUPPLIER_CATEGORIES, 
-  SUPPLIERS, 
+  DashboardStatsSkeleton,
+  TableSkeleton,
+  CardGridSkeleton,
+  ListSkeleton,
+  PageHeaderSkeleton,
+  CardSkeleton
+} from '@/components/ui/skeletons';
+import { 
+  CUSTOMER_STATS, 
+  CUSTOMER_SEGMENTS, 
+  CUSTOMERS, 
   RECENT_ACTIVITIES, 
   QUICK_ACTIONS 
-} from '@/lib/components-Data/supplier/constent';
+} from '@/lib/components-Data/customer/constent';
 import { 
   getStatusColor, 
   getStatusText, 
-  getCategoryColor, 
-  getRatingColor, 
+  getSegmentColor, 
   formatIndianCurrency, 
   formatDate, 
   getInitials,
   getActivityIconColor 
-} from '@/lib/components-imp-utils/supplier';
-import { SuppliersIcon, UserIcon } from '@/components/Icons';
+} from '@/lib/components-imp-utils/customer';
+import { CustomersIcon, UserIcon } from '@/components/Icons';
 
-export default function SuppliersPage() {
+export default function CustomersPage() {
   const {
     searchTerm,
     setSearchTerm,
-    selectedCategory,
-    setSelectedCategory,
+    selectedSegment,
+    setSelectedSegment,
     sortBy,
     setSortBy,
     viewMode,
     setViewMode,
     isExporting,
+    isLoading,
     handleExport
-  } = useSuppliers();
+  } = useCustomers();
 
-  const filteredSuppliers = SUPPLIERS.filter(supplier => {
-    const matchesSearch = supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         supplier.contactPerson.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         supplier.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || 
-                           supplier.category.toLowerCase().replace(' ', '-') === selectedCategory;
-    return matchesSearch && matchesCategory;
+  const filteredCustomers = CUSTOMERS.filter(customer => {
+    const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         customer.company.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSegment = selectedSegment === 'all' || 
+                          customer.segment.toLowerCase() === selectedSegment ||
+                          (selectedSegment === 'inactive' && customer.status === 'inactive') ||
+                          (selectedSegment === 'vip' && customer.tags.includes('VIP')) ||
+                          (selectedSegment === 'new' && customer.tags.includes('New Customer')) ||
+                          (selectedSegment === 'at-risk' && customer.tags.includes('At Risk'));
+    return matchesSearch && matchesSegment;
   });
+
+  if (isLoading) {
+    return (
+      <div className="p-6 space-y-6">
+        {/* Header Skeleton */}
+        <PageHeaderSkeleton />
+        
+        {/* Stats Skeleton */}
+        <DashboardStatsSkeleton />
+        
+        {/* Main Content Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Sidebar Skeleton */}
+          <div className="lg:col-span-1 space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Customer Segments</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ListSkeleton items={7} />
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Activities</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ListSkeleton items={5} />
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Main Content Skeleton */}
+          <div className="lg:col-span-3">
+            <Card>
+              <CardHeader>
+                <CardTitle>Customer List</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TableSkeleton rows={10} columns={7} />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+        
+        {/* Quick Actions Skeleton */}
+        <CardSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -57,10 +120,10 @@ export default function SuppliersPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center">
-            <SuppliersIcon size={28} className="mr-3" />
-            Supplier Management
+            <CustomersIcon size={28} className="mr-3" />
+            Customer Management
           </h1>
-          <p className="text-gray-600 mt-1">Manage your supplier relationships and procurement</p>
+          <p className="text-gray-600 mt-1">Manage and track your customer relationships</p>
         </div>
         <div className="mt-4 sm:mt-0 flex space-x-3">
           <Button 
@@ -78,14 +141,14 @@ export default function SuppliersPage() {
             )}
           </Button>
           <Button>
-            Add New Supplier
+            Add New Customer
           </Button>
         </div>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {SUPPLIER_STATS.map((stat) => (
+        {CUSTOMER_STATS.map((stat) => (
           <motion.div
             key={stat.name}
             initial={{ opacity: 0, y: 20 }}
@@ -118,29 +181,29 @@ export default function SuppliersPage() {
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Supplier Categories Sidebar */}
+        {/* Customer Segments Sidebar */}
         <div className="lg:col-span-1 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Categories</CardTitle>
+              <CardTitle>Customer Segments</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {SUPPLIER_CATEGORIES.map((category) => (
+                {CUSTOMER_SEGMENTS.map((segment) => (
                   <motion.button
-                    key={category.id}
+                    key={segment.id}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => setSelectedCategory(category.id)}
+                    onClick={() => setSelectedSegment(segment.id)}
                     className={`w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-colors ${
-                      selectedCategory === category.id
+                      selectedSegment === segment.id
                         ? 'bg-blue-50 text-blue-700 border border-blue-200'
                         : 'text-gray-600 hover:bg-gray-50'
                     }`}
                   >
-                    <span>{category.name}</span>
+                    <span>{segment.name}</span>
                     <Badge variant="secondary" className="text-xs">
-                      {category.count}
+                      {segment.count}
                     </Badge>
                   </motion.button>
                 ))}
@@ -169,7 +232,7 @@ export default function SuppliersPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-gray-900">{activity.message}</p>
                       <div className="flex items-center mt-1 text-xs text-gray-500">
-                        <span>{activity.supplier}</span>
+                        <span>{activity.customer}</span>
                         <span className="mx-1">•</span>
                         <span>{activity.time}</span>
                       </div>
@@ -181,16 +244,16 @@ export default function SuppliersPage() {
           </Card>
         </div>
 
-        {/* Supplier Table/Cards */}
+        {/* Customer Table/Cards */}
         <div className="lg:col-span-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Supplier List</CardTitle>
+              <CardTitle>Customer List</CardTitle>
               <div className="flex space-x-3">
                 <div className="relative">
                   <Input
                     type="text"
-                    placeholder="Search suppliers..."
+                    placeholder="Search customers..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-[250px] pl-10"
@@ -207,9 +270,9 @@ export default function SuppliersPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem key="name" value="name">Name</SelectItem>
-                    <SelectItem key="totalPaid" value="totalPaid">Total Paid</SelectItem>
+                    <SelectItem key="totalSpent" value="totalSpent">Total Spent</SelectItem>
                     <SelectItem key="totalOrders" value="totalOrders">Orders</SelectItem>
-                    <SelectItem key="rating" value="rating">Rating</SelectItem>
+                    <SelectItem key="joinDate" value="joinDate">Join Date</SelectItem>
                   </SelectContent>
                 </Select>
                 <Tabs value={viewMode} onValueChange={setViewMode} className="w-auto">
@@ -234,69 +297,57 @@ export default function SuppliersPage() {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Supplier</TableHead>
+                            <TableHead>Customer</TableHead>
                             <TableHead>Contact</TableHead>
-                            <TableHead>Category</TableHead>
+                            <TableHead>Segment</TableHead>
                             <TableHead>Orders</TableHead>
-                            <TableHead>Total Paid</TableHead>
-                            <TableHead>Pending</TableHead>
-                            <TableHead>Rating</TableHead>
+                            <TableHead>Total Spent</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {filteredSuppliers.map((supplier) => (
-                            <TableRow key={supplier.id} className="hover:bg-gray-50">
+                          {filteredCustomers.map((customer) => (
+                            <TableRow key={customer.id} className="hover:bg-gray-50">
                               <TableCell>
                                 <div className="flex items-center">
-                                  <div className="h-12 w-12 bg-indigo-500 rounded-full flex items-center justify-center mr-3">
+                                  <div className="h-12 w-12 bg-blue-500 rounded-full flex items-center justify-center mr-3">
                                     <span className="text-white text-sm font-medium">
-                                      {getInitials(supplier.name)}
+                                      {getInitials(customer.name)}
                                     </span>
                                   </div>
                                   <div>
-                                    <div className="font-medium">{supplier.name}</div>
-                                    <div className="text-sm text-gray-500">{supplier.contactPerson}</div>
-                                    <div className="text-xs text-gray-400">{supplier.location}</div>
+                                    <div className="font-medium">{customer.name}</div>
+                                    <div className="text-sm text-gray-500">{customer.company}</div>
+                                    <div className="text-xs text-gray-400">{customer.location}</div>
                                   </div>
                                 </div>
                               </TableCell>
                               <TableCell>
-                                <div className="text-sm text-gray-900">{supplier.email}</div>
-                                <div className="text-sm text-gray-500">{supplier.phone}</div>
+                                <div className="text-sm text-gray-900">{customer.email}</div>
+                                <div className="text-sm text-gray-500">{customer.phone}</div>
                               </TableCell>
                               <TableCell>
-                                <Badge variant="outline" className={getCategoryColor(supplier.category)}>
-                                  {supplier.category}
+                                <Badge variant="outline" className={getSegmentColor(customer.segment)}>
+                                  {customer.segment}
                                 </Badge>
                               </TableCell>
                               <TableCell>
-                                <div className="text-sm text-gray-900">{supplier.totalOrders}</div>
-                                <div className="text-xs text-gray-500">Last: {formatDate(supplier.lastOrder)}</div>
+                                <div className="text-sm text-gray-900">{customer.totalOrders}</div>
+                                <div className="text-xs text-gray-500">Last: {formatDate(customer.lastOrder)}</div>
                               </TableCell>
                               <TableCell className="font-medium">
-                                {formatIndianCurrency(supplier.totalPaid)}
+                                {formatIndianCurrency(customer.totalSpent)}
                               </TableCell>
                               <TableCell>
-                                <div className={`font-medium ${supplier.pendingAmount > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                                  {supplier.pendingAmount > 0 ? formatIndianCurrency(supplier.pendingAmount) : 'Nil'}
-                                </div>
-                              </TableCell>
-                              <TableCell>
-                                <div className={getRatingColor(supplier.rating)}>
-                                  ★ {supplier.rating}
-                                </div>
-                              </TableCell>
-                              <TableCell>
-                                <Badge variant="outline" className={getStatusColor(supplier.status)}>
-                                  {getStatusText(supplier.status)}
+                                <Badge variant="outline" className={getStatusColor(customer.status)}>
+                                  {getStatusText(customer.status)}
                                 </Badge>
                               </TableCell>
                               <TableCell>
                                 <div className="flex space-x-2">
                                   <Button variant="ghost" size="sm">View</Button>
-                                  <Button variant="ghost" size="sm">Order</Button>
+                                  <Button variant="ghost" size="sm">Edit</Button>
                                 </div>
                               </TableCell>
                             </TableRow>
@@ -306,9 +357,9 @@ export default function SuppliersPage() {
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                      {filteredSuppliers.map((supplier) => (
+                      {filteredCustomers.map((customer) => (
                         <motion.div
-                          key={supplier.id}
+                          key={customer.id}
                           initial={{ opacity: 0, scale: 0.95 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ duration: 0.3 }}
@@ -316,51 +367,39 @@ export default function SuppliersPage() {
                         >
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center">
-                              <div className="h-12 w-12 bg-indigo-500 rounded-full flex items-center justify-center mr-3">
+                              <div className="h-12 w-12 bg-blue-500 rounded-full flex items-center justify-center mr-3">
                                 <span className="text-white text-sm font-medium">
-                                  {getInitials(supplier.name)}
+                                  {getInitials(customer.name)}
                                 </span>
                               </div>
                               <div>
-                                <h3 className="text-sm font-medium">{supplier.name}</h3>
-                                <p className="text-xs text-gray-500">{supplier.contactPerson}</p>
+                                <h3 className="text-sm font-medium">{customer.name}</h3>
+                                <p className="text-xs text-gray-500">{customer.company}</p>
                               </div>
                             </div>
-                            <Badge variant="outline" className={getStatusColor(supplier.status)}>
-                              {getStatusText(supplier.status)}
+                            <Badge variant="outline" className={getStatusColor(customer.status)}>
+                              {getStatusText(customer.status)}
                             </Badge>
                           </div>
                           
                           <div className="space-y-2 mb-4">
                             <div className="flex justify-between text-sm">
-                              <span className="text-gray-500">Category:</span>
-                              <Badge variant="outline" className={getCategoryColor(supplier.category)}>
-                                {supplier.category}
+                              <span className="text-gray-500">Segment:</span>
+                              <Badge variant="outline" className={getSegmentColor(customer.segment)}>
+                                {customer.segment}
                               </Badge>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-500">Total Orders:</span>
-                              <span className="font-medium">{supplier.totalOrders}</span>
+                              <span className="font-medium">{customer.totalOrders}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                              <span className="text-gray-500">Total Paid:</span>
-                              <span className="font-medium">{formatIndianCurrency(supplier.totalPaid)}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                              <span className="text-gray-500">Pending:</span>
-                              <span className={`font-medium ${supplier.pendingAmount > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                                {supplier.pendingAmount > 0 ? formatIndianCurrency(supplier.pendingAmount) : 'Nil'}
-                              </span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                              <span className="text-gray-500">Rating:</span>
-                              <span className={getRatingColor(supplier.rating)}>
-                                ★ {supplier.rating}
-                              </span>
+                              <span className="text-gray-500">Total Spent:</span>
+                              <span className="font-medium">{formatIndianCurrency(customer.totalSpent)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-500">Location:</span>
-                              <span>{supplier.location}</span>
+                              <span>{customer.location}</span>
                             </div>
                           </div>
 
@@ -369,7 +408,7 @@ export default function SuppliersPage() {
                               View Details
                             </Button>
                             <Button variant="outline" size="sm" className="flex-1">
-                              Create Order
+                              Contact
                             </Button>
                           </div>
                         </motion.div>
@@ -387,7 +426,7 @@ export default function SuppliersPage() {
       <Card>
         <CardHeader>
           <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>Common supplier management tasks</CardDescription>
+          <CardDescription>Common customer management tasks</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">

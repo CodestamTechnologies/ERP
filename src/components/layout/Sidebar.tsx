@@ -71,10 +71,10 @@ const Sidebar = () => {
     { id: 'dashboard', name: 'Dashboard', icon: <DashboardIcon size={20} />, badge: null, href: '/dashboard' },
     { id: 'sales', name: 'Sales', icon: <SalesIcon size={20} />, badge: '12', href: '/sales' },
     { id: 'inventory', name: 'Inventory', icon: <InventoryIcon size={20} />, badge: null, href: '/inventory' },
-    { id: 'customers', name: 'Customers', icon: <CustomersIcon size={20} />, badge: '3', href: '/sales/customers' },
-    { id: 'suppliers', name: 'Suppliers', icon: <SuppliersIcon size={20} />, badge: null, href: '/inventory/suppliers' },
+    { id: 'customers', name: 'Customers', icon: <CustomersIcon size={20} />, badge: '3', href: '/customers' },
+    { id: 'suppliers', name: 'Suppliers', icon: <SuppliersIcon size={20} />, badge: null, href: '/suppliers' },
     { id: 'finance', name: 'Finance', icon: <FinanceIcon size={20} />, badge: null, href: '/finance' },
-    { id: 'reports', name: 'Reports', icon: <ReportsIcon size={20} />, badge: null, href: '/finance/reports' },
+    { id: 'reports', name: 'Reports', icon: <ReportsIcon size={20} />, badge: null, href: '/reports' },
     { id: 'ai-insights', name: 'AI Insights', icon: <AIInsightsIcon size={20} />, badge: 'NEW', href: '/ai-insights' },
   ]);
 

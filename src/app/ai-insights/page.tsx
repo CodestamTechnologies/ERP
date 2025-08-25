@@ -10,6 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAIInsights } from '@/hooks/useAiInsights';
 import { 
+  DashboardStatsSkeleton,
+  CardGridSkeleton,
+  ListSkeleton,
+  PageHeaderSkeleton,
+  CardSkeleton
+} from '@/components/ui/skeletons';
+import { 
   AI_METRICS, 
   AI_INSIGHTS, 
   AI_MODELS, 
@@ -34,8 +41,51 @@ export default function AIInsightsPage() {
     selectedModel,
     setSelectedModel,
     isAnalyzing,
+    isLoading,
     handleAnalyze
   } = useAIInsights();
+
+  if (isLoading) {
+    return (
+      <div className="p-6 space-y-6">
+        {/* Header Skeleton */}
+        <PageHeaderSkeleton />
+        
+        {/* Stats Skeleton */}
+        <DashboardStatsSkeleton />
+        
+        {/* Main Content Skeleton */}
+        <Card>
+          <CardHeader className="border-b">
+            <CardTitle>AI Insights & Analytics</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <CardGridSkeleton count={4} />
+          </CardContent>
+        </Card>
+        
+        {/* Quick Actions Skeleton */}
+        <CardSkeleton />
+        
+        {/* Bottom Section Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Latest AI Insights</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ListSkeleton items={3} />
+              </CardContent>
+            </Card>
+          </div>
+          <div className="lg:col-span-1">
+            <CardSkeleton />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const renderTabContent = () => {
     switch (activeTab) {
