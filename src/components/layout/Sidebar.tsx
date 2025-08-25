@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   DashboardIcon, 
   SalesIcon, 
@@ -22,9 +22,12 @@ import {
 } from '../Icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp, faGoogle } from '@fortawesome/free-brands-svg-icons';
+import { useAuth } from '@/context/authContext';
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, signOut } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationFilter, setNotificationFilter] = useState('all');
   const [departmentFilter, setDepartmentFilter] = useState('all');
@@ -32,6 +35,8 @@ const Sidebar = () => {
   const [showMyTools, setShowMyTools] = useState(false);
   const [showAddToolModal, setShowAddToolModal] = useState(false);
   const [selectedToolId, setSelectedToolId] = useState<string>('hub-track-pro');
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
 
   // Define available tool presets
   const availableTools = [
@@ -82,6 +87,20 @@ const Sidebar = () => {
   const [toolMenuPosition, setToolMenuPosition] = useState<{top: number, left: number} | null>(null);
   const builtinIds = ['dashboard','sales','inventory','customers','suppliers','finance','reports','ai-insights'];
   const buttonRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Close profile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Close overlay on outside click
   useEffect(() => {
@@ -404,6 +423,15 @@ const Sidebar = () => {
     
     // For all other cases, check if pathname starts with href
     return pathname.startsWith(href + '/');
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.push('/auth/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   return (
@@ -774,17 +802,67 @@ const Sidebar = () => {
           </Link>
         </div>
         
-        {/* User Profile */}
-        <div className="p-4 border-t border-white/20" style={{ backgroundColor: '#1e2155' }}>
-          <div className="flex items-center space-x-3">
+        {/* User Profile with Dropdown */}
+        <div className="p-4 border-t border-white/20 relative" style={{ backgroundColor: '#1e2155' }} ref={profileMenuRef}>
+          <div 
+            className="flex items-center space-x-3 cursor-pointer"
+            onClick={() => setShowProfileMenu(!showProfileMenu)}
+          >
             <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-medium">A</span>
+              {user?.photoURL ? (
+                <img src={user.photoURL} alt="Profile" className="w-8 h-8 rounded-full" />
+              ) : (
+                <span className="text-white text-sm font-medium">
+                  {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
+                </span>
+              )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">Admin User</p>
-              <p className="text-xs text-white/60 truncate">admin@codestam.com</p>
+              <p className="text-sm font-medium text-white truncate">
+                {user?.displayName || 'User'}
+              </p>
+              <p className="text-xs text-white/60 truncate">
+                {user?.email || 'No email'}
+              </p>
             </div>
+            <svg 
+              className={`w-4 h-4 text-white/60 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`}
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
           </div>
+
+          {/* Profile Dropdown Menu */}
+          {showProfileMenu && (
+            <div className="absolute bottom-full left-4 right-4 mb-2 bg-white rounded-md shadow-lg overflow-hidden z-50">
+              <Link
+                href="/profile"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={() => setShowProfileMenu(false)}
+              >
+                Profile Settings
+              </Link>
+              <Link
+                href="/settings"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={() => setShowProfileMenu(false)}
+              >
+                Account Settings
+              </Link>
+              <button
+                onClick={() => {
+                  setShowProfileMenu(false);
+                  handleSignOut();
+                }}
+                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+              >
+                Sign Out
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
