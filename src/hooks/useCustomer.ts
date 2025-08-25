@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export const useCustomers = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -6,6 +6,16 @@ export const useCustomers = () => {
   const [sortBy, setSortBy] = useState('name');
   const [viewMode, setViewMode] = useState('table');
   const [isExporting, setIsExporting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate initial data loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1600);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleExport = () => {
     setIsExporting(true);
@@ -24,6 +34,7 @@ export const useCustomers = () => {
     viewMode,
     setViewMode,
     isExporting,
+    isLoading,
     handleExport
   };
 };

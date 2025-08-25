@@ -64,6 +64,7 @@ export interface Activity {
   icon: React.ReactNode;
   priority: string;
   createdAt?: any;
+  timestamp?: number;
 }
 
 export interface QuickAction {
