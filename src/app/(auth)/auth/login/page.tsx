@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/authContext';
@@ -14,19 +14,44 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, signInWithGoogle } = useAuth();
+  const { signIn, signInWithGoogle, user } = useAuth();
   const router = useRouter();
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (user) {
+      router.push('/');
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validation
+    if (!email || !password) {
+      return setError('Please fill in all fields');
+    }
+    
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      return setError('Please enter a valid email address');
+    }
     
     try {
       setError('');
       setLoading(true);
       await signIn(email, password);
-      router.push('/');
+      // The redirect will be handled by the useEffect when user state changes
     } catch (error: any) {
-      setError('Failed to sign in: ' + error.message);
+      console.error('Sign in error:', error);
+      
+      // More specific error messages
+      if (error.code === 'auth/invalid-credential') {
+        setError('Invalid email or password');
+      } else if (error.code === 'auth/too-many-requests') {
+        setError('Too many failed attempts. Please try again later.');
+      } else {
+        setError('Failed to sign in: ' + error.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -37,9 +62,15 @@ export default function Login() {
       setError('');
       setLoading(true);
       await signInWithGoogle();
-      router.push('/');
+      // The redirect will be handled by the useEffect when user state changes
     } catch (error: any) {
-      setError('Failed to sign in with Google: ' + error.message);
+      console.error('Google sign in error:', error);
+      
+      if (error.code === 'auth/popup-closed') {
+        setError('Google sign in was canceled');
+      } else {
+        setError('Failed to sign in with Google: ' + error.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -70,6 +101,7 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="Enter your email"
+                disabled={loading}
               />
             </div>
             <div className="space-y-2">
@@ -81,6 +113,7 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="Enter your password"
+                disabled={loading}
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>

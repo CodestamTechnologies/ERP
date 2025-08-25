@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/authContext';
@@ -16,11 +16,31 @@ export default function Signup() {
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signUp, signInWithGoogle } = useAuth();
+  const { signUp, signInWithGoogle, user } = useAuth();
   const router = useRouter();
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (user) {
+      router.push('/');
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validation
+    if (!email || !password || !confirmPassword || !displayName) {
+      return setError('Please fill in all fields');
+    }
+    
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      return setError('Please enter a valid email address');
+    }
+    
+    if (password.length < 6) {
+      return setError('Password should be at least 6 characters');
+    }
     
     if (password !== confirmPassword) {
       return setError('Passwords do not match');
@@ -30,9 +50,18 @@ export default function Signup() {
       setError('');
       setLoading(true);
       await signUp(email, password, displayName);
-      router.push('/');
+      // The redirect will be handled by the useEffect when user state changes
     } catch (error: any) {
-      setError('Failed to create an account: ' + error.message);
+      console.error('Sign up error:', error);
+      
+      // More specific error messages
+      if (error.code === 'auth/email-already-in-use') {
+        setError('This email is already registered');
+      } else if (error.code === 'auth/weak-password') {
+        setError('Password is too weak');
+      } else {
+        setError('Failed to create an account: ' + error.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -43,9 +72,15 @@ export default function Signup() {
       setError('');
       setLoading(true);
       await signInWithGoogle();
-      router.push('/');
+      // The redirect will be handled by the useEffect when user state changes
     } catch (error: any) {
-      setError('Failed to sign up with Google: ' + error.message);
+      console.error('Google sign up error:', error);
+      
+      if (error.code === 'auth/popup-closed') {
+        setError('Google sign up was canceled');
+      } else {
+        setError('Failed to sign up with Google: ' + error.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -76,6 +111,7 @@ export default function Signup() {
                 onChange={(e) => setDisplayName(e.target.value)}
                 required
                 placeholder="Enter your full name"
+                disabled={loading}
               />
             </div>
             <div className="space-y-2">
@@ -87,6 +123,7 @@ export default function Signup() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="Enter your email"
+                disabled={loading}
               />
             </div>
             <div className="space-y-2">
@@ -98,6 +135,7 @@ export default function Signup() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="Enter your password"
+                disabled={loading}
               />
             </div>
             <div className="space-y-2">
@@ -109,6 +147,7 @@ export default function Signup() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 placeholder="Confirm your password"
+                disabled={loading}
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
