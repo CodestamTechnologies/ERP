@@ -13,14 +13,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Label } from '@/components/ui/label';
 import { useSalesFirestore } from '@/hooks/useSalesFirestore';
 import { 
-  DashboardStatsSkeleton,
-  TableSkeleton,
-  CardGridSkeleton,
-  DashboardChartSkeleton,
-  PageHeaderSkeleton,
-  ListSkeleton
-} from '@/components/ui/skeletons';
-import { 
   QUICK_ACTIONS, 
   TABS 
 } from '@/lib/components-Data/sales/constent';
@@ -28,14 +20,12 @@ import {
   getStatusColor, 
   getPaymentStatusColor, 
   getPriorityColor, 
-  getActivityPriorityColor, 
-  getActivityBgColor, 
   formatIndianCurrency, 
   getInitials 
 } from '@/lib/components-imp-utils/sales';
-import { SalesIcon, ChartIcon, AIInsightsIcon, OrderIcon, CustomersIcon } from '@/components/Icons';
+import { SalesIcon, ChartIcon, OrderIcon, CustomersIcon } from '@/components/Icons';
 import RecentActivities from '@/components/RecentActivities';
-import { useState, useMemo, useCallback, memo, lazy, Suspense, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { SalesOrder, SalesTeamMember, Activity } from '@/types/Sales';
 import {
   LineChart,
@@ -55,199 +45,6 @@ import {
 
 // Define colors for charts
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
-
-// Memoized components for better performance
-const SalesChannelCard = memo(({ channel }: { channel: any }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.3 }}
-  >
-    <Card className="h-full">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h4 className="font-medium text-gray-900">{channel.name}</h4>
-          <span className={`text-sm font-medium text-${channel.color}-600`}>
-            {channel.growth}
-          </span>
-        </div>
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Revenue:</span>
-            <span className="font-medium">{formatIndianCurrency(channel.revenue)}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Orders:</span>
-            <span className="font-medium">{channel.orders}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Avg Order:</span>
-            <span className="font-medium">{formatIndianCurrency(channel.avgOrderValue)}</span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  </motion.div>
-));
-
-const OrderTableRow = memo(({ order, onViewDetails, onEdit, onDelete }: {
-  order: SalesOrder;
-  onViewDetails: (order: SalesOrder) => void;
-  onEdit: (order: SalesOrder) => void;
-  onDelete: (id: string) => void;
-}) => (
-  <TableRow className="hover:bg-gray-50">
-    <TableCell>
-      <div>
-        <div className="font-medium">{order.id}</div>
-        <div className="text-sm text-gray-500">{order.date}</div>
-        <div className="text-xs text-gray-400">Due: {order.dueDate}</div>
-        <Badge variant="outline" className={getPriorityColor(order.priority)}>
-          {order.priority} priority
-        </Badge>
-      </div>
-    </TableCell>
-    <TableCell>
-      <div>
-        <div className="font-medium">{order.customer}</div>
-        <div className="text-sm text-gray-500">{order.customerEmail}</div>
-        <div className="text-xs text-gray-400">{order.region}</div>
-      </div>
-    </TableCell>
-    <TableCell>
-      <div>
-        <div className="font-medium">{formatIndianCurrency(order.amount)}</div>
-        <div className="text-sm text-gray-500">{order.items} items</div>
-        <div className="text-xs text-gray-400">{order.category}</div>
-      </div>
-    </TableCell>
-    <TableCell>
-      <div className="space-y-1">
-        <Badge variant="outline" className={getStatusColor(order.status)}>
-          {order.status}
-        </Badge>
-        <div>
-          <Badge variant="outline" className={getPaymentStatusColor(order.paymentStatus)}>
-            {order.paymentStatus}
-          </Badge>
-        </div>
-      </div>
-    </TableCell>
-    <TableCell>
-      <div className="text-sm text-gray-900">{order.salesRep}</div>
-      <div className="text-sm text-gray-500">{order.channel}</div>
-    </TableCell>
-    <TableCell>
-      <div>
-        <div className="font-medium text-green-600">{formatIndianCurrency(order.profit)}</div>
-        <div className="text-xs text-gray-500">
-          {((order.profit / (order.amount - order.tax)) * 100).toFixed(1)}% margin
-        </div>
-      </div>
-    </TableCell>
-    <TableCell>
-      <div className="flex justify-end space-x-2">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => onViewDetails(order)}
-        >
-          View
-        </Button>
-        <Button variant="ghost" size="sm" onClick={() => onEdit(order)}>Edit</Button>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => onDelete(order.id)}
-          className="text-red-600 hover:text-red-800"
-        >
-          Delete
-        </Button>
-      </div>
-    </TableCell>
-  </TableRow>
-));
-
-const TeamMemberCard = memo(({ rep, onEdit, onDelete }: {
-  rep: SalesTeamMember;
-  onEdit: (member: SalesTeamMember) => void;
-  onDelete: (id: string) => void;
-}) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.3 }}
-  >
-    <Card className="h-full">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center">
-            <div className="h-12 w-12 bg-blue-500 rounded-full flex items-center justify-center mr-4">
-              <span className="text-white text-sm font-medium">
-                {getInitials(rep.name)}
-              </span>
-            </div>
-            <div>
-              <h4 className="font-medium">{rep.name}</h4>
-              <p className="text-sm text-gray-500">{rep.region}</p>
-              <div className="flex items-center mt-1">
-                <span className="text-yellow-400">★</span>
-                <span className="text-sm text-gray-600 ml-1">{rep.rating}</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex space-x-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => onEdit(rep)}
-            >
-              Edit
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => onDelete(rep.id)}
-              className="text-red-600 hover:text-red-800"
-            >
-              Delete
-            </Button>
-          </div>
-        </div>
-        
-        <div className="space-y-3">
-          <div>
-            <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-500">Target Achievement</span>
-              <span className="font-medium">{((rep.achieved / rep.target) * 100).toFixed(1)}%</span>
-            </div>
-            <Progress value={(rep.achieved / rep.target) * 100} className="w-full" />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>{formatIndianCurrency(rep.achieved)}</span>
-              <span>{formatIndianCurrency(rep.target)}</span>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="text-gray-500">Orders:</span>
-              <div className="font-medium">{rep.orders}</div>
-            </div>
-            <div>
-              <span className="text-gray-500">Conversion:</span>
-              <div className="font-medium">{rep.conversion}%</div>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  </motion.div>
-));
-
-// Lazy load chart components
-const LazyLineChart = lazy(() => import('recharts').then(module => ({ default: module.LineChart })));
-const LazyPieChart = lazy(() => import('recharts').then(module => ({ default: module.PieChart })));
-const LazyBarChart = lazy(() => import('recharts').then(module => ({ default: module.BarChart })));
 
 const Sales = () => {
   const {
@@ -279,6 +76,7 @@ const Sales = () => {
     getConnectionStatusText
   } = useSalesFirestore();
 
+  // All useState hooks
   const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
   const [isTeamDialogOpen, setIsTeamDialogOpen] = useState(false);
   const [isOrderDetailDialogOpen, setIsOrderDetailDialogOpen] = useState(false);
@@ -286,8 +84,18 @@ const Sales = () => {
   const [editingOrder, setEditingOrder] = useState<SalesOrder | null>(null);
   const [editingMember, setEditingMember] = useState<SalesTeamMember | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
 
-  // Calculate sales channels data dynamically from orders
+  // useEffect hooks
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // useMemo hooks
   const salesChannelsData = useMemo(() => {
     const channels = [
       { id: 'online', name: 'Online Store', color: 'blue' },
@@ -301,8 +109,6 @@ const Sales = () => {
       const revenue = channelOrders.reduce((sum, order) => sum + order.amount, 0);
       const orderCount = channelOrders.length;
       const avgOrderValue = orderCount > 0 ? revenue / orderCount : 0;
-      
-      // Calculate growth (this would normally compare with previous period)
       const growth = channelOrders.length > 0 ? '+12.5%' : '+0%';
 
       return {
@@ -315,7 +121,6 @@ const Sales = () => {
     });
   }, [orders]);
 
-  // Calculate category distribution for pie chart
   const categoryData = useMemo(() => {
     const categories: Record<string, number> = {};
     
@@ -332,14 +137,7 @@ const Sales = () => {
     }));
   }, [orders]);
 
-  // Calculate forecast data
   const forecastData = useMemo(() => {
-    // Simple forecasting based on recent growth
-    const recentOrders = orders.slice(0, 10); // Last 10 orders
-    const totalRevenue = recentOrders.reduce((sum, order) => sum + order.amount, 0);
-    const avgRevenue = recentOrders.length > 0 ? totalRevenue / recentOrders.length : 0;
-    
-    // Project 30% growth for next period
     const projectedRevenue = salesStats.totalRevenue * 1.3;
     const projectedOrders = salesStats.totalOrders * 1.25;
     
@@ -349,12 +147,9 @@ const Sales = () => {
       growthPercentage: '30%',
       projectedOrders
     };
-  }, [orders, salesStats]);
+  }, [salesStats]);
 
-  // Generate sales trend data for line chart
-  // Calculate sales trend data
   const salesTrendData = useMemo(() => {
-    // Generate data for the selected period
     const days = selectedPeriod === '7days' ? 7 : selectedPeriod === '30days' ? 30 : 
                 selectedPeriod === '90days' ? 90 : 365;
     
@@ -379,6 +174,39 @@ const Sales = () => {
     return data;
   }, [orders, selectedPeriod]);
 
+  const sortedOrders = useMemo(() => {
+    const filtered = orders.filter(order => {
+      const matchesSearch = debouncedSearchTerm === '' || 
+                           order.customer.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                           order.id.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                           order.salesRep.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
+      const matchesStatus = selectedStatus === 'all' || order.status === selectedStatus;
+      return matchesSearch && matchesStatus;
+    });
+
+    return filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'amount':
+          return b.amount - a.amount;
+        case 'customer':
+          return a.customer.localeCompare(b.customer);
+        case 'status':
+          return a.status.localeCompare(b.status);
+        case 'date':
+        default:
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+      }
+    });
+  }, [orders, debouncedSearchTerm, selectedStatus, sortBy]);
+
+  // useCallback hooks
+  const handleTabChange = useCallback((newTab: string) => {
+    setTimeout(() => {
+      setActiveTab(newTab);
+    }, 50);
+  }, [setActiveTab]);
+
+  // Stats data
   const SALES_STATS = [
     { 
       name: 'Total Revenue', 
@@ -418,13 +246,13 @@ const Sales = () => {
     },
   ];
 
+  // Event handlers
   const handleViewOrderDetails = (order: SalesOrder) => {
     setSelectedOrder(order);
     setIsOrderDetailDialogOpen(true);
   };
 
   const handleActivityClick = (activity: Activity) => {
-    // Find the order related to this activity
     const relatedOrder = orders.find(order => 
       activity.message.includes(order.id) || 
       activity.message.includes(order.customer)
@@ -488,7 +316,6 @@ const Sales = () => {
     }
   };
 
-  // Optimized button click handler
   const handleCreateOrderClick = () => {
     setEditingOrder(null);
     setIsOrderDialogOpen(true);
@@ -522,51 +349,6 @@ const Sales = () => {
       console.error('Error saving team member:', error);
     }
   };
-
-  // Debounced search term for better performance
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
-  // Sort orders based on selected sort option with debounced search
-  const sortedOrders = useMemo(() => {
-    const filtered = orders.filter(order => {
-      const matchesSearch = debouncedSearchTerm === '' || 
-                           order.customer.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-                           order.id.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-                           order.salesRep.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
-      const matchesStatus = selectedStatus === 'all' || order.status === selectedStatus;
-      return matchesSearch && matchesStatus;
-    });
-
-    return filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'amount':
-          return b.amount - a.amount;
-        case 'customer':
-          return a.customer.localeCompare(b.customer);
-        case 'status':
-          return a.status.localeCompare(b.status);
-        case 'date':
-        default:
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-      }
-    });
-  }, [orders, debouncedSearchTerm, selectedStatus, sortBy]);
-
-  // Optimized tab change handler
-  const handleTabChange = useCallback((newTab: string) => {
-    // Add a small delay to prevent rapid switching
-    setTimeout(() => {
-      setActiveTab(newTab);
-    }, 50);
-  }, [setActiveTab]);
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -1294,7 +1076,6 @@ const Sales = () => {
                             cy="50%"
                             labelLine={false}
                             label={({ name, percent = 0 }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-
                             outerRadius={80}
                             fill="#8884d8"
                             dataKey="value"
