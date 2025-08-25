@@ -11,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { useSalesRealtime } from '@/hooks/useSalesRealtime';
+import { useSalesFirestore } from '@/hooks/useSalesFirestore';
 import { 
   DashboardStatsSkeleton,
   TableSkeleton,
@@ -34,6 +34,7 @@ import {
   getInitials 
 } from '@/lib/components-imp-utils/sales';
 import { SalesIcon, ChartIcon, AIInsightsIcon, OrderIcon, CustomersIcon } from '@/components/Icons';
+import RecentActivities from '@/components/RecentActivities';
 import { useState, useMemo, useCallback, memo, lazy, Suspense, useEffect } from 'react';
 import { SalesOrder, SalesTeamMember, Activity } from '@/types/Sales';
 import {
@@ -276,7 +277,7 @@ const Sales = () => {
     connectionStatus,
     getConnectionStatusColor,
     getConnectionStatusText
-  } = useSalesRealtime();
+  } = useSalesFirestore();
 
   const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
   const [isTeamDialogOpen, setIsTeamDialogOpen] = useState(false);
@@ -1568,54 +1569,17 @@ const Sales = () => {
         </div>
 
         <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activities</CardTitle>
-              <CardDescription>Latest activities in the sales system</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {loading.activities ? (
-                <div className="flex justify-center items-center h-48">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                </div>
-              ) : activities.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-48 text-center">
-                  <div className="bg-gray-100 p-3 rounded-full mb-3">
-                    <SalesIcon size={24} className="text-gray-500" />
-                  </div>
-                  <h3 className="text-sm font-medium text-gray-900 mb-1">No activities yet</h3>
-                  <p className="text-xs text-gray-500">Activities will appear here as they occur</p>
-                </div>
-              ) : (
-                <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {activities.map((activity) => (
-                    <motion.div
-                      key={activity.id}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="flex items-start space-x-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer"
-                      onClick={() => handleActivityClick(activity)}
-                    >
-                      <div className={getActivityBgColor(activity.priority) + " p-2 rounded-full"}>
-                        {activity.icon}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-900">{activity.message}</p>
-                        <div className="flex items-center mt-1 text-xs text-gray-500">
-                          <span>{activity.time}</span>
-                          <span className="mx-1">•</span>
-                          <span className={getActivityPriorityColor(activity.priority)}>
-                            {activity.priority}
-                          </span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <RecentActivities
+            activities={activities}
+            loading={loading.activities}
+            onActivityClick={handleActivityClick}
+            title="Recent Activities"
+            description="Latest activities in the sales system"
+            emptyStateTitle="No activities yet"
+            emptyStateDescription="Activities will appear here as they occur"
+            maxHeight="max-h-96"
+            showPriority={true}
+          />
         </div>
       </div>
 
