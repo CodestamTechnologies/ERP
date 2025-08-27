@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { 
   DashboardIcon, SalesIcon, InventoryIcon, CustomersIcon, SuppliersIcon, 
   FinanceIcon, ReportsIcon, AIInsightsIcon, SettingsIcon, NotificationIcon,
-  OrderIcon, PaymentIcon, WarningIcon, UserIcon
+  OrderIcon, PaymentIcon, WarningIcon, UserIcon, WebsiteIcon
 } from '../Icons';
 import { Mail, Calendar, CheckSquare, Globe } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -269,6 +269,7 @@ const Sidebar = () => {
     { id: 'todo', name: 'TODO', icon: <CheckSquare className="w-5 h-5 text-purple-400" />, badge: null, href: '/todo' },
     { id: 'calendar', name: 'Calendar', icon: <Calendar className="w-5 h-5 text-orange-400" />, badge: null, href: '/calendar' },
     { id: 'connect-domain', name: 'Connect Domain', icon: <Globe className="w-5 h-5 text-blue-400" />, badge: null, href: '/settings/domain' },
+    { id: 'website', name: 'Website', icon: <WebsiteIcon size={20} />, badge: null, href: '/website' },
   ]);
 
   // Computed values
