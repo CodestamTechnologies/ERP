@@ -23,7 +23,13 @@ import {
   Brain,
   Settings,
   BarChart3,
-  Globe
+  Globe,
+  Bell,
+  ShoppingCart,
+  CreditCard,
+  AlertTriangle,
+  User,
+  TrendingDown
 } from 'lucide-react';
 
 interface IconProps {
@@ -120,11 +126,10 @@ export const AIInsightsIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const SettingsIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faCog} 
+  <Settings 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#6B7280',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -132,11 +137,10 @@ export const SettingsIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const OrderIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faClipboardList} 
+  <ShoppingCart 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#3B82F6',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -144,11 +148,10 @@ export const OrderIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const PaymentIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faCreditCard} 
+  <CreditCard 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#10B981',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -156,11 +159,10 @@ export const PaymentIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const WarningIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faExclamationTriangle} 
+  <AlertTriangle 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#F59E0B',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -168,11 +170,10 @@ export const WarningIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const UserIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faUser} 
+  <User 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#8B5CF6',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -180,11 +181,10 @@ export const UserIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const ChartIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faChartLine} 
+  <BarChart3 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#06B6D4',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -203,12 +203,12 @@ export const InvoiceIcon = ({ className = "", size = 24 }: IconProps) => (
   />
 );
 
+// Updated to use Shadcn Bell icon
 export const NotificationIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faBell} 
+  <Bell 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#F59E0B',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}

@@ -1,20 +1,21 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { 
-  DashboardIcon, SalesIcon, InventoryIcon, CustomersIcon, SuppliersIcon, 
-  FinanceIcon, ReportsIcon, AIInsightsIcon, SettingsIcon, NotificationIcon,
-  OrderIcon, PaymentIcon, WarningIcon, UserIcon, WebsiteIcon
-} from '../Icons';
 import { Mail, Calendar, CheckSquare, Globe } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
+
+import { 
+  DashboardIcon, SalesIcon, InventoryIcon, CustomersIcon, SuppliersIcon, 
+  FinanceIcon, ReportsIcon, AIInsightsIcon, NotificationIcon, WebsiteIcon
+} from '../Icons';
 import { useAuth } from '@/context/authContext';
 import SecondarySidebar, { SecondarySidebarConfig } from './SecondarySidebar';
-import { emailServicesConfig, messagingServicesConfig, reportsServicesConfig } from '@/lib/sidebar-configs';
+import { emailServicesConfig, messagingServicesConfig, reportsServicesConfig, financeServicesConfig } from '@/lib/sidebar-configs';
+import { NotificationPanel, type Notification } from '@/components/ui/notification-panel';
 
 // Types
 interface MenuItem {
@@ -35,21 +36,17 @@ interface Tool {
   href?: string;
 }
 
-interface Notification {
-  id: number;
-  type: string;
-  title: string;
-  message: string;
-  time: string;
-  icon: React.ReactNode;
-  priority: 'high' | 'medium' | 'low';
-  read: boolean;
-  department: string;
+interface SidebarState {
+  showNotifications: boolean;
+  showMyTools: boolean;
+  showAddToolModal: boolean;
+  selectedToolId: string;
+  showProfileMenu: boolean;
+  showSecondarySidebar: boolean;
+  toolMenuPosition: { top: number; left: number } | null;
 }
 
 // Constants
-const BUILTIN_IDS = ['dashboard', 'sales', 'inventory', 'customers', 'suppliers', 'finance', 'documents', 'ai-insights'];
-
 const AVAILABLE_TOOLS: Tool[] = [
   { id: 'hub-track-pro', name: 'Hub track pro', icon: 'H', color: 'from-purple-500 to-pink-500' },
   { id: 'goku', name: 'GOKU', icon: 'G', color: 'from-orange-500 to-red-500' },
@@ -64,39 +61,36 @@ const CUSTOM_TOOLS: (Tool & { href: string })[] = [
   { id: 'gama', name: 'GAMA', icon: 'G', color: 'from-green-500 to-teal-500', href: '/tools/gama' },
   { id: 'alpha-tool-custom', name: 'Alpha Tool', icon: 'A', color: 'from-blue-500 to-cyan-500', href: '/tools/alpha' },
   { id: 'beta-tool', name: 'Beta Tool', icon: 'B', color: 'from-yellow-500 to-orange-500', href: '/tools/beta' },
-  { id: 'gamma-tool', name: 'Gamma Tool', icon: 'G', color: 'from-indigo-500 to-purple-500', href: '/tools/gamma' },
-  { id: 'delta-tool', name: 'Delta Tool', icon: 'D', color: 'from-pink-500 to-rose-500', href: '/tools/delta' },
-  { id: 'epsilon-tool', name: 'Epsilon Tool', icon: 'E', color: 'from-teal-500 to-green-500', href: '/tools/epsilon' },
-  { id: 'zeta-tool', name: 'Zeta Tool', icon: 'Z', color: 'from-red-500 to-pink-500', href: '/tools/zeta' },
-  { id: 'theta-tool', name: 'Theta Tool', icon: 'T', color: 'from-cyan-500 to-blue-500', href: '/tools/theta' },
 ];
 
 const MOCK_NOTIFICATIONS: Notification[] = [
-  { id: 1, type: 'alert', title: 'Low Stock Alert', message: 'MacBook Pro inventory is running low (5 units remaining)', time: '5 minutes ago', icon: <WarningIcon size={16} />, priority: 'high', read: false, department: 'inventory' },
-  { id: 2, type: 'order', title: 'New Order Received', message: 'Order #ORD-2024-001 from TechCorp Solutions (₹1,25,000)', time: '15 minutes ago', icon: <OrderIcon size={16} />, priority: 'medium', read: false, department: 'sales' },
-  { id: 3, type: 'payment', title: 'Payment Received', message: 'Payment of ₹2,50,000 received from Global Enterprises', time: '1 hour ago', icon: <PaymentIcon size={16} />, priority: 'medium', read: true, department: 'finance' },
-  { id: 4, type: 'customer', title: 'New Customer Registration', message: 'Innovation Labs has registered as a new customer', time: '2 hours ago', icon: <UserIcon size={16} />, priority: 'low', read: true, department: 'sales' },
-  { id: 5, type: 'system', title: 'AI Insights Updated', message: 'New AI insights available for Q1 sales forecast', time: '3 hours ago', icon: <AIInsightsIcon size={16} />, priority: 'medium', read: true, department: 'analytics' },
+  {
+    id: '1', type: 'warning', title: 'Low Stock Alert',
+    message: 'MacBook Pro inventory is running low (5 units remaining).',
+    timestamp: new Date(Date.now() - 5 * 60 * 1000), read: false, starred: false,
+    department: 'inventory', priority: 'high', actionUrl: '/inventory/products/macbook-pro'
+  },
+  {
+    id: '2', type: 'success', title: 'New Order Received',
+    message: 'Order #ORD-2024-001 from TechCorp Solutions worth ₹1,25,000.',
+    timestamp: new Date(Date.now() - 15 * 60 * 1000), read: false, starred: true,
+    department: 'sales', priority: 'medium', actionUrl: '/sales/orders/ORD-2024-001'
+  },
+  {
+    id: '3', type: 'success', title: 'Payment Received',
+    message: 'Payment of ₹2,50,000 received from Global Enterprises.',
+    timestamp: new Date(Date.now() - 60 * 60 * 1000), read: true, starred: false,
+    department: 'finance', priority: 'medium', actionUrl: '/finance/payments/PAY-2024-089'
+  },
+  {
+    id: '4', type: 'error', title: 'System Backup Failed',
+    message: 'Automated system backup failed. Manual intervention required.',
+    timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000), read: false, starred: false,
+    department: 'it', priority: 'high', actionUrl: '/settings/backup'
+  }
 ];
 
-// Utility functions
-const getColorClasses = {
-  priority: (priority: string) => ({
-    high: 'border-l-red-500 bg-red-50',
-    medium: 'border-l-yellow-500 bg-yellow-50',
-    low: 'border-l-green-500 bg-green-50',
-  }[priority] || 'border-l-gray-500 bg-gray-50'),
-  
-  type: (type: string) => ({
-    alert: 'text-red-600',
-    order: 'text-blue-600',
-    payment: 'text-green-600',
-    customer: 'text-purple-600',
-    system: 'text-indigo-600',
-  }[type] || 'text-gray-600'),
-};
-
-// Custom hooks
+// Custom Hooks
 const useClickOutside = (ref: React.RefObject<HTMLElement>, callback: () => void, active = true) => {
   useEffect(() => {
     if (!active) return;
@@ -118,53 +112,67 @@ const useClickOutside = (ref: React.RefObject<HTMLElement>, callback: () => void
 
 const useRouteActive = () => {
   const pathname = usePathname();
-  
   return (href: string) => {
     if (pathname === href) return true;
-    
     const excludeParentRoutes = ['/sales', '/inventory', '/finance', '/tools'];
     if (excludeParentRoutes.some(route => route === href && pathname.startsWith(`${href}/`))) {
       return false;
     }
-    
     return pathname.startsWith(`${href}/`);
   };
 };
 
-// Components
-const FilterSelect = ({ value, onChange, options, placeholder }: {
-  value: string;
-  onChange: (value: string) => void;
-  options: { value: string; label: string }[];
-  placeholder?: string;
-}) => (
-  <select
-    value={value}
-    onChange={(e) => onChange(e.target.value)}
-    className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
-  >
-    {placeholder && <option value="all">{placeholder}</option>}
-    {options.map(option => (
-      <option key={option.value} value={option.value}>{option.label}</option>
-    ))}
-  </select>
-);
+const useSmartPosition = (triggerRef: React.RefObject<HTMLElement>, isOpen: boolean) => {
+  const [position, setPosition] = useState({ top: 0, left: 0, right: 'auto' });
 
-const NotificationItem = ({ notification }: { notification: Notification }) => (
-  <div className={`p-4 border-l-4 hover:bg-gray-50 transition-colors ${getColorClasses.priority(notification.priority)} ${!notification.read ? 'bg-blue-50' : ''}`}>
-    <div className="flex items-start space-x-3">
-      <div className={`p-1 rounded ${getColorClasses.type(notification.type)}`}>
-        {notification.icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between">
-          <h4 className="text-sm font-medium text-gray-900 truncate">{notification.title}</h4>
-          {!notification.read && <div className="w-2 h-2 bg-blue-500 rounded-full ml-2"></div>}
-        </div>
-        <p className="text-sm text-gray-600 mt-1 line-clamp-2">{notification.message}</p>
-        <p className="text-xs text-gray-500 mt-2">{notification.time}</p>
-      </div>
-    </div>
+  useEffect(() => {
+    if (!isOpen || !triggerRef.current) return;
+
+    const updatePosition = () => {
+      const triggerRect = triggerRef.current!.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const panelWidth = 384;
+      const panelHeight = 500;
+
+      let top = triggerRect.bottom + 8;
+      let left = triggerRect.left;
+      let right = 'auto';
+
+      // Handle horizontal overflow
+      if (left + panelWidth > viewportWidth - 20) {
+        right = viewportWidth - triggerRect.right;
+        left = 'auto' as any;
+      }
+      if (typeof left === 'number' && left < 20) left = 20;
+
+      // Handle vertical overflow
+      if (top + panelHeight > viewportHeight - 20) {
+        top = triggerRect.top - panelHeight - 8;
+        if (top < 20) top = 20;
+      }
+
+      setPosition({ top, left: left as number, right: right as string });
+    };
+
+    updatePosition();
+    const cleanup = () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition);
+    };
+    
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition);
+    return cleanup;
+  }, [isOpen, triggerRef]);
+
+  return position;
+};
+
+// Components
+const ToolIcon = ({ tool }: { tool: Tool }) => (
+  <div className={`w-5 h-5 bg-gradient-to-r ${tool.color} rounded flex items-center justify-center`}>
+    <span className="text-white text-xs font-bold">{tool.icon}</span>
   </div>
 );
 
@@ -191,34 +199,87 @@ const MenuItemComponent = ({ item, isActive, onSecondaryClick }: {
   );
 
   if (item.hasSecondary) {
-    return (
-      <button onClick={(e) => onSecondaryClick?.(item, e)} className={`${baseClasses} ${activeClasses}`}>
-        {content}
-      </button>
-    );
+    return <button onClick={(e) => onSecondaryClick?.(item, e)} className={`${baseClasses} ${activeClasses}`}>{content}</button>;
   }
-
   if (item.onClick) {
-    return (
-      <button onClick={item.onClick} className={`${baseClasses} ${activeClasses}`}>
-        {content}
-      </button>
-    );
+    return <button onClick={item.onClick} className={`${baseClasses} ${activeClasses}`}>{content}</button>;
   }
-
-  return (
-    <Link href={item.href} className={`${baseClasses} ${activeClasses}`}>
-      {content}
-    </Link>
-  );
+  return <Link href={item.href} className={`${baseClasses} ${activeClasses}`}>{content}</Link>;
 };
 
-const ToolIcon = ({ tool }: { tool: Tool }) => (
-  <div className={`w-5 h-5 bg-gradient-to-r ${tool.color} rounded flex items-center justify-center`}>
-    <span className="text-white text-xs font-bold">{tool.icon}</span>
+const NotificationBell = ({ 
+  unreadCount, 
+  onClick, 
+  triggerRef 
+}: { 
+  unreadCount: number; 
+  onClick: () => void; 
+  triggerRef: React.RefObject<HTMLButtonElement>; 
+}) => (
+  <button
+    ref={triggerRef}
+    onClick={onClick}
+    className="relative p-2 text-white hover:text-gray-200 transition-colors rounded-lg hover:bg-white/10"
+  >
+    <NotificationIcon size={20} />
+    {unreadCount > 0 && (
+      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse font-medium">
+        {unreadCount > 9 ? '9+' : unreadCount}
+      </span>
+    )}
+  </button>
+);
+
+const UserProfile = ({ 
+  user, 
+  showProfileMenu, 
+  onToggleMenu, 
+  onSignOut, 
+  profileMenuRef 
+}: {
+  user: any;
+  showProfileMenu: boolean;
+  onToggleMenu: () => void;
+  onSignOut: () => void;
+  profileMenuRef: React.RefObject<HTMLDivElement>;
+}) => (
+  <div className="p-4 border-t border-white/20 relative" style={{ backgroundColor: '#1e2155' }} ref={profileMenuRef}>
+    <div className="flex items-center space-x-3 cursor-pointer" onClick={onToggleMenu}>
+      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+        {user?.photoURL ? (
+          <img src={user.photoURL} alt="Profile" className="w-8 h-8 rounded-full" />
+        ) : (
+          <span className="text-white text-sm font-medium">
+            {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
+          </span>
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-white truncate">{user?.displayName || 'User'}</p>
+        <p className="text-xs text-white/60 truncate">{user?.email || 'No email'}</p>
+      </div>
+      <svg className={`w-4 h-4 text-white/60 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+      </svg>
+    </div>
+
+    {showProfileMenu && (
+      <div className="absolute bottom-full left-4 right-4 mb-2 bg-white rounded-md shadow-lg overflow-hidden z-50">
+        <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={onToggleMenu}>
+          Profile Settings
+        </Link>
+        <Link href="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={onToggleMenu}>
+          Account Settings
+        </Link>
+        <button onClick={onSignOut} className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+          Sign Out
+        </button>
+      </div>
+    )}
   </div>
 );
 
+// Main Sidebar Component
 const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
@@ -226,64 +287,60 @@ const Sidebar = () => {
   const isActive = useRouteActive();
   
   // State
-  const [state, setState] = useState({
+  const [state, setState] = useState<SidebarState>({
     showNotifications: false,
-    notificationFilter: 'all',
-    departmentFilter: 'all',
-    priorityFilter: 'all',
     showMyTools: false,
     showAddToolModal: false,
     selectedToolId: 'hub-track-pro',
     showProfileMenu: false,
     showSecondarySidebar: false,
-    toolMenuPosition: null as { top: number; left: number } | null,
+    toolMenuPosition: null,
   });
   
+  const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
   const [secondarySidebarConfig, setSecondarySidebarConfig] = useState<SecondarySidebarConfig | null>(null);
   
   // Refs
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
+  const notificationTriggerRef = useRef<HTMLButtonElement>(null);
 
-  // Event handlers
-  const updateState = (updates: Partial<typeof state>) => setState(prev => ({ ...prev, ...updates }));
+  // Smart positioning for notification panel
+  const notificationPosition = useSmartPosition(notificationTriggerRef, state.showNotifications);
 
-  const handleOpenSecondarySidebar = (config: SecondarySidebarConfig) => {
-    setSecondarySidebarConfig(config);
-    updateState({ showSecondarySidebar: true });
-  };
-
+  // Menu Items
   const [menuItems, setMenuItems] = useState<MenuItem[]>([
     { id: 'dashboard', name: 'Dashboard', icon: <DashboardIcon size={20} />, badge: null, href: '/dashboard' },
     { id: 'sales', name: 'Sales', icon: <SalesIcon size={20} />, badge: '12', href: '/sales' },
     { id: 'inventory', name: 'Inventory', icon: <InventoryIcon size={20} />, badge: null, href: '/inventory' },
     { id: 'customers', name: 'Customers', icon: <CustomersIcon size={20} />, badge: '3', href: '/customers' },
     { id: 'suppliers', name: 'Suppliers', icon: <SuppliersIcon size={20} />, badge: null, href: '/suppliers' },
-    { id: 'finance', name: 'Finance', icon: <FinanceIcon size={20} />, badge: null, href: '/finance' },
+    { id: 'finance', name: 'Finance', icon: <FinanceIcon size={20} />, badge: null, href: '/finance', hasSecondary: true },
     { id: 'documents', name: 'Documents', icon: <ReportsIcon size={20} />, badge: null, href: '/documents', hasSecondary: true },
     { id: 'ai-insights', name: 'AI Insights', icon: <AIInsightsIcon size={20} />, badge: 'NEW', href: '/ai-insights' },
-    // Socials options merged
     { id: 'whatsapp', name: 'WhatsApp', icon: <FontAwesomeIcon icon={faWhatsapp} className="w-5 h-5 text-green-400" />, badge: null, href: '#', onClick: () => handleOpenSecondarySidebar(messagingServicesConfig) },
     { id: 'email', name: 'Email', icon: <Mail className="w-5 h-5 text-red-400" />, badge: null, href: '#', onClick: () => handleOpenSecondarySidebar(emailServicesConfig) },
-    // Others options merged
     { id: 'todo', name: 'TODO', icon: <CheckSquare className="w-5 h-5 text-purple-400" />, badge: null, href: '/todo' },
     { id: 'calendar', name: 'Calendar', icon: <Calendar className="w-5 h-5 text-orange-400" />, badge: null, href: '/calendar' },
     { id: 'connect-domain', name: 'Connect Domain', icon: <Globe className="w-5 h-5 text-blue-400" />, badge: null, href: '/settings/domain' },
     { id: 'website', name: 'Website', icon: <WebsiteIcon size={20} />, badge: null, href: '/website' },
   ]);
 
-  // Computed values
-  const filteredNotifications = useMemo(() => 
-    MOCK_NOTIFICATIONS.filter(notification => {
-      const matchesType = state.notificationFilter === 'all' || notification.type === state.notificationFilter;
-      const matchesDepartment = state.departmentFilter === 'all' || notification.department === state.departmentFilter;
-      const matchesPriority = state.priorityFilter === 'all' || notification.priority === state.priorityFilter;
-      return matchesType && matchesDepartment && matchesPriority;
-    }), 
-    [state.notificationFilter, state.departmentFilter, state.priorityFilter]
-  );
+  // Event Handlers
+  const updateState = (updates: Partial<SidebarState>) => setState(prev => ({ ...prev, ...updates }));
 
-  const unreadCount = MOCK_NOTIFICATIONS.filter(n => !n.read).length;
+  const handleOpenSecondarySidebar = (config: SecondarySidebarConfig) => {
+    setSecondarySidebarConfig(config);
+    updateState({ showSecondarySidebar: true });
+  };
+
+  const handleMenuItemClick = (item: MenuItem, e: React.MouseEvent) => {
+    if (item.hasSecondary) {
+      e.preventDefault();
+      if (item.id === 'documents') handleOpenSecondarySidebar(reportsServicesConfig);
+      else if (item.id === 'finance') handleOpenSecondarySidebar(financeServicesConfig);
+    }
+  };
 
   const handleSignOut = async () => {
     try {
@@ -294,12 +351,16 @@ const Sidebar = () => {
     }
   };
 
-  const handleMenuItemClick = (item: MenuItem, e: React.MouseEvent) => {
-    if (item.hasSecondary) {
-      e.preventDefault();
-      if (item.id === 'documents') {
-        handleOpenSecondarySidebar(reportsServicesConfig);
-      }
+  // Notification Handlers
+  const handleMarkAsRead = (id: string) => setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+  const handleMarkAllAsRead = () => setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  const handleDeleteNotification = (id: string) => setNotifications(prev => prev.filter(n => n.id !== id));
+  const handleStarNotification = (id: string) => setNotifications(prev => prev.map(n => n.id === id ? { ...n, starred: !n.starred } : n));
+  const handleNotificationAction = (notification: Notification) => {
+    if (notification.actionUrl) {
+      router.push(notification.actionUrl);
+      updateState({ showNotifications: false });
+      handleMarkAsRead(notification.id);
     }
   };
 
@@ -318,44 +379,12 @@ const Sidebar = () => {
     }
   };
 
-  const clearFilters = () => updateState({
-    departmentFilter: 'all',
-    priorityFilter: 'all',
-    notificationFilter: 'all'
-  });
+  // Computed Values
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   // Click outside handlers
   useClickOutside(profileMenuRef, () => updateState({ showProfileMenu: false }), state.showProfileMenu);
   useClickOutside(notificationRef, () => updateState({ showNotifications: false }), state.showNotifications);
-
-  // Filter options
-  const filterOptions = {
-    departments: [
-      { value: 'sales', label: 'Sales' },
-      { value: 'finance', label: 'Finance' },
-      { value: 'inventory', label: 'Inventory' },
-      { value: 'hr', label: 'HR' },
-      { value: 'it', label: 'IT' },
-      { value: 'procurement', label: 'Procurement' },
-      { value: 'analytics', label: 'Analytics' },
-      { value: 'customer-service', label: 'Customer Service' },
-    ],
-    priorities: [
-      { value: 'high', label: 'High' },
-      { value: 'medium', label: 'Medium' },
-      { value: 'low', label: 'Low' },
-    ],
-    types: [
-      { value: 'alert', label: 'Alerts' },
-      { value: 'order', label: 'Orders' },
-      { value: 'payment', label: 'Payments' },
-      { value: 'customer', label: 'Customers' },
-      { value: 'system', label: 'System' },
-      { value: 'hr', label: 'HR' },
-      { value: 'finance', label: 'Finance' },
-      { value: 'it', label: 'IT' },
-    ],
-  };
 
   return (
     <div className="hidden lg:flex lg:flex-shrink-0">
@@ -371,86 +400,17 @@ const Sidebar = () => {
           
           <div className="h-8 w-px bg-white/30 mx-3"></div>
           
-          {/* Notification Bell */}
           <div className="relative" ref={notificationRef}>
-            <button
+            <NotificationBell 
+              unreadCount={unreadCount}
               onClick={() => updateState({ showNotifications: !state.showNotifications })}
-              className="relative p-2 text-white hover:text-gray-200 transition-colors"
-            >
-              <NotificationIcon size={20} />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-
-            {/* Notification Dropdown */}
-            {state.showNotifications && (
-              <div className="absolute left-0 top-full mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
-                <div className="p-4 border-b border-gray-200">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
-                    <span className="text-sm text-gray-500">{unreadCount} unread</span>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="grid grid-cols-3 gap-2">
-                      <FilterSelect
-                        value={state.departmentFilter}
-                        onChange={(value) => updateState({ departmentFilter: value })}
-                        options={filterOptions.departments}
-                        placeholder="All Departments"
-                      />
-                      <FilterSelect
-                        value={state.priorityFilter}
-                        onChange={(value) => updateState({ priorityFilter: value })}
-                        options={filterOptions.priorities}
-                        placeholder="All Priority"
-                      />
-                      <FilterSelect
-                        value={state.notificationFilter}
-                        onChange={(value) => updateState({ notificationFilter: value })}
-                        options={filterOptions.types}
-                        placeholder="All Types"
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span>Showing {filteredNotifications.length} of {MOCK_NOTIFICATIONS.length} notifications</span>
-                      {(state.departmentFilter !== 'all' || state.priorityFilter !== 'all' || state.notificationFilter !== 'all') && (
-                        <button onClick={clearFilters} className="text-blue-600 hover:text-blue-800">
-                          Clear filters
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="max-h-80 overflow-y-auto">
-                  {filteredNotifications.map(notification => (
-                    <NotificationItem key={notification.id} notification={notification} />
-                  ))}
-                </div>
-                
-                <div className="p-4 border-t border-gray-200 bg-gray-50">
-                  <div className="flex space-x-2">
-                    <button className="flex-1 text-sm bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors">
-                      Mark All Read
-                    </button>
-                    <button className="flex-1 text-sm bg-gray-200 text-gray-700 px-3 py-2 rounded hover:bg-gray-300 transition-colors">
-                      View All
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+              triggerRef={notificationTriggerRef}
+            />
           </div>
         </div>
 
         {/* Navigation */}
         <nav className="flex-1 px-4 py-6" style={{ backgroundColor: '#1e2155' }}>
-          {/* Tools Section Header */}
           <div className="flex items-center justify-between px-3 mb-3">
             <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wider">Tools</h3>
             <button
@@ -464,16 +424,15 @@ const Sidebar = () => {
             </button>
           </div>
           
-          {/* All Menu Items - Increased Height */}
           <div className="h-96 overflow-y-auto space-y-2 pr-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
             {menuItems.map((item) => {
               let active = false;
               
-              // Handle different types of active states
               if (item.hasSecondary && item.id === 'documents') {
                 active = state.showSecondarySidebar && secondarySidebarConfig?.title === 'Document Types';
+              } else if (item.hasSecondary && item.id === 'finance') {
+                active = state.showSecondarySidebar && secondarySidebarConfig?.title === 'Finance Management';
               } else if (item.onClick && (item.id === 'whatsapp' || item.id === 'email')) {
-                // WhatsApp and Email are active when their respective secondary sidebars are open
                 active = state.showSecondarySidebar && (
                   (item.id === 'whatsapp' && secondarySidebarConfig?.title === 'Messaging Services') ||
                   (item.id === 'email' && secondarySidebarConfig?.title === 'Email Services')
@@ -494,7 +453,7 @@ const Sidebar = () => {
           </div>
         </nav>
 
-        {/* My Tools Section - Moved to Bottom */}
+        {/* My Tools Section */}
         <div className="px-4 pb-4 border-t border-white/20" style={{ backgroundColor: '#1e2155' }}>
           <button
             onClick={e => {
@@ -539,56 +498,44 @@ const Sidebar = () => {
         </div>
         
         {/* User Profile */}
-        <div className="p-4 border-t border-white/20 relative" style={{ backgroundColor: '#1e2155' }} ref={profileMenuRef}>
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => updateState({ showProfileMenu: !state.showProfileMenu })}>
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-              {user?.photoURL ? (
-                <img src={user.photoURL} alt="Profile" className="w-8 h-8 rounded-full" />
-              ) : (
-                <span className="text-white text-sm font-medium">
-                  {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
-                </span>
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{user?.displayName || 'User'}</p>
-              <p className="text-xs text-white/60 truncate">{user?.email || 'No email'}</p>
-            </div>
-            <svg className={`w-4 h-4 text-white/60 transition-transform ${state.showProfileMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
-
-          {state.showProfileMenu && (
-            <div className="absolute bottom-full left-4 right-4 mb-2 bg-white rounded-md shadow-lg overflow-hidden z-50">
-              {[
-                { href: '/profile', label: 'Profile Settings' },
-                { href: '/settings', label: 'Account Settings' },
-              ].map(({ href, label }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  onClick={() => updateState({ showProfileMenu: false })}
-                >
-                  {label}
-                </Link>
-              ))}
-              <button
-                onClick={() => {
-                  updateState({ showProfileMenu: false });
-                  handleSignOut();
-                }}
-                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-              >
-                Sign Out
-              </button>
-            </div>
-          )}
-        </div>
+        <UserProfile
+          user={user}
+          showProfileMenu={state.showProfileMenu}
+          onToggleMenu={() => updateState({ showProfileMenu: !state.showProfileMenu })}
+          onSignOut={() => {
+            updateState({ showProfileMenu: false });
+            handleSignOut();
+          }}
+          profileMenuRef={profileMenuRef}
+        />
       </div>
 
-      {/* Modals and Portals */}
+      {/* Notification Panel */}
+      {state.showNotifications && typeof window !== 'undefined' && createPortal(
+        <div 
+          className="fixed z-[9999]"
+          style={{
+            top: `${notificationPosition.top}px`,
+            left: notificationPosition.left !== 'auto' ? `${notificationPosition.left}px` : 'auto',
+            right: notificationPosition.right !== 'auto' ? `${notificationPosition.right}px` : 'auto',
+            maxHeight: 'calc(100vh - 100px)',
+          }}
+          data-notification-dropdown
+        >
+          <NotificationPanel
+            notifications={notifications}
+            onMarkAsRead={handleMarkAsRead}
+            onMarkAllAsRead={handleMarkAllAsRead}
+            onDelete={handleDeleteNotification}
+            onStar={handleStarNotification}
+            onAction={handleNotificationAction}
+            className="shadow-2xl border-2 border-gray-100"
+          />
+        </div>,
+        document.body
+      )}
+
+      {/* Add Tool Modal */}
       {state.showAddToolModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
@@ -640,6 +587,7 @@ const Sidebar = () => {
         </div>
       )}
 
+      {/* Secondary Sidebar */}
       {secondarySidebarConfig && typeof window !== 'undefined' && createPortal(
         <SecondarySidebar
           isOpen={state.showSecondarySidebar}
