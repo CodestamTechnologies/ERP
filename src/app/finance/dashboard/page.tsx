@@ -562,7 +562,7 @@ const FinanceDashboard = () => {
                       </div>
                       <p className="text-sm text-gray-600 mb-4">{report.description}</p>
                       <div className="flex space-x-2">
-                        <Button variant="outline" size="sm" className="flex-1">
+                        <Button variant="outline" size="sm" className="flex-1" onClick={() => window.location.href = report.href}>
                           <Eye size={14} className="mr-1" />
                           View
                         </Button>

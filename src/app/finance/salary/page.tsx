@@ -29,15 +29,15 @@ import {
 import { useState } from 'react';
 
 // Import components
-import { SalaryStatsCard } from '@/components/salary/SalaryStatsCard';
-import { EmployeeCard } from '@/components/salary/EmployeeCard';
-import { PayrollBatchCard } from '@/components/salary/PayrollBatchCard';
-import { SalarySlipCard } from '@/components/salary/SalarySlipCard';
-import { DisbursementCard } from '@/components/salary/DisbursementCard';
-import { CreatePayrollDialog } from '@/components/salary/dialogs/CreatePayrollDialog';
-import { ProcessDisbursementDialog } from '@/components/salary/dialogs/ProcessDisbursementDialog';
-import { EmployeeDetailsDialog } from '@/components/salary/dialogs/EmployeeDetailsDialog';
-import { BulkUploadDialog } from '@/components/salary/dialogs/BulkUploadDialog';
+import { SalaryStatsCard } from '@/components/finance/salary/SalaryStatsCard';
+import { EmployeeCard } from '@/components/finance/salary/EmployeeCard';
+import { PayrollBatchCard } from '@/components/finance/salary/PayrollBatchCard';
+import { SalarySlipCard } from '@/components/finance/salary/SalarySlipCard';
+import { DisbursementCard } from '@/components/finance/salary/DisbursementCard';
+import { CreatePayrollDialog } from '@/components/finance/salary/dialogs/CreatePayrollDialog';
+import { ProcessDisbursementDialog } from '@/components/finance/salary/dialogs/ProcessDisbursementDialog';
+import { EmployeeDetailsDialog } from '@/components/finance/salary/dialogs/EmployeeDetailsDialog';
+import { BulkUploadDialog } from '@/components/finance/salary/dialogs/BulkUploadDialog';
 
 const SalaryDisbursementPage = () => {
   const {

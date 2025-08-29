@@ -31,16 +31,16 @@ import {
 import { useState } from 'react';
 
 // Import components
-import { ReimbursementStatsCard } from '@/components/reimbursements/ReimbursementStatsCard';
-import { ReimbursementCard } from '@/components/reimbursements/ReimbursementCard';
-import { PaymentBatchCard } from '@/components/reimbursements/PaymentBatchCard';
-import { PaymentMethodCard } from '@/components/reimbursements/PaymentMethodCard';
-import { VendorCard } from '@/components/reimbursements/VendorCard';
-import { CreateReimbursementDialog } from '@/components/reimbursements/dialogs/CreateReimbursementDialog';
-import { ReimbursementDetailsDialog } from '@/components/reimbursements/dialogs/ReimbursementDetailsDialog';
-import { ProcessPaymentDialog } from '@/components/reimbursements/dialogs/ProcessPaymentDialog';
-import { BulkPaymentDialog } from '@/components/reimbursements/dialogs/BulkPaymentDialog';
-import { PaymentMethodDialog } from '@/components/reimbursements/dialogs/PaymentMethodDialog';
+import { ReimbursementStatsCard } from '@/components/finance/reimbursements/ReimbursementStatsCard';
+import { ReimbursementCard } from '@/components/finance/reimbursements/ReimbursementCard';
+import { PaymentBatchCard } from '@/components/finance/reimbursements/PaymentBatchCard';
+import { PaymentMethodCard } from '@/components/finance/reimbursements/PaymentMethodCard';
+import { VendorCard } from '@/components/finance/reimbursements/VendorCard';
+import { CreateReimbursementDialog } from '@/components/finance/reimbursements/dialogs/CreateReimbursementDialog';
+import { ReimbursementDetailsDialog } from '@/components/finance/reimbursements/dialogs/ReimbursementDetailsDialog';
+import { ProcessPaymentDialog } from '@/components/finance/reimbursements/dialogs/ProcessPaymentDialog';
+import { BulkPaymentDialog } from '@/components/finance/reimbursements/dialogs/BulkPaymentDialog';
+import { PaymentMethodDialog } from '@/components/finance/reimbursements/dialogs/PaymentMethodDialog';
 
 const ReimbursementsPage = () => {
   const {

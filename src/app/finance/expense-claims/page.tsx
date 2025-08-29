@@ -29,15 +29,15 @@ import {
 import { useState } from 'react';
 
 // Import components
-import { ExpenseStatsCard } from '@/components/expense-claims/ExpenseStatsCard';
-import { ExpenseClaimCard } from '@/components/expense-claims/ExpenseClaimCard';
-import { ApprovalCard } from '@/components/expense-claims/ApprovalCard';
-import { ExpenseReportCard } from '@/components/expense-claims/ExpenseReportCard';
-import { PolicyCard } from '@/components/expense-claims/PolicyCard';
-import { CreateClaimDialog } from '@/components/expense-claims/dialogs/CreateClaimDialog';
-import { ClaimDetailsDialog } from '@/components/expense-claims/dialogs/ClaimDetailsDialog';
-import { BulkApprovalDialog } from '@/components/expense-claims/dialogs/BulkApprovalDialog';
-import { PolicyManagementDialog } from '@/components/expense-claims/dialogs/PolicyManagementDialog';
+import { ExpenseStatsCard } from '@/components/finance/expense-claims/ExpenseStatsCard';
+import { ExpenseClaimCard } from '@/components/finance/expense-claims/ExpenseClaimCard';
+import { ApprovalCard } from '@/components/finance/expense-claims/ApprovalCard';
+import { ExpenseReportCard } from '@/components/finance/expense-claims/ExpenseReportCard';
+import { PolicyCard } from '@/components/finance/expense-claims/PolicyCard';
+import { CreateClaimDialog } from '@/components/finance/expense-claims/dialogs/CreateClaimDialog';
+import { ClaimDetailsDialog } from '@/components/finance/expense-claims/dialogs/ClaimDetailsDialog';
+import { BulkApprovalDialog } from '@/components/finance/expense-claims/dialogs/BulkApprovalDialog';
+import { PolicyManagementDialog } from '@/components/finance/expense-claims/dialogs/PolicyManagementDialog';
 
 const ExpenseClaimsPage = () => {
   const {

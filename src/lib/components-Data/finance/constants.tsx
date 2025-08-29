@@ -87,36 +87,42 @@ export const REPORT_TYPES = [
     name: 'Profit & Loss Statement', 
     description: 'Income and expenses summary', 
     icon: <BarChart3 size={24} className="text-blue-600" />,
-    color: 'text-blue-600'
+    color: 'text-blue-600',
+    href: '/finance/profit-loss'
   },
   { 
     name: 'Balance Sheet', 
     description: 'Assets, liabilities, and equity', 
     icon: <PieChartIcon size={24} className="text-green-600" />,
-    color: 'text-green-600'
+    color: 'text-green-600',
+    href: '/finance/balance-sheet'
   },
   { 
     name: 'Cash Flow Statement', 
     description: 'Cash inflows and outflows', 
     icon: <TrendingUp size={24} className="text-purple-600" />,
-    color: 'text-purple-600'
+    color: 'text-purple-600',
+    href: '/finance/cash-flow'
   },
   { 
     name: 'Budget vs Actual', 
     description: 'Budget performance analysis', 
     icon: <Target size={24} className="text-orange-600" />,
-    color: 'text-orange-600'
+    color: 'text-orange-600',
+    href: '/finance/budget-analysis'
   },
   { 
     name: 'Accounts Receivable', 
     description: 'Outstanding customer payments', 
     icon: <UserIcon size={24} className="text-red-600" />,
-    color: 'text-red-600'
+    color: 'text-red-600',
+    href: '/finance/accounts-receivable'
   },
   { 
     name: 'Accounts Payable', 
     description: 'Outstanding vendor payments', 
     icon: <Building2 size={24} className="text-indigo-600" />,
-    color: 'text-indigo-600'
+    color: 'text-indigo-600',
+    href: '/finance/vendor-bills'
   },
 ];

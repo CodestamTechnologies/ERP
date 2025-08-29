@@ -1,61 +1,40 @@
-'use client';
-
-import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { ReactNode } from 'react';
 
 interface StatsCardProps {
   title: string;
   value: string;
   change: string;
-  icon: ReactNode;
+  icon: React.ReactNode;
   color: string;
   bgColor: string;
   progress: number;
   index: number;
 }
 
-export const StatsCard = ({
-  title,
-  value,
-  change,
-  icon,
-  color,
-  bgColor,
-  progress,
-  index
-}: StatsCardProps) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.1 }}
-    >
-      <Card className="hover:shadow-md transition-shadow">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
-              <div className={`p-3 rounded-lg ${bgColor} mr-4`}>
-                <div className={color}>
-                  {icon}
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">{title}</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
-              </div>
-            </div>
+export const StatsCard = ({ title, value, change, icon, color, bgColor, progress, index }: StatsCardProps) => (
+  <Card className={`hover:shadow-md transition-all duration-300 ${bgColor} border-l-4 ${color.replace('text-', 'border-')}`}
+        style={{ animationDelay: `${index * 100}ms` }}>
+    <CardContent className="p-6">
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
+          <p className="text-2xl font-bold text-gray-900 mb-2">{value}</p>
+          <p className="text-sm text-gray-500">{change}</p>
+        </div>
+        <div className={`p-3 rounded-full ${bgColor} ${color}`}>
+          {icon}
+        </div>
+      </div>
+      {progress > 0 && (
+        <div className="mt-4">
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div 
+              className={`h-2 rounded-full transition-all duration-500 ${color.replace('text-', 'bg-')}`}
+              style={{ width: `${Math.min(progress, 100)}%` }}
+            />
           </div>
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>{change}</span>
-              <span>{progress.toFixed(0)}%</span>
-            </div>
-            <Progress value={progress} className="w-full h-2" />
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  );
-};
+        </div>
+      )}
+    </CardContent>
+  </Card>
+);

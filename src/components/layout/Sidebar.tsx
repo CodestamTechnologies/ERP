@@ -14,7 +14,7 @@ import {
 } from '../Icons';
 import { useAuth } from '@/context/authContext';
 import SecondarySidebar, { SecondarySidebarConfig } from './SecondarySidebar';
-import { emailServicesConfig, messagingServicesConfig, reportsServicesConfig, financeServicesConfig } from '@/lib/sidebar-configs';
+import { emailServicesConfig, messagingServicesConfig, reportsServicesConfig, financeServicesConfig, aiInsightsConfig, documentsServicesConfig } from '@/lib/sidebar-configs';
 import { NotificationPanel, type Notification } from '@/components/ui/notification-panel';
 
 // Types
@@ -317,7 +317,7 @@ const Sidebar = () => {
     { id: 'suppliers', name: 'Suppliers', icon: <SuppliersIcon size={20} />, badge: null, href: '/suppliers' },
     { id: 'finance', name: 'Finance', icon: <FinanceIcon size={20} />, badge: null, href: '/finance', hasSecondary: true },
     { id: 'documents', name: 'Documents', icon: <ReportsIcon size={20} />, badge: null, href: '/documents', hasSecondary: true },
-    { id: 'ai-insights', name: 'AI Insights', icon: <AIInsightsIcon size={20} />, badge: 'NEW', href: '/ai-insights' },
+    { id: 'ai-insights', name: 'AI Insights', icon: <AIInsightsIcon size={20} />, badge: 'NEW', href: '/ai-insights', hasSecondary: true },
     { id: 'whatsapp', name: 'WhatsApp', icon: <FontAwesomeIcon icon={faWhatsapp} className="w-5 h-5 text-green-400" />, badge: null, href: '#', onClick: () => handleOpenSecondarySidebar(messagingServicesConfig) },
     { id: 'email', name: 'Email', icon: <Mail className="w-5 h-5 text-red-400" />, badge: null, href: '#', onClick: () => handleOpenSecondarySidebar(emailServicesConfig) },
     { id: 'todo', name: 'TODO', icon: <CheckSquare className="w-5 h-5 text-purple-400" />, badge: null, href: '/todo' },
@@ -337,8 +337,9 @@ const Sidebar = () => {
   const handleMenuItemClick = (item: MenuItem, e: React.MouseEvent) => {
     if (item.hasSecondary) {
       e.preventDefault();
-      if (item.id === 'documents') handleOpenSecondarySidebar(reportsServicesConfig);
+      if (item.id === 'documents') handleOpenSecondarySidebar(documentsServicesConfig);
       else if (item.id === 'finance') handleOpenSecondarySidebar(financeServicesConfig);
+      else if (item.id === 'ai-insights') handleOpenSecondarySidebar(aiInsightsConfig);
     }
   };
 
@@ -429,9 +430,11 @@ const Sidebar = () => {
               let active = false;
               
               if (item.hasSecondary && item.id === 'documents') {
-                active = state.showSecondarySidebar && secondarySidebarConfig?.title === 'Document Types';
+                active = state.showSecondarySidebar && secondarySidebarConfig?.title === 'Document Management';
               } else if (item.hasSecondary && item.id === 'finance') {
                 active = state.showSecondarySidebar && secondarySidebarConfig?.title === 'Finance Management';
+              } else if (item.hasSecondary && item.id === 'ai-insights') {
+                active = state.showSecondarySidebar && secondarySidebarConfig?.title === 'AI Insights';
               } else if (item.onClick && (item.id === 'whatsapp' || item.id === 'email')) {
                 active = state.showSecondarySidebar && (
                   (item.id === 'whatsapp' && secondarySidebarConfig?.title === 'Messaging Services') ||

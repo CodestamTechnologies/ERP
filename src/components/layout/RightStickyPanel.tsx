@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { SettingsIcon, ThemeIcon } from '../Icons';
+import { Store } from 'lucide-react';
 
 interface RightStickyPanelProps {
   onThemeToggle?: () => void;
@@ -24,6 +25,10 @@ const RightStickyPanel = ({ onThemeToggle }: RightStickyPanelProps) => {
     router.push('/settings');
   };
 
+  const handleToolsMarketplaceClick = () => {
+    router.push('/tools-marketplace');
+  };
+
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
   };
@@ -37,6 +42,18 @@ const RightStickyPanel = ({ onThemeToggle }: RightStickyPanelProps) => {
             ? 'opacity-100 translate-y-0 scale-100' 
             : 'opacity-0 translate-y-2 scale-95 pointer-events-none'
         }`}>
+          {/* Tools Marketplace Icon */}
+          <button
+            onClick={handleToolsMarketplaceClick}
+            className="p-2 rounded-md bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 text-blue-600 hover:text-purple-600 transition-all duration-200 hover:scale-105 group relative"
+            title="Tools Marketplace"
+          >
+            <Store size={16} />
+            <div className="absolute right-full mr-2 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+              Tools Marketplace
+            </div>
+          </button>
+
           {/* Settings Icon */}
           <button
             onClick={handleSettingsClick}

@@ -1,6 +1,6 @@
 'use client';
 
-import MOUComponent from '@/components/documents/BRD/MOUComponent';
+import MOUComponent from '@/components/documents/MOUComponent';
 
 export default function MOUPage() {
   return <MOUComponent />;

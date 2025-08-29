@@ -24,12 +24,12 @@ import {
 import { useState } from 'react';
 
 // Import components
-import { ReconciliationStatsCard } from '@/components/reconciliation/ReconciliationStatsCard';
-import { StatementUploadCard } from '@/components/reconciliation/StatementUploadCard';
-import { DiscrepancyCard } from '@/components/reconciliation/DiscrepancyCard';
-import { ReconciliationRuleCard } from '@/components/reconciliation/ReconciliationRuleCard';
-import { UploadStatementDialog } from '@/components/reconciliation/dialogs/UploadStatementDialog';
-import { RuleManagementDialog } from '@/components/reconciliation/dialogs/RuleManagementDialog';
+import { ReconciliationStatsCard } from '@/components/finance/reconciliation/ReconciliationStatsCard';
+import { StatementUploadCard } from '@/components/finance/reconciliation/StatementUploadCard';
+import { DiscrepancyCard } from '@/components/finance/reconciliation/DiscrepancyCard';
+import { ReconciliationRuleCard } from '@/components/finance/reconciliation/ReconciliationRuleCard';
+import { UploadStatementDialog } from '@/components/finance/reconciliation/dialogs/UploadStatementDialog';
+import { RuleManagementDialog } from '@/components/finance/reconciliation/dialogs/RuleManagementDialog';
 
 const BankReconciliationPage = () => {
   const {

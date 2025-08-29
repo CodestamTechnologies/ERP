@@ -32,14 +32,14 @@ import { useState } from 'react';
 import { BankAccount, BankIntegrationProvider, ReconciliationItem } from '@/types/bankAccount';
 
 // Import components
-import { AccountCard } from '@/components/bank-accounts/AccountCard';
-import { ProviderCard } from '@/components/bank-accounts/ProviderCard';
-import { ReconciliationCard } from '@/components/bank-accounts/ReconciliationCard';
-import { StatementCard } from '@/components/bank-accounts/StatementCard';
-import { StatsCard } from '@/components/bank-accounts/StatsCard';
-import { ProviderConnectionDialog } from '@/components/bank-accounts/dialogs/ProviderConnectionDialog';
-import { AddAccountDialog } from '@/components/bank-accounts/dialogs/AddAccountDialog';
-import { AccountDetailDialog } from '@/components/bank-accounts/dialogs/AccountDetailDialog';
+import { AccountCard } from '@/components/finance/bank-accounts/AccountCard';
+import { ProviderCard } from '@/components/finance/bank-accounts/ProviderCard';
+import { ReconciliationCard } from '@/components/finance/bank-accounts/ReconciliationCard';
+import { StatementCard } from '@/components/finance/bank-accounts/StatementCard';
+import { StatsCard } from '@/components/finance/bank-accounts/StatsCard';
+import { ProviderConnectionDialog } from '@/components/finance/bank-accounts/dialogs/ProviderConnectionDialog';
+import { AddAccountDialog } from '@/components/finance/bank-accounts/dialogs/AddAccountDialog';
+import { AccountDetailDialog } from '@/components/finance/bank-accounts/dialogs/AccountDetailDialog';
 
 const BankAccountsPage = () => {
   const {

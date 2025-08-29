@@ -32,19 +32,19 @@ import { useState } from 'react';
 
 // Import components
 import { StatsCard } from '@/components/shared/StatsCard';
-import { InvoiceCard } from '@/components/invoices/InvoiceCard';
-import { BillCard } from '@/components/invoices/BillCard';
-import { CustomerCard } from '@/components/invoices/CustomerCard';
-import { TemplateCard } from '@/components/invoices/TemplateCard';
-import { CreateInvoiceDialog } from '@/components/invoices/dialogs/CreateInvoiceDialog';
-import { CreateBillDialog } from '@/components/invoices/dialogs/CreateBillDialog';
-import { InvoiceDetailsDialog } from '@/components/invoices/dialogs/InvoiceDetailsDialog';
-import { SendInvoiceDialog } from '@/components/invoices/dialogs/SendInvoiceDialog';
-import { PaymentTrackingDialog } from '@/components/invoices/dialogs/PaymentTrackingDialog';
-import { AddCustomerDialog } from '@/components/invoices/dialogs/AddCustomerDialog';
-import { CreateTemplateDialog } from '@/components/invoices/dialogs/CreateTemplateDialog';
-import { EditBillDialog } from '@/components/invoices/dialogs/EditBillDialog';
-import { TemplatePreviewDialog } from '@/components/invoices/dialogs/TemplatePreviewDialog';
+import { InvoiceCard } from '@/components/finance/invoices/InvoiceCard';
+import { BillCard } from '@/components/finance/invoices/BillCard';
+import { CustomerCard } from '@/components/finance/invoices/CustomerCard';
+import { TemplateCard } from '@/components/finance/invoices/TemplateCard';
+import { CreateInvoiceDialog } from '@/components/finance/invoices/dialogs/CreateInvoiceDialog';
+import { CreateBillDialog } from '@/components/finance/invoices/dialogs/CreateBillDialog';
+import { InvoiceDetailsDialog } from '@/components/finance/invoices/dialogs/InvoiceDetailsDialog';
+import { SendInvoiceDialog } from '@/components/finance/invoices/dialogs/SendInvoiceDialog';
+import { PaymentTrackingDialog } from '@/components/finance/invoices/dialogs/PaymentTrackingDialog';
+import { AddCustomerDialog } from '@/components/finance/invoices/dialogs/AddCustomerDialog';
+import { CreateTemplateDialog } from '@/components/finance/invoices/dialogs/CreateTemplateDialog';
+import { EditBillDialog } from '@/components/finance/invoices/dialogs/EditBillDialog';
+import { TemplatePreviewDialog } from '@/components/finance/invoices/dialogs/TemplatePreviewDialog';
 
 const InvoicesPage = () => {
   const {

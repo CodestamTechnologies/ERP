@@ -101,7 +101,7 @@ export const financeServicesConfig: SecondarySidebarConfig = {
           badge: null,
           color: 'text-blue-600',
           bgColor: 'hover:bg-blue-50',
-          href: '/finance/profit-loss'
+          href: '#'
         }
       ]
     },
@@ -470,7 +470,7 @@ export const financeServicesConfig: SecondarySidebarConfig = {
           badge: null,
           color: 'text-pink-600',
           bgColor: 'hover:bg-pink-50',
-          href: '/finance/profit-loss-statement'
+          href: '/finance/profit-loss'
         },
         {
           id: 'cash-flow-statement',
