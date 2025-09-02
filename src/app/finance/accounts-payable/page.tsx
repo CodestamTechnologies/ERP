@@ -14,7 +14,7 @@ import {
  Building2, CheckCircle
 } from 'lucide-react';
 import { useState } from 'react';
-import { PayableInvoice, Vendor, BulkPaymentRequest } from '@/types/accountsPayable';
+import { PayableInvoice, Vendor, BulkPaymentRequest, PayableLineItem } from '@/types/accountsPayable';
 
 // Import components
 import { PayableInvoiceCard } from '@/components/finance/accounts-payable/PayableInvoiceCard';
@@ -37,7 +37,30 @@ interface PaymentData {
 interface SchedulePaymentData {
   scheduledDate: string;
   amount: number;
+  paymentMethod: string;
   notes?: string;
+}
+
+// Define the CreatePayableData interface to match what the dialog sends
+interface CreatePayableData {
+  vendorId: string;
+  vendorName: string;
+  vendorEmail: string;
+  invoiceNumber: string;
+  invoiceDate: string;
+  dueDate: string;
+  description: string;
+  paymentTerms: string;
+  priority: string;
+  currency: string;
+  exchangeRate: number;
+  notes: string;
+  tags: string[];
+  attachments: string[];
+  subtotal: number;
+  taxAmount: number;
+  totalAmount: number;
+  lineItems: PayableLineItem[];
 }
 
 const AccountsPayablePage = () => {
@@ -58,9 +81,14 @@ const AccountsPayablePage = () => {
   });
 
   const handlers = {
-    createPayable: async (data: Partial<PayableInvoice>) => {
+    createPayable: async (data: CreatePayableData) => {
       try {
-        await createPayableInvoice(data);
+        // Convert the CreatePayableData to Partial<PayableInvoice>
+        const payableData: Partial<PayableInvoice> = {
+          ...data,
+          priority: data.priority as 'low' | 'medium' | 'high' | 'urgent'
+        };
+        await createPayableInvoice(payableData);
         setDialogs(prev => ({ ...prev, createPayable: false }));
         alert('Payable invoice created successfully!');
       } catch { alert('Error creating payable invoice.'); }

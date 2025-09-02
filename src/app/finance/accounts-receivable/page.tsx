@@ -48,8 +48,8 @@ interface PaymentData {
 }
 
 interface ReminderData {
-  message: string;
-  reminderType: 'email' | 'sms' | 'phone';
+  type: 'email' | 'sms' | 'phone';
+  message?: string;
   scheduledDate?: string;
 }
 
