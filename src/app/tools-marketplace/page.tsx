@@ -45,6 +45,26 @@ interface Tool {
   suite?: string; // Added for the extended tool type
 }
 
+// Define CustomSection interface to match the hook
+interface CustomSection {
+  id: string;
+  name: string;
+  tools: string[];
+  order: number;
+}
+
+// Define SidebarConfig interface to match the hook
+interface SidebarConfig {
+  enabledTools: string[];
+  toolOrder: string[];
+  customSections: CustomSection[];
+  sectionConfigs: Record<string, {
+    enabledSections: string[];
+    sectionOrder: string[];
+    subOptionConfigs: Record<string, string[]>;
+  }>;
+}
+
 const ToolsMarketplacePage = () => {
   const {
     availableTools, installedTools, sidebarConfig, hubTrackTools, gokuTools, gamaTools,
@@ -106,6 +126,26 @@ const ToolsMarketplacePage = () => {
       const tool = allTools.find(t => t.id === toolId);
       return total + (tool ? getToolPrice(toolId) : 0);
     }, 0);
+  };
+
+  const getCartItems = () => {
+    return cart
+      .map(id => {
+        const tool = allTools.find(tool => tool.id === id);
+        if (!tool) return null;
+        
+        return {
+          id: tool.id,
+          name: tool.name,
+          suite: tool.suite || 'Unknown',
+          category: tool.category,
+          icon: tool.icon,
+          price: getToolPrice(tool.id),
+          isPremium: tool.isPremium,
+          isNew: tool.isNew
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null);
   };
 
   if (loading) {
@@ -202,7 +242,7 @@ const ToolsMarketplacePage = () => {
                       sidebarConfig={sidebarConfig}
                       onInstall={installTool}
                       onUninstall={uninstallTool}
-                      onConfigUpdate={updateSidebarConfig}
+                      onConfigUpdate={(config) => updateSidebarConfig(config)}
                       isProcessing={isProcessing}
                     />
                   </div>
@@ -221,7 +261,7 @@ const ToolsMarketplacePage = () => {
                       sidebarConfig={sidebarConfig}
                       onInstall={installTool}
                       onUninstall={uninstallTool}
-                      onConfigUpdate={updateSidebarConfig}
+                      onConfigUpdate={(config) => updateSidebarConfig(config)}
                       isProcessing={isProcessing}
                     />
                   </div>
@@ -385,7 +425,7 @@ const ToolsMarketplacePage = () => {
       <PurchaseDialog
         isOpen={showPurchaseDialog}
         onClose={() => setShowPurchaseDialog(false)}
-        cartItems={cart.map(id => allTools.find(tool => tool.id === id)).filter(Boolean)}
+        cartItems={getCartItems()}
         totalPrice={getTotalCartPrice()}
         onPurchase={handleToolPurchase}
         userCredits={subscription.credits}

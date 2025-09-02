@@ -144,7 +144,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data, companyLogo, for
         <p className="text-sm">If you accept this offer, please sign below and return this letter to us. We look forward to welcoming you to the {data.company.name} team!</p>
       </div>
 
-      <p>Should you have any questions about this offer or need clarification on any terms, please don't hesitate to contact our HR department.</p>
+      <p>Should you have any questions about this offer or need clarification on any terms, please don&apos;t hesitate to contact our HR department.</p>
       <p>We are excited about the possibility of you joining our team and look forward to your positive response.</p>
       <p className="mt-6">Sincerely,</p>
     </div>
@@ -429,7 +429,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ data, companyLogo, 
       
       <p>On behalf of {data.company.name}, I am delighted to extend this formal offer of employment for the executive position of <strong>{data.job.title}</strong> within our {data.job.department} division.</p>
       
-      <p>Your exceptional qualifications, proven track record, and leadership capabilities make you the ideal candidate for this strategic role. We are excited about the prospect of you joining our executive team and contributing to our organization's continued growth and success.</p>
+      <p>Your exceptional qualifications, proven track record, and leadership capabilities make you the ideal candidate for this strategic role. We are excited about the prospect of you joining our executive team and contributing to our organization&apos;s continued growth and success.</p>
 
       {/* Executive Position Details */}
       <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-8 rounded-lg border border-gray-200">
@@ -494,7 +494,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ data, companyLogo, 
 
       <p>This offer includes our comprehensive executive benefits package, detailed terms of employment, and is subject to the successful completion of our standard pre-employment verification process.</p>
       
-      <p>We are confident that this opportunity will provide you with the platform to further your career while making a significant impact on our organization's strategic direction.</p>
+      <p>We are confident that this opportunity will provide you with the platform to further your career while making a significant impact on our organization&apos;s strategic direction.</p>
       
       <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-r-lg">
         <p className="font-semibold text-gray-900 mb-2">Offer Validity</p>

@@ -266,7 +266,7 @@ const LOIComponent = () => {
         <p>Dear {data.recipient.name},</p>
         
         <p>
-          This Letter of Intent ("LOI") serves to express {data.sender.company}'s serious interest in 
+          This Letter of Intent LOI&quot; serves to express {data.sender.company}&apos;s serious interest in 
           establishing a business relationship with {data.recipient.company} regarding the following opportunity:
         </p>
 

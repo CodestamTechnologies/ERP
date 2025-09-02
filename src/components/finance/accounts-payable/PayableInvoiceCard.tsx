@@ -5,14 +5,24 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { FileText, Calendar, DollarSign, Building2, Eye, Send, Clock, CheckCircle, AlertTriangle, MoreHorizontal } from 'lucide-react';
 import { PayableInvoice } from '@/types/accountsPayable';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-
+interface ScheduleData {
+  amount?: number;
+  scheduledDate?: string;
+  paymentMethod?: string;
+  bankAccount?: string;
+  notes?: string;
+  approvalRequired?: boolean;
+  recurringPayment?: boolean;
+  recurringFrequency?: string;
+  recurringEndDate?: string;
+}
 interface PayableInvoiceCardProps {
   invoice: PayableInvoice;
   isSelected: boolean;
   onSelect: (selected: boolean) => void;
   onViewDetails: (invoice: PayableInvoice) => void;
   onProcessPayment: (invoice: PayableInvoice) => void;
-  onSchedulePayment: (invoiceId: string, scheduleData: any) => void;
+  onSchedulePayment: (invoiceId: string, scheduleData: ScheduleData) => void;
   onSendReminder: (invoiceId: string) => void;
   onApprove: (invoiceId: string) => void;
   onReject: (invoiceId: string, reason: string) => void;

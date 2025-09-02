@@ -6,13 +6,19 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Invoice } from '@/hooks/useInvoices';
 import { FileText, User, Calendar, DollarSign, Send, CreditCard, Printer, Download } from 'lucide-react';
-
+interface PaymentData {
+  amount: number;
+  paymentDate?: string;
+  paymentMethod?: 'cash' | 'check' | 'bank_transfer' | 'credit_card' | 'online';
+  reference?: string;
+  notes?: string;
+}
 interface InvoiceDetailsDialogProps {
   isOpen: boolean;
   onClose: () => void;
   invoice: Invoice | null;
   onSend: (invoice: Invoice) => void;
-  onRecordPayment: (invoiceId: string, paymentData: any) => void;
+  onRecordPayment: (invoiceId: string, paymentData: PaymentData) => void;
   isProcessing: boolean;
 }
 

@@ -10,8 +10,28 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, Plus, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 
+interface InvoiceItem {
+  name: string;
+  quantity: number;
+  rate: number;
+  amount: number;
+}
+
+interface InvoiceData {
+  customerId: string;
+  customerName: string;
+  invoiceDate: string;
+  dueDate: string;
+  description: string;
+  taxRate: string;
+  discountAmount: number;
+  amount: number;
+  taxAmount: number;
+  items: InvoiceItem[];
+}
+
 interface CreateInvoiceDialogProps {
-  isOpen: boolean; onClose: () => void; onCreateInvoice: (invoiceData: any) => Promise<void>;
+  isOpen: boolean; onClose: () => void; onCreateInvoice: (invoiceData: InvoiceData) => Promise<void>;
   customers: Array<{ id: string; name: string; }>;
   isProcessing: boolean;
 }
@@ -33,7 +53,7 @@ export const CreateInvoiceDialog = ({
   const discountAmount = parseFloat(formData.discountAmount) || 0;
   const totalAmount = subtotal + taxAmount - discountAmount;
 
-  const handleItemChange = (index: number, field: string, value: any) => {
+  const handleItemChange = (index: number, field: keyof InvoiceItem, value: string | number) => {
     const newItems = [...formData.items];
     newItems[index] = { ...newItems[index], [field]: value };
     if (field === 'quantity' || field === 'rate') {

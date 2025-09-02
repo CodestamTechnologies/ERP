@@ -9,11 +9,21 @@ import { Card, CardContent } from '@/components/ui/card';
 import { BillLineItem } from '@/hooks/useInvoices';
 import { Plus, Trash2, Calculator } from 'lucide-react';
 import { useState } from 'react';
-
+interface BillData {
+  vendorName: string;
+  vendorEmail: string;
+  billDate: string;
+  dueDate: string;
+  notes: string;
+  subtotal: number;
+  taxAmount: number;
+  totalAmount: number;
+  lineItems: Array<BillLineItem & { id: string }>;
+}
 interface CreateBillDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateBill: (billData: any) => Promise<void>;
+  onCreateBill: (billData: BillData) => Promise<void>;
   isProcessing: boolean;
 }
 
@@ -74,7 +84,15 @@ export const CreateBillDialog = ({
     const billData = {
       vendorName, vendorEmail, billDate, dueDate, notes,
       subtotal: totals.subtotal, taxAmount: totals.totalTax, totalAmount: totals.totalAmount,
-      lineItems: lineItems.map((item, index) => ({ ...item, id: `line-${Date.now()}-${index}` }))
+      lineItems: lineItems.map((item, index) => ({
+        id: `line-${Date.now()}-${index}`,
+        description: item.description || '',
+        quantity: item.quantity || 0,
+        unitPrice: item.unitPrice || 0,
+        taxRate: item.taxRate || 0,
+        totalAmount: item.totalAmount || 0,
+        category: item.category
+      }))
     };
 
     try {

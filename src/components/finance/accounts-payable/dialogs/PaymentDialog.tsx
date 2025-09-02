@@ -22,12 +22,37 @@ import {
 } from 'lucide-react';
 import { PayableInvoice } from '@/types/accountsPayable';
 
+interface PaymentData {
+  amount: number;
+  paymentDate: string;
+  paymentMethod: string;
+  bankAccount: string;
+  referenceNumber: string;
+  checkNumber: string;
+  notes: string;
+  applyDiscount: boolean;
+  discountAmount: number;
+  discountReason: string;
+}
+
+interface ScheduleData {
+  amount: number;
+  scheduledDate: string;
+  paymentMethod: string;
+  bankAccount: string;
+  notes: string;
+  approvalRequired: boolean;
+  recurringPayment: boolean;
+  recurringFrequency: string;
+  recurringEndDate: string;
+}
+
 interface PaymentDialogProps {
   isOpen: boolean;
   onClose: () => void;
   invoice: PayableInvoice | null;
-  onProcessPayment: (invoiceId: string, paymentData: any) => void;
-  onSchedulePayment: (invoiceId: string, scheduleData: any) => void;
+  onProcessPayment: (invoiceId: string, paymentData: PaymentData) => void;
+  onSchedulePayment: (invoiceId: string, scheduleData: ScheduleData) => void;
   isProcessing: boolean;
 }
 

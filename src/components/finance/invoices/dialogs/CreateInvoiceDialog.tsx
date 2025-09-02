@@ -10,11 +10,26 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Customer, InvoiceTemplate, InvoiceLineItem } from '@/hooks/useInvoices';
 import { Plus, Trash2, Calculator } from 'lucide-react';
 import { useState } from 'react';
-
+interface InvoiceData {
+  customerId: string;
+  customerName?: string;
+  customerEmail?: string;
+  customerAddress?: string;
+  issueDate: string;
+  dueDate: string;
+  templateId?: string;
+  notes: string;
+  terms: string;
+  subtotal: number;
+  taxAmount: number;
+  discountAmount: number;
+  totalAmount: number;
+  lineItems: Array<Partial<InvoiceLineItem> & { id: string }>;
+}
 interface CreateInvoiceDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateInvoice: (invoiceData: any) => Promise<void>;
+  onCreateInvoice: (invoiceData: InvoiceData) => Promise<void>;
   customers: Customer[];
   templates: InvoiceTemplate[];
   isProcessing: boolean;
@@ -129,8 +144,15 @@ export const CreateInvoiceDialog = ({
       discountAmount: totals.totalDiscount,
       totalAmount: totals.totalAmount,
       lineItems: lineItems.map((item, index) => ({
-        ...item,
-        id: `line-${Date.now()}-${index}`
+        id: `line-${Date.now()}-${index}`,
+        description: item.description || '',
+        quantity: item.quantity || 0,
+        unitPrice: item.unitPrice || 0,
+        taxRate: item.taxRate || 0,
+        discountRate: item.discountRate || 0,
+        totalAmount: item.totalAmount || 0,
+        productId: item.productId,
+        productName: item.productName
       }))
     };
 

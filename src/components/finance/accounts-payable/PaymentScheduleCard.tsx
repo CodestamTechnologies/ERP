@@ -13,11 +13,22 @@ import {
   FileText
 } from 'lucide-react';
 import { PaymentSchedule } from '@/types/accountsPayable';
-
+interface RescheduleData {
+  amount?: number;
+  scheduledDate?: string;
+  paymentMethod?: string;
+  bankAccount?: string;
+  notes?: string;
+  approvalRequired?: boolean;
+  recurringPayment?: boolean;
+  recurringFrequency?: string;
+  recurringEndDate?: string;
+  reason?: string;
+}
 interface PaymentScheduleCardProps {
   payment: PaymentSchedule;
   onProcessPayment: (payment: PaymentSchedule) => void;
-  onReschedule: (paymentId: string, scheduleData: any) => void;
+  onReschedule: (paymentId: string, scheduleData: RescheduleData) => void;
   isProcessing: boolean;
 }
 

@@ -182,7 +182,7 @@ export const EditBillDialog = ({
             </div>
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select value={status} onValueChange={(value: any) => setStatus(value)}>
+              <Select value={status} onValueChange={(value: 'draft' | 'pending' | 'approved' | 'paid' | 'overdue') => setStatus(value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

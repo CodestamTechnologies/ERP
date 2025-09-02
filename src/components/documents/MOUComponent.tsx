@@ -270,7 +270,7 @@ const MOUComponent = () => {
       {/* MOU Content */}
       <div className="mb-6 space-y-6 text-gray-800 leading-relaxed">
         <p>
-          This Memorandum of Understanding ("MOU") is entered into on {formatDate(data.mou.effectiveDate)} between {data.partyA.name} (Party A) and {data.partyB.name} (Party B), collectively referred to as "the Parties."
+          This Memorandum of Understanding MOU is entered into on {formatDate(data.mou.effectiveDate)} between {data.partyA.name} (Party A) and {data.partyB.name} (Party B), collectively referred to as the Parties.
         </p>
 
         {[

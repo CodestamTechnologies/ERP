@@ -6,11 +6,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Send, Building2, FileText } from 'lucide-react';
-
+interface ReminderData {
+  template: string;
+  customMessage: string;
+  includeInvoiceDetails: boolean;
+}
 interface BulkReminderDialogProps {
   isOpen: boolean; onClose: () => void;
   selectedInvoices: Array<{ id: string; invoiceNumber: string; customerName: string; remainingAmount: number; status: string; }>;
-  onSendReminders: (invoiceIds: string[], reminderData: any) => Promise<void>;
+  onSendReminders: (invoiceIds: string[], reminderData: ReminderData) => Promise<void>;
   isProcessing: boolean;
 }
 

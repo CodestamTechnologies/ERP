@@ -56,6 +56,7 @@ interface PaymentData {
 interface ScheduleData {
   scheduledDate: string;
   amount: number;
+  paymentMethod: string;
   notes?: string;
   reminderDays?: number;
 }
@@ -222,6 +223,41 @@ const VendorBillsPage = () => {
     } catch (error) {
       console.error('Error creating bill:', error);
     }
+  };
+
+  const handleCreateBillFromDialog = async (billData: {
+    vendorId: string;
+    vendorName: string;
+    billDate: string;
+    dueDate: string;
+    amount: number;
+    taxAmount: number;
+    discountAmount: number;
+    description: string;
+    category: string;
+    priority: string;
+    paymentTerms: string;
+    reference: string;
+    attachments: string[];
+  }) => {
+    // Convert VendorBillData to CreateBillData with proper type casting
+    const createBillData: CreateBillData = {
+      vendorId: billData.vendorId,
+      vendorName: billData.vendorName,
+      billDate: billData.billDate,
+      dueDate: billData.dueDate,
+      amount: billData.amount,
+      priority: billData.priority as 'high' | 'medium' | 'low',
+      description: billData.description,
+      category: billData.category,
+      taxAmount: billData.taxAmount,
+      discountAmount: billData.discountAmount,
+      attachments: billData.attachments,
+      paymentTerms: billData.paymentTerms,
+      reference: billData.reference
+    };
+    
+    await handleCreateBill(createBillData);
   };
 
   const handleProcessPayment = async (billId: string, paymentData: PaymentData) => {
@@ -830,7 +866,7 @@ const VendorBillsPage = () => {
       <CreateVendorBillDialog
         isOpen={dialogs.createBill}
         onClose={() => setDialogs(prev => ({ ...prev, createBill: false }))}
-        onCreateBill={handleCreateBill}
+        onCreateBill={handleCreateBillFromDialog}
         vendors={vendors}
         isProcessing={isProcessing}
       />

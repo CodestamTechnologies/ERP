@@ -33,6 +33,13 @@ interface Tool {
   icon: React.ReactNode;
 }
 
+interface CustomSection {
+  id: string;
+  name: string;
+  tools: string[];
+  order: number;
+}
+
 interface SectionConfig {
   enabledSections: string[];
   sectionOrder: string[];
@@ -42,7 +49,8 @@ interface SectionConfig {
 interface SidebarConfig {
   enabledTools: string[];
   toolOrder: string[];
-  sectionConfigs?: Record<string, SectionConfig>;
+  customSections: CustomSection[];
+  sectionConfigs: Record<string, SectionConfig>;
 }
 
 // Mock data for Finance module sections

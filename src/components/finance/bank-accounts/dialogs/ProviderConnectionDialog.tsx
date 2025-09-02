@@ -26,20 +26,33 @@ import {
   Loader2,
   AlertTriangle
 } from 'lucide-react';
-
+interface ConnectionData {
+  username?: string;
+  password?: string;
+  securityQuestion?: string;
+}
+interface DiscoveredAccount {
+  id: string;
+  name: string;
+  bankName: string;
+  accountNumber: string;
+  accountType: string;
+  balance: number;
+  currency: string;
+}
 interface ProviderConnectionDialogProps {
   isOpen: boolean;
   onClose: () => void;
   provider: BankIntegrationProvider | null;
   connectionStep: number;
-  connectionData: any;
+  connectionData: ConnectionData;
   connectionError: string | null;
-  discoveredAccounts: any[];
+  discoveredAccounts: DiscoveredAccount[];
   selectedAccountsToAdd: string[];
   isConnecting: boolean;
   onNextStep: () => void;
   onPrevStep: () => void;
-  onConnectionDataChange: (data: any) => void;
+  onConnectionDataChange: (data: ConnectionData) => void;
   onTestConnection: () => void;
   onAccountSelectionChange: (accountId: string, selected: boolean) => void;
   onAddSelectedAccounts: () => void;
@@ -80,7 +93,7 @@ export const ProviderConnectionDialog = ({
             </div>
 
             <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="font-medium mb-3">What you'll get:</h4>
+              <h4 className="font-medium mb-3">What you&apos;ll get:</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {provider.features.map((feature, index) => (
                   <div key={index} className="flex items-center gap-2">
@@ -194,7 +207,7 @@ export const ProviderConnectionDialog = ({
                   <Globe size={48} className="mx-auto text-blue-500 mb-4" />
                   <h4 className="font-medium mb-2">Open Banking Integration</h4>
                   <p className="text-sm text-gray-600 mb-4">
-                    You'll be redirected to your bank's secure login page
+                    You&apos;ll be redirected to your bank&apos;s secure login page
                   </p>
                   <Button onClick={onTestConnection} disabled={isConnecting}>
                     {isConnecting ? (
@@ -217,7 +230,7 @@ export const ProviderConnectionDialog = ({
                   <FileText size={48} className="mx-auto text-gray-500 mb-4" />
                   <h4 className="font-medium mb-2">Manual Integration</h4>
                   <p className="text-sm text-gray-600 mb-4">
-                    You'll need to manually enter account details and upload statements
+                    You&apos;ll need to manually enter account details and upload statements
                   </p>
                   <Button onClick={onManualAdd}>
                     <Plus size={16} className="mr-2" />
@@ -252,7 +265,7 @@ export const ProviderConnectionDialog = ({
               </div>
               <h3 className="text-xl font-semibold mb-2">Select Accounts</h3>
               <p className="text-gray-600">
-                Choose which accounts you'd like to connect to your ERP system
+                Choose which accounts you&apos;d like to connect to your ERP system
               </p>
             </div>
 
@@ -291,7 +304,7 @@ export const ProviderConnectionDialog = ({
                 <AlertTriangle size={48} className="mx-auto text-gray-400 mb-4" />
                 <h4 className="font-medium mb-2">No Accounts Found</h4>
                 <p className="text-sm text-gray-600">
-                  We couldn't find any accounts with the provided credentials. Please check and try again.
+                  We couldn&apos;t find any accounts with the provided credentials. Please check and try again.
                 </p>
               </div>
             )}

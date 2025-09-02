@@ -4,8 +4,30 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { FileText, Building2, Calendar, DollarSign, Edit, CreditCard, Download } from 'lucide-react';
 
+interface InvoiceItem {
+  name: string;
+  quantity: number;
+  rate: number;
+  amount: number;
+}
+
+interface Invoice {
+  invoiceNumber: string;
+  status: string;
+  amount: number;
+  customerName: string;
+  invoiceDate: string;
+  dueDate: string;
+  paidAmount: number;
+  remainingAmount: number;
+  taxAmount: number;
+  discountAmount: number;
+  items?: InvoiceItem[];
+  description?: string;
+}
+
 interface InvoiceDetailsDialogProps {
-  isOpen: boolean; onClose: () => void; invoice: any; onEdit: () => void; onRecordPayment: () => void;
+  isOpen: boolean; onClose: () => void; invoice: Invoice; onEdit: () => void; onRecordPayment: () => void;
   formatCurrency: (amount: number) => string; formatDate: (date: string) => string;
 }
 
@@ -131,7 +153,7 @@ export const InvoiceDetailsDialog = ({ isOpen, onClose, invoice, onEdit, onRecor
                     </tr>
                   </thead>
                   <tbody>
-                    {invoice.items.map((item: any, index: number) => (
+                    {invoice.items.map((item: InvoiceItem, index: number) => (
                       <tr key={index} className="border-b">
                         <td className="p-2">{item.name}</td>
                         <td className="text-right p-2">{item.quantity}</td>

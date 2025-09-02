@@ -10,12 +10,19 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Invoice } from '@/hooks/useInvoices';
 import { Mail, Send, FileText, User } from 'lucide-react';
 import { useState } from 'react';
-
+interface EmailData {
+  to: string;
+  cc: string;
+  subject: string;
+  message: string;
+  sendCopy: boolean;
+  attachPdf: boolean;
+}
 interface SendInvoiceDialogProps {
   isOpen: boolean;
   onClose: () => void;
   invoice: Invoice | null;
-  onSend: (invoiceId: string, emailData: any) => void;
+  onSend: (invoiceId: string, emailData: EmailData) => void;
   isProcessing: boolean;
 }
 
@@ -111,7 +118,7 @@ Your Company`;
                 onChange={(e) => setToEmail(e.target.value)}
                 placeholder={invoice.customerEmail}
               />
-              <p className="text-xs text-gray-500">Leave blank to use customer's email: {invoice.customerEmail}</p>
+              <p className="text-xs text-gray-500">Leave blank to use customer&apos;s email: {invoice.customerEmail}</p>
             </div>
 
             <div className="space-y-2">

@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { InvoiceTemplate } from '@/hooks/useInvoices';
 import { Palette, Plus, FileText, Eye } from 'lucide-react';
 import { useState } from 'react';
-
+type LayoutType = 'modern' | 'classic' | 'minimal' | 'professional';
 interface CreateTemplateDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -27,7 +27,7 @@ export const CreateTemplateDialog = ({
 }: CreateTemplateDialogProps) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [layout, setLayout] = useState<'modern' | 'classic' | 'minimal' | 'professional'>('modern');
+  const [layout, setLayout] = useState<LayoutType>('modern');
   const [primaryColor, setPrimaryColor] = useState('#3B82F6');
   const [secondaryColor, setSecondaryColor] = useState('#F3F4F6');
   const [fontFamily, setFontFamily] = useState('Inter');
@@ -125,7 +125,7 @@ export const CreateTemplateDialog = ({
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="layout">Layout Style</Label>
-                  <Select value={layout} onValueChange={(value: any) => setLayout(value)}>
+                  <Select value={layout} onValueChange={(value: 'modern' | 'classic' | 'minimal' | 'professional') => setLayout(value)}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>

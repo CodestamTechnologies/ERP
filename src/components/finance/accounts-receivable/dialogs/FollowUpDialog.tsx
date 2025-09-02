@@ -10,9 +10,25 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, CalendarDays, Building2, FileText } from 'lucide-react';
 import { format, addDays, addWeeks } from 'date-fns';
 
+interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  customerName: string;
+  remainingAmount: number;
+  status: string;
+  dueDate: string;
+}
+
+interface FollowUpData {
+  type: string;
+  scheduledDate: string;
+  priority: string;
+  notes: string;
+}
+
 interface FollowUpDialogProps {
-  isOpen: boolean; onClose: () => void; invoice: any;
-  onCreateFollowUp: (invoiceId: string, followUpData: any) => Promise<void>;
+  isOpen: boolean; onClose: () => void; invoice: Invoice;
+  onCreateFollowUp: (invoiceId: string, followUpData: FollowUpData) => Promise<void>;
   isProcessing: boolean;
 }
 

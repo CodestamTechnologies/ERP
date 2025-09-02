@@ -11,9 +11,26 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, CreditCard } from 'lucide-react';
 import { format } from 'date-fns';
 
+interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  customerName: string;
+  status: string;
+  amount: number;
+  remainingAmount: number;
+}
+
+interface PaymentData {
+  amount: number;
+  paymentMethod: string;
+  paymentDate: string;
+  reference: string;
+  notes: string;
+}
+
 interface PaymentRecordDialogProps {
-  isOpen: boolean; onClose: () => void; invoice: any;
-  onRecordPayment: (invoiceId: string, paymentData: any) => Promise<void>;
+  isOpen: boolean; onClose: () => void; invoice: Invoice;
+  onRecordPayment: (invoiceId: string, paymentData: PaymentData) => Promise<void>;
   isProcessing: boolean;
 }
 

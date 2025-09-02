@@ -11,14 +11,21 @@ import { Badge } from '@/components/ui/badge';
 import { Invoice } from '@/hooks/useInvoices';
 import { CreditCard, DollarSign, Calendar, User, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
-
+interface PaymentData {
+  amount: number;
+  paymentDate: string;
+  paymentMethod: PaymentMethod;
+  reference: string;
+  notes: string;
+}
 interface PaymentTrackingDialogProps {
   isOpen: boolean;
   onClose: () => void;
   invoices: Invoice[];
-  onRecordPayment: (invoiceId: string, paymentData: any) => void;
+  onRecordPayment: (invoiceId: string, paymentData: PaymentData) => void;
   isProcessing: boolean;
 }
+type PaymentMethod = 'bank_transfer' | 'credit_card' | 'check' | 'cash' | 'online';
 
 export const PaymentTrackingDialog = ({
   isOpen,
@@ -30,7 +37,7 @@ export const PaymentTrackingDialog = ({
   const [selectedInvoiceId, setSelectedInvoiceId] = useState('');
   const [paymentAmount, setPaymentAmount] = useState('');
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
-  const [paymentMethod, setPaymentMethod] = useState('bank_transfer');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('bank_transfer');
   const [reference, setReference] = useState('');
   const [notes, setNotes] = useState('');
 
@@ -194,7 +201,7 @@ export const PaymentTrackingDialog = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="paymentMethod">Payment Method</Label>
-                  <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                  <Select value={paymentMethod} onValueChange={(value: PaymentMethod) => setPaymentMethod(value)}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>

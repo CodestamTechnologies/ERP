@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { useExpenseClaims } from '@/hooks/useExpenseClaims';
+import { useExpenseClaims, ExpenseItem } from '@/hooks/useExpenseClaims';
 import { 
   Receipt,
   Plus,
@@ -105,12 +105,42 @@ const ExpenseClaimsPage = () => {
     setIsClaimDetailsOpen(true);
   };
 
+  const handleViewApprovalDetails = (approval: typeof approvals[0]) => {
+    // Find the corresponding claim for the approval
+    const claim = claims.find(c => c.id === approval.claimId);
+    if (claim) {
+      setSelectedClaim(claim);
+      setIsClaimDetailsOpen(true);
+    }
+  };
+
   const handleApproveClaim = async (claimId: string, comments?: string) => {
     await approveClaim(claimId, comments);
   };
 
   const handleRejectClaim = async (claimId: string, reason: string) => {
     await rejectClaim(claimId, reason);
+  };
+
+  const handleCreateClaim = async (claimData: {
+    title: string;
+    description: string;
+    category: string;
+    department: string;
+    amount: number;
+    expenses: Array<ExpenseItem & { id: string }>;
+  }) => {
+    // Convert ClaimFormData to Partial<ExpenseClaim>
+    const expenseClaimData = {
+      title: claimData.title,
+      description: claimData.description,
+      category: claimData.category as 'travel' | 'meals' | 'accommodation' | 'office' | 'transport' | 'other',
+      department: claimData.department,
+      amount: claimData.amount,
+      expenses: claimData.expenses
+    };
+    
+    await createClaim(expenseClaimData);
   };
 
   if (loading) {
@@ -361,7 +391,7 @@ const ExpenseClaimsPage = () => {
                     approval={approval}
                     onApprove={handleApproveClaim}
                     onReject={handleRejectClaim}
-                    onViewDetails={handleViewClaimDetails}
+                    onViewDetails={handleViewApprovalDetails}
                     isProcessing={isProcessing}
                   />
                 ))}
@@ -425,7 +455,7 @@ const ExpenseClaimsPage = () => {
       <CreateClaimDialog
         isOpen={isCreateClaimOpen}
         onClose={() => setIsCreateClaimOpen(false)}
-        onCreateClaim={createClaim}
+        onCreateClaim={handleCreateClaim}
         policies={policies}
         isProcessing={isProcessing}
       />

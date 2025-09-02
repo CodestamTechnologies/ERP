@@ -126,7 +126,10 @@ const OfferLetterComponent: React.FC = () => {
 
   // Utility functions
   const updateField = useCallback(<T extends keyof OfferLetterData>(section: T, field: keyof OfferLetterData[T], value: string | boolean | number) => {
-    updateData({ [section]: { ...data[section], [field]: value } });
+    const currentSection = data[section];
+    if (typeof currentSection === 'object' && currentSection !== null) {
+      updateData({ [section]: { ...currentSection, [field]: value } });
+    }
   }, [data, updateData]);
 
   const updateRootField = useCallback((field: keyof OfferLetterData, value: string | boolean | number) => {
@@ -351,6 +354,17 @@ const OfferLetterComponent: React.FC = () => {
     }
   }, [selectedTemplate, data, companyLogo, formatCurrency, formatDate]);
 
+  // Define field interface
+  interface FormFieldConfig {
+    label: string;
+    id: string;
+    type?: 'text' | 'email' | 'date' | 'textarea' | 'select' | 'number';
+    required?: boolean;
+    icon?: React.ReactNode;
+    span?: number;
+    options?: { value: string; label: string }[];
+  }
+
   // Tab configuration
   const tabsConfig = useMemo(() => [
     { 
@@ -365,8 +379,8 @@ const OfferLetterComponent: React.FC = () => {
         { label: 'State', id: 'state', required: true },
         { label: 'ZIP Code', id: 'zip', required: true },
         { label: 'Phone', id: 'phone', required: true, icon: <Phone className="w-4 h-4" /> },
-        { label: 'Email', id: 'email', type: 'email', required: true, icon: <AtSign className="w-4 h-4" />, span: 2 }
-      ]
+        { label: 'Email', id: 'email', type: 'email' as const, required: true, icon: <AtSign className="w-4 h-4" />, span: 2 }
+      ] as FormFieldConfig[]
     },
     { 
       id: 'candidate', 
@@ -375,13 +389,13 @@ const OfferLetterComponent: React.FC = () => {
       fields: [
         { label: 'First Name', id: 'firstName', required: true, icon: <User className="w-4 h-4" /> },
         { label: 'Last Name', id: 'lastName', required: true },
-        { label: 'Email', id: 'email', type: 'email', required: true, icon: <AtSign className="w-4 h-4" /> },
+        { label: 'Email', id: 'email', type: 'email' as const, required: true, icon: <AtSign className="w-4 h-4" /> },
         { label: 'Phone', id: 'phone', required: true, icon: <Phone className="w-4 h-4" /> },
         { label: 'Address', id: 'address', required: true, icon: <MapPin className="w-4 h-4" />, span: 2 },
         { label: 'City', id: 'city', required: true },
         { label: 'State', id: 'state', required: true },
         { label: 'ZIP Code', id: 'zip', required: true }
-      ]
+      ] as FormFieldConfig[]
     },
     { 
       id: 'job', 
@@ -391,24 +405,24 @@ const OfferLetterComponent: React.FC = () => {
         { label: 'Job Title', id: 'title', required: true, icon: <Briefcase className="w-4 h-4" /> },
         { label: 'Department', id: 'department', required: true },
         { label: 'Reporting Manager', id: 'reportingManager', required: true },
-        { label: 'Employment Type', id: 'employmentType', type: 'select', options: options.employmentType, required: true },
-        { label: 'Start Date', id: 'startDate', type: 'date', required: true, icon: <Calendar className="w-4 h-4" /> },
-        { label: 'Work Location', id: 'workLocation', type: 'select', options: options.workLocation, required: true },
+        { label: 'Employment Type', id: 'employmentType', type: 'select' as const, options: options.employmentType, required: true },
+        { label: 'Start Date', id: 'startDate', type: 'date' as const, required: true, icon: <Calendar className="w-4 h-4" /> },
+        { label: 'Work Location', id: 'workLocation', type: 'select' as const, options: options.workLocation, required: true },
         { label: 'Work Schedule', id: 'workSchedule', required: true, icon: <Clock className="w-4 h-4" />, span: 2 }
-      ]
+      ] as FormFieldConfig[]
     },
     { 
       id: 'compensation', 
       label: 'Compensation', 
       icon: DollarSign, 
       fields: [
-        { label: 'Base Salary', id: 'baseSalary', type: 'number', required: true, icon: <DollarSign className="w-4 h-4" /> },
-        { label: 'Currency', id: 'currency', type: 'select', options: options.currency, required: true },
-        { label: 'Pay Frequency', id: 'payFrequency', type: 'select', options: options.payFrequency, required: true },
+        { label: 'Base Salary', id: 'baseSalary', type: 'number' as const, required: true, icon: <DollarSign className="w-4 h-4" /> },
+        { label: 'Currency', id: 'currency', type: 'select' as const, options: options.currency, required: true },
+        { label: 'Pay Frequency', id: 'payFrequency', type: 'select' as const, options: options.payFrequency, required: true },
         { label: 'Performance Bonus', id: 'bonus' },
         { label: 'Stock Options', id: 'stockOptions' },
         { label: 'Other Compensation', id: 'otherCompensation' }
-      ]
+      ] as FormFieldConfig[]
     }
   ], [options]);
 
@@ -572,21 +586,28 @@ const OfferLetterComponent: React.FC = () => {
                     
                     {/* Regular Form Fields */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {tab.fields.map(field => (
-                        <div key={field.id} className={field.span === 2 ? 'md:col-span-2' : ''}>
-                          <FormField
-                            label={field.label}
-                            id={`${tab.id}-${field.id}`}
-                            value={data[tab.id as keyof OfferLetterData][field.id as keyof any] || ''}
-                            onChange={(v) => updateField(tab.id as keyof OfferLetterData, field.id as any, v)}
-                            type={field.type as any}
-                            options={field.options}
-                            required={field.required}
-                            icon={field.icon}
-                            placeholder={field.label}
-                          />
-                        </div>
-                      ))}
+                      {tab.fields.map(field => {
+                        const sectionData = data[tab.id as keyof OfferLetterData];
+                        const fieldValue = typeof sectionData === 'object' && sectionData !== null 
+  ? (sectionData as unknown as Record<string, unknown>)[field.id] || ''
+  : '';
+                        
+                        return (
+                          <div key={field.id} className={field.span === 2 ? 'md:col-span-2' : ''}>
+                            <FormField
+                              label={field.label}
+                              id={`${tab.id}-${field.id}`}
+                              value={String(fieldValue)}
+                              onChange={(v) => updateField(tab.id as keyof OfferLetterData, field.id as keyof OfferLetterData[keyof OfferLetterData], v)}
+                              type={field.type}
+                              options={field.options}
+                              required={field.required}
+                              icon={field.icon}
+                              placeholder={field.label}
+                            />
+                          </div>
+                        );
+                      })}
                     </div>
                   </CardContent>
                 </Card>
@@ -630,7 +651,7 @@ const OfferLetterComponent: React.FC = () => {
                             key={field.key} 
                             label={field.label} 
                             checked={data.benefits[field.key as keyof typeof data.benefits] as boolean} 
-                            onChange={(v) => updateField('benefits', field.key as any, v)} 
+                            onChange={(v) => updateField('benefits', field.key as keyof OfferLetterData['benefits'], v)} 
                             description={field.desc} 
                           />
                         ))}
@@ -651,7 +672,7 @@ const OfferLetterComponent: React.FC = () => {
                             label={field.label} 
                             id={field.id} 
                             value={data.benefits[field.id as keyof typeof data.benefits] as string} 
-                            onChange={(v) => updateField('benefits', field.id as any, v)} 
+                            onChange={(v) => updateField('benefits', field.id as keyof OfferLetterData['benefits'], v)} 
                             placeholder={field.placeholder} 
                           />
                         </div>
@@ -736,7 +757,7 @@ const OfferLetterComponent: React.FC = () => {
                             key={field.key} 
                             label={field.label} 
                             checked={data.terms[field.key as keyof typeof data.terms] as boolean} 
-                            onChange={(v) => updateField('terms', field.key as any, v)} 
+                            onChange={(v) => updateField('terms', field.key as keyof OfferLetterData['terms'], v)} 
                             description={field.desc} 
                           />
                         ))}
@@ -773,7 +794,7 @@ const OfferLetterComponent: React.FC = () => {
                       key={field.id} 
                       label={field.label} 
                       id={field.id} 
-                      type={field.type as any} 
+                      type={field.type as 'text' | 'email' | 'date' | 'textarea' | 'select' | 'number' | undefined} 
                       value={data[field.id as keyof OfferLetterData] as string} 
                       onChange={(v) => updateRootField(field.id as keyof OfferLetterData, v)} 
                       required={field.required} 

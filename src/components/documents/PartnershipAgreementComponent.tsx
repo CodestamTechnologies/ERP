@@ -297,7 +297,7 @@ const PartnershipAgreementComponent = () => {
 
       <div className="mb-6 space-y-6 text-gray-800 leading-relaxed">
         <p>
-          This Partnership Agreement ("Agreement") is entered into on {formatDate(data.partnership.effectiveDate)} between the following parties:
+          This Partnership Agreement Agreement is entered into on {formatDate(data.partnership.effectiveDate)} between the following parties:
         </p>
 
         {/* Partners Information */}
@@ -308,7 +308,7 @@ const PartnershipAgreementComponent = () => {
 
         <PreviewSection title="1. PARTNERSHIP FORMATION">
           <p>
-            The parties hereby agree to form a {data.partnership.partnershipType} under the name "{data.partnership.partnershipName}" 
+            The parties hereby agree to form a {data.partnership.partnershipType} under the name {data.partnership.partnershipName} 
             for the purpose of {data.partnership.businessPurpose}.
           </p>
           {data.partnership.businessAddress && (

@@ -48,7 +48,7 @@ export const CreateBudgetDialog = ({
   // Calculate end date based on period
   const calculateEndDate = (start: string, period: string) => {
     const startDate = new Date(start);
-    let endDate = new Date(startDate);
+    const endDate = new Date(startDate);
     
     switch (period) {
       case 'monthly':

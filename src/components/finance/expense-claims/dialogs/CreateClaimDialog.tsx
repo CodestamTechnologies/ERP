@@ -94,8 +94,7 @@ export const CreateClaimDialog = ({
         amount: exp.amount || 0,
         currency: exp.currency || 'USD',
         isReimbursable: exp.isReimbursable ?? true,
-        receiptUrl: exp.receiptUrl,
-        merchant: exp.merchant,
+        receiptId: exp.receiptId,
         notes: exp.notes
       }))
     };

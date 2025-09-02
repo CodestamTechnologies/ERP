@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Account } from '@/hooks/useFinance';
 import { Building2, Plus } from 'lucide-react';
 import { useState } from 'react';
-
+type AccountType = 'bank' | 'cash' | 'credit' | 'investment';
 interface AddAccountDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -24,7 +24,7 @@ export const AddAccountDialog = ({
   isProcessing
 }: AddAccountDialogProps) => {
   const [name, setName] = useState('');
-  const [type, setType] = useState<'bank' | 'cash' | 'credit' | 'investment'>('bank');
+  const [type, setType] = useState<AccountType>('bank');
   const [balance, setBalance] = useState<number>(0);
   const [currency, setCurrency] = useState('INR');
   const [accountNumber, setAccountNumber] = useState('');
@@ -99,7 +99,7 @@ export const AddAccountDialog = ({
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="type">Account Type</Label>
-                  <Select value={type} onValueChange={(value: any) => setType(value)}>
+                  <Select value={type} onValueChange={(value: AccountType) => setType(value)}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>

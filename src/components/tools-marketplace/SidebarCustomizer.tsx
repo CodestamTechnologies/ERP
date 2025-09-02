@@ -16,11 +16,22 @@ interface Tool {
   icon: ReactNode;
 }
 
+interface CustomSection {
+  id: string;
+  name: string;
+  tools: string[];
+  order: number;
+}
+
 interface SidebarConfig {
   enabledTools: string[];
   toolOrder: string[];
-  customSections: unknown[];
-  sectionConfigs: Record<string, unknown>;
+  customSections: CustomSection[];
+  sectionConfigs: Record<string, {
+    enabledSections: string[];
+    sectionOrder: string[];
+    subOptionConfigs: Record<string, string[]>;
+  }>;
 }
 
 interface SidebarCustomizerProps {

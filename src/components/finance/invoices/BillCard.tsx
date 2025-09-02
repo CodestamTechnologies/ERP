@@ -16,11 +16,23 @@ import {
   Clock,
   AlertTriangle
 } from 'lucide-react';
-
+interface BillUpdates {
+  status?: 'draft' | 'pending' | 'approved' | 'paid' | 'overdue';
+  paidAmount?: number;
+  balanceAmount?: number;
+  vendorName?: string;
+  vendorEmail?: string;
+  billDate?: string;
+  dueDate?: string;
+  notes?: string;
+  subtotal?: number;
+  taxAmount?: number;
+  totalAmount?: number;
+}
 interface BillCardProps {
   bill: Bill;
   onViewDetails: (bill: Bill) => void;
-  onEdit: (billId: string, updates: any) => void;
+  onEdit: (billId: string, updates: BillUpdates) => void;
   onDelete: (billId: string) => void;
   isProcessing: boolean;
 }
