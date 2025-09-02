@@ -28,7 +28,21 @@ export interface ComposeData {
   subject: string;
   content: string;
   priority: 'high' | 'medium' | 'low';
-  [key: string]: any; // For service-specific fields
+  // Service-specific fields
+  encryptionEnabled?: boolean;
+  passwordProtection?: boolean;
+  expirationEnabled?: boolean;
+  expirationTime?: string;
+  importance?: string;
+  sensitivity?: string;
+  [key: string]: string | boolean | undefined; // For additional service-specific fields
+}
+
+interface CustomAction {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  action: (data: ComposeData) => void;
 }
 
 export interface ComposeDialogProps {
@@ -39,7 +53,7 @@ export interface ComposeDialogProps {
   
   // Service configuration
   serviceName: string;
-  serviceIcon: any;
+  serviceIcon: React.ComponentType<{ className?: string }>;
   serviceColor: string;
   serviceType: 'google' | 'microsoft' | 'zoho' | 'proton';
   
@@ -49,12 +63,7 @@ export interface ComposeDialogProps {
   // Service-specific options
   securityOptions?: ReactNode;
   additionalFields?: ReactNode;
-  customActions?: Array<{
-    id: string;
-    label: string;
-    icon: any;
-    action: (data: ComposeData) => void;
-  }>;
+  customActions?: CustomAction[];
   
   // Customization
   title?: string;
@@ -89,7 +98,7 @@ const ComposeDialog = ({
     ...initialData
   });
 
-  const updateField = (field: string, value: any) => {
+  const updateField = (field: string, value: string | boolean) => {
     setComposeData(prev => ({ ...prev, [field]: value }));
   };
 

@@ -413,8 +413,31 @@ export const useVendorBills = () => {
     }
   }, []);
 
+  // Define interfaces for payment operations
+  interface PaymentData {
+    amount: number;
+    paymentMethod: string;
+    paymentDate: string;
+    reference?: string;
+    notes?: string;
+  }
+
+  interface BulkPaymentData {
+    paymentMethod: string;
+    paymentDate: string;
+    reference?: string;
+    notes?: string;
+  }
+
+  interface ScheduleData {
+    scheduledDate: string;
+    amount: number;
+    paymentMethod: string;
+    notes?: string;
+  }
+
   // Process payment
-  const processPayment = useCallback(async (billId: string, paymentData: any) => {
+  const processPayment = useCallback(async (billId: string, paymentData: PaymentData) => {
     setIsProcessing(true);
     try {
       // Simulate API call
@@ -446,7 +469,7 @@ export const useVendorBills = () => {
   }, []);
 
   // Bulk payment
-  const bulkPayment = useCallback(async (billIds: string[], paymentData: any) => {
+  const bulkPayment = useCallback(async (billIds: string[], paymentData: BulkPaymentData) => {
     setIsProcessing(true);
     try {
       // Simulate API call
@@ -477,7 +500,7 @@ export const useVendorBills = () => {
   }, []);
 
   // Schedule payment
-  const schedulePayment = useCallback(async (billId: string, scheduleData: any) => {
+  const schedulePayment = useCallback(async (billId: string, scheduleData: ScheduleData) => {
     setIsProcessing(true);
     try {
       // Simulate API call

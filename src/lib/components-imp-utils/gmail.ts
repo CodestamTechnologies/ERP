@@ -114,9 +114,56 @@ export const getEmailDomain = (email: string): string => {
   return parts.length > 1 ? parts[1] : '';
 };
 
-export const sortEmails = (emails: any[], sortBy: string, sortOrder: 'asc' | 'desc' = 'desc') => {
+// Define interfaces for type safety
+interface Email {
+  id: string;
+  sender: string;
+  recipient: string;
+  subject: string;
+  content: string;
+  timestamp: string;
+  date: string;
+  isRead: boolean;
+  isStarred: boolean;
+  priority: 'high' | 'medium' | 'low';
+  folder: string;
+  hasAttachments: boolean;
+  threadId: string;
+}
+
+interface EmailFilters {
+  folder?: string;
+  priority?: string;
+  isRead?: boolean;
+  isStarred?: boolean;
+  hasAttachments?: boolean;
+  dateRange?: { start: string; end: string };
+  sender?: string;
+  recipient?: string;
+  searchTerm?: string;
+}
+
+interface EmailThread {
+  id: string;
+  subject: string;
+  participants: string[];
+  emails: Email[];
+  lastActivity: string;
+  isRead: boolean;
+  isStarred: boolean;
+  emailCount: number;
+}
+
+interface EmailTemplate {
+  name: string;
+  subject: string;
+  content: string;
+  category: string;
+}
+
+export const sortEmails = (emails: Email[], sortBy: string, sortOrder: 'asc' | 'desc' = 'desc') => {
   return [...emails].sort((a, b) => {
-    let aValue, bValue;
+    let aValue: string | number, bValue: string | number;
     
     switch (sortBy) {
       case 'date':
@@ -133,8 +180,8 @@ export const sortEmails = (emails: any[], sortBy: string, sortOrder: 'asc' | 'de
         break;
       case 'priority':
         const priorityOrder = { high: 3, medium: 2, low: 1 };
-        aValue = priorityOrder[a.priority as keyof typeof priorityOrder] || 0;
-        bValue = priorityOrder[b.priority as keyof typeof priorityOrder] || 0;
+        aValue = priorityOrder[a.priority] || 0;
+        bValue = priorityOrder[b.priority] || 0;
         break;
       case 'size':
         aValue = a.content.length;
@@ -153,7 +200,7 @@ export const sortEmails = (emails: any[], sortBy: string, sortOrder: 'asc' | 'de
   });
 };
 
-export const filterEmails = (emails: any[], filters: any) => {
+export const filterEmails = (emails: Email[], filters: EmailFilters) => {
   return emails.filter(email => {
     // Folder filter
     if (filters.folder && filters.folder !== 'all' && email.folder !== filters.folder) {
@@ -215,26 +262,33 @@ export const filterEmails = (emails: any[], filters: any) => {
   });
 };
 
-export const groupEmailsByThread = (emails: any[]) => {
-  const threads: { [key: string]: any } = {};
+export const groupEmailsByThread = (emails: Email[]): EmailThread[] => {
+  const threads: { [key: string]: EmailThread } = {};
   
   emails.forEach(email => {
     if (!threads[email.threadId]) {
       threads[email.threadId] = {
         id: email.threadId,
         subject: email.subject,
-        participants: new Set(),
+        participants: [],
         emails: [],
         lastActivity: email.timestamp,
         isRead: true,
-        isStarred: false
+        isStarred: false,
+        emailCount: 0
       };
     }
     
     const thread = threads[email.threadId];
     thread.emails.push(email);
-    thread.participants.add(email.sender);
-    thread.participants.add(email.recipient);
+    
+    // Add participants (avoiding duplicates)
+    if (!thread.participants.includes(email.sender)) {
+      thread.participants.push(email.sender);
+    }
+    if (!thread.participants.includes(email.recipient)) {
+      thread.participants.push(email.recipient);
+    }
     
     // Update thread properties
     if (new Date(email.timestamp) > new Date(thread.lastActivity)) {
@@ -250,16 +304,15 @@ export const groupEmailsByThread = (emails: any[]) => {
     }
   });
   
-  // Convert participants Set to Array
-  Object.values(threads).forEach((thread: any) => {
-    thread.participants = Array.from(thread.participants);
+  // Set email count for each thread
+  Object.values(threads).forEach((thread) => {
     thread.emailCount = thread.emails.length;
   });
   
   return Object.values(threads);
 };
 
-export const calculateEmailMetrics = (emails: any[]) => {
+export const calculateEmailMetrics = (emails: Email[]) => {
   const metrics = {
     total: emails.length,
     unread: 0,
@@ -279,7 +332,7 @@ export const calculateEmailMetrics = (emails: any[]) => {
     if (email.hasAttachments) metrics.withAttachments++;
     
     // Priority distribution
-    metrics.byPriority[email.priority as keyof typeof metrics.byPriority]++;
+    metrics.byPriority[email.priority]++;
     
     // Folder distribution
     if (!metrics.byFolder[email.folder]) {
@@ -312,7 +365,7 @@ export const calculateEmailMetrics = (emails: any[]) => {
   return metrics;
 };
 
-export const generateEmailReport = (emails: any[], dateRange: { start: string; end: string }) => {
+export const generateEmailReport = (emails: Email[], dateRange: { start: string; end: string }) => {
   const filteredEmails = emails.filter(email => {
     const emailDate = new Date(email.date);
     const startDate = new Date(dateRange.start);
@@ -336,7 +389,7 @@ export const generateEmailReport = (emails: any[], dateRange: { start: string; e
   };
 };
 
-export const exportEmailsToCSV = (emails: any[]) => {
+export const exportEmailsToCSV = (emails: Email[]) => {
   const headers = [
     'Subject',
     'Sender',
@@ -366,7 +419,7 @@ export const exportEmailsToCSV = (emails: any[]) => {
   return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
 };
 
-export const validateEmailTemplate = (template: any) => {
+export const validateEmailTemplate = (template: EmailTemplate) => {
   const errors: string[] = [];
   
   if (!template.name || template.name.trim().length === 0) {

@@ -5,10 +5,28 @@ import { Separator } from '@/components/ui/separator';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { ShoppingCart, CreditCard, Check, AlertTriangle, Crown, Zap } from 'lucide-react';
+import { ReactNode } from 'react';
+
+// Define CartItem interface for type safety
+interface CartItem {
+  id: string;
+  name: string;
+  suite: string;
+  category: string;
+  icon: ReactNode;
+  price: number;
+  isPremium?: boolean;
+  isNew?: boolean;
+}
 
 interface PurchaseDialogProps {
-  isOpen: boolean; onClose: () => void; cartItems: any[]; totalPrice: number;
-  onPurchase: (toolId: string) => Promise<void>; userCredits: number; isProcessing: boolean;
+  isOpen: boolean;
+  onClose: () => void;
+  cartItems: CartItem[];
+  totalPrice: number;
+  onPurchase: (toolId: string) => Promise<void>;
+  userCredits: number;
+  isProcessing: boolean;
 }
 
 export const PurchaseDialog = ({

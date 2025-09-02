@@ -35,10 +35,13 @@ export const formatIndianCurrency = (amount: number): string => {
 };
 
 // Convert Firestore timestamp to date string
-const timestampToDateString = (timestamp: any): string => {
+const timestampToDateString = (timestamp: Timestamp | Date | string | null | undefined): string => {
   if (!timestamp) return new Date().toISOString().split('T')[0];
-  if (timestamp.toDate) {
+  if (timestamp instanceof Timestamp) {
     return timestamp.toDate().toISOString().split('T')[0];
+  }
+  if (timestamp instanceof Date) {
+    return timestamp.toISOString().split('T')[0];
   }
   return new Date(timestamp).toISOString().split('T')[0];
 };
@@ -348,8 +351,18 @@ export const batchUpdateOrdersFirestore = async (updates: { [orderId: string]: P
   }
 };
 
+// Define interface for analytics data
+interface OrdersAnalytics {
+  totalRevenue: number;
+  totalOrders: number;
+  avgOrderValue: number;
+  statusCounts: Record<string, number>;
+  channelRevenue: Record<string, number>;
+  lastUpdated: number;
+}
+
 // Analytics helpers for Firestore data
-export const getOrdersAnalyticsFirestore = (callback: (analytics: any) => void) => {
+export const getOrdersAnalyticsFirestore = (callback: (analytics: OrdersAnalytics) => void) => {
   try {
     const ordersQuery = query(collection(firestore, ORDERS_COLLECTION));
     

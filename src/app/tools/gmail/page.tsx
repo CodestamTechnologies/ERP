@@ -20,7 +20,7 @@ export default function GmailPage() {
           </svg>
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Gmail Integration Coming Soon</h2>
           <p className="text-gray-600 mb-6">
-            We're working on integrating Gmail functionality to help you manage your email communications, 
+            We&apos;re working on integrating Gmail functionality to help you manage your email communications, 
             track email campaigns, and analyze email performance metrics.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">

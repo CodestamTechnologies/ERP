@@ -19,6 +19,24 @@ import WebsiteFeatures from '@/components/website/WebsiteFeatures';
 import QuickSetup from '@/components/website/QuickSetup';
 import WebsiteBuilder from '@/components/website/WebsiteBuilder';
 
+// Define interfaces for type safety
+interface DomainAnalysis {
+  domain: string;
+  status: 'online' | 'offline' | 'error';
+  loadTime: string;
+  ssl: boolean;
+  responsive: boolean;
+  seoScore: number;
+  technologies: string[];
+}
+
+interface WebsiteData {
+  name: string;
+  domain: string;
+  template?: string;
+  settings?: Record<string, unknown>;
+}
+
 const WebsitePage = () => {
   const {
     domainUrl,
@@ -47,7 +65,7 @@ const WebsitePage = () => {
   const [selectedTemplate, setSelectedTemplate] = useState(0);
   const [showQuickSetup, setShowQuickSetup] = useState(false);
   const [showWebsiteBuilder, setShowWebsiteBuilder] = useState(false);
-  const [domainAnalysis, setDomainAnalysis] = useState<any>(null);
+  const [domainAnalysis, setDomainAnalysis] = useState<DomainAnalysis | null>(null);
 
   // Template data
   const templates = [
@@ -121,7 +139,7 @@ const WebsitePage = () => {
   };
 
   // Handle website creation from builder
-  const handleWebsiteCreation = (websiteData: any) => {
+  const handleWebsiteCreation = (websiteData: WebsiteData) => {
     console.log('Creating website with data:', websiteData);
     
     // Simulate adding the created website to tabs
@@ -627,7 +645,7 @@ const WebsitePage = () => {
               <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200">
                 <div className="flex items-center space-x-3 mb-4">
                   <Target className="w-6 h-6 text-indigo-600" />
-                  <h4 className="font-semibold text-indigo-900">What You'll Get</h4>
+                  <h4 className="font-semibold text-indigo-900">What You&apos;ll Get</h4>
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-sm text-indigo-800">
                   <div className="flex items-center space-x-2">

@@ -1,8 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
+interface ProfitLossData {
+  operatingRevenue: number;
+  nonOperatingRevenue: number;
+  operatingExpenses: number;
+  nonOperatingExpenses: number;
+  totalRevenue: number;
+  costOfGoodsSold: number;
+  operatingProfit: number;
+  netProfit: number;
+}
+
 interface ProfitLossChartProps {
-  data: any; formatCurrency: (amount: number) => string;
+  data: ProfitLossData;
+  formatCurrency: (amount: number) => string;
 }
 
 export const ProfitLossChart = ({ data, formatCurrency }: ProfitLossChartProps) => {

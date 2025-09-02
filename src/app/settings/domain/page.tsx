@@ -122,7 +122,7 @@ export default function ConnectDomainPage() {
                   <div>
                     <h3 className="font-medium text-gray-900">Configure DNS</h3>
                     <p className="text-sm text-gray-600 mt-1">
-                      Point your domain's A record to our server IP address.
+                      Point your domain&apos;s A record to our server IP address.
                     </p>
                     <div className="mt-2 p-2 bg-gray-100 rounded text-sm font-mono">
                       A Record: @ → 192.168.1.100
@@ -137,7 +137,7 @@ export default function ConnectDomainPage() {
                   <div>
                     <h3 className="font-medium text-gray-900">Connect Domain</h3>
                     <p className="text-sm text-gray-600 mt-1">
-                      Enter your domain in the form and click "Connect Domain".
+                      Enter your domain in the form and click Connect Domain.
                     </p>
                   </div>
                 </div>
@@ -149,7 +149,7 @@ export default function ConnectDomainPage() {
                   <div>
                     <h3 className="font-medium text-gray-900">SSL Certificate</h3>
                     <p className="text-sm text-gray-600 mt-1">
-                      We'll automatically generate an SSL certificate for your domain.
+                      We&apos;ll automatically generate an SSL certificate for your domain.
                     </p>
                   </div>
                 </div>

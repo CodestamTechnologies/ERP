@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -16,8 +16,7 @@ import {
   WHATSAPP_MESSAGES, 
   WHATSAPP_TEAM, 
   RECENT_ACTIVITIES, 
-  QUICK_ACTIONS, 
-  TABS 
+  QUICK_ACTIONS
 } from '@/lib/components-Data/whatsapp/constent';
 import { 
   getStatusColor, 
@@ -39,13 +38,44 @@ import {
   faComments,
   faChartLine,
   faClock,
-  faCheckDouble,
-  faExclamationTriangle,
   faEnvelope,
   faBullhorn,
   faPhone
 } from '@fortawesome/free-solid-svg-icons';
-import { ChartIcon, AIInsightsIcon, DashboardIcon, CustomersIcon, UserIcon } from '@/components/Icons';
+import { ChartIcon, AIInsightsIcon } from '@/components/Icons';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { ReactNode } from 'react';
+
+// Define interfaces for type safety
+interface TabItem {
+  id: string;
+  name: string;
+  icon: ReactNode;
+}
+
+interface EnhancedStat {
+  name: string;
+  value: string;
+  change: string;
+  changeType: 'positive' | 'negative';
+  target: string;
+  progress: number;
+  icon: ReactNode;
+}
+
+interface EnhancedQuickAction {
+  name: string;
+  color: string;
+  icon: ReactNode;
+}
+
+interface EnhancedRecentActivity {
+  id: string;
+  message: string;
+  time: string;
+  priority: string;
+  icon: ReactNode;
+}
 
 export default function WhatsAppPage() {
   const {
@@ -120,19 +150,19 @@ export default function WhatsAppPage() {
   );
 
   // Icon mapping function for stats
-  const getStatsIcon = (iconType: string) => {
-    const iconMap: { [key: string]: JSX.Element } = {
+  const getStatsIcon = (iconType: string): ReactNode => {
+    const iconMap: { [key: string]: ReactNode } = {
       eye: <FontAwesomeIcon icon={faEye} className="w-5 h-5" style={{ color: '#3B82F6' }} />,
       paperPlane: <FontAwesomeIcon icon={faPaperPlane} className="w-5 h-5" style={{ color: '#10B981' }} />,
       reply: <FontAwesomeIcon icon={faReply} className="w-5 h-5" style={{ color: '#8B5CF6' }} />,
       userPlus: <FontAwesomeIcon icon={faUserPlus} className="w-5 h-5" style={{ color: '#F59E0B' }} />
     };
-    return iconMap[iconType];
+    return iconMap[iconType] || <FontAwesomeIcon icon={faEye} className="w-5 h-5" style={{ color: '#3B82F6' }} />;
   };
 
   // Icon mapping function for quick actions
-  const getQuickActionIcon = (iconType: string, color: string) => {
-    const iconMap: { [key: string]: any } = {
+  const getQuickActionIcon = (iconType: string, color: string): ReactNode => {
+    const iconMap: { [key: string]: IconDefinition } = {
       bullhorn: faBullhorn,
       envelope: faEnvelope,
       userPlus: faUserPlus,
@@ -141,19 +171,29 @@ export default function WhatsAppPage() {
       phone: faPhone
     };
 
-    return <FontAwesomeIcon icon={iconMap[iconType]} className={`w-5 h-5 text-${color}-600`} />;
+    const icon = iconMap[iconType];
+    if (!icon) {
+      return <FontAwesomeIcon icon={faComments} className={`w-5 h-5 text-${color}-600`} />;
+    }
+
+    return <FontAwesomeIcon icon={icon} className={`w-5 h-5 text-${color}-600`} />;
   };
 
   // Icon mapping function for activities
-  const getActivityIcon = (iconType: string) => {
-    const iconMap: { [key: string]: any } = {
+  const getActivityIcon = (iconType: string): ReactNode => {
+    const iconMap: { [key: string]: IconDefinition } = {
       comments: faComments,
       bullhorn: faBullhorn,
       userPlus: faUserPlus,
       clock: faClock
     };
 
-    return <FontAwesomeIcon icon={iconMap[iconType]} className="w-4 h-4" />;
+    const icon = iconMap[iconType];
+    if (!icon) {
+      return <FontAwesomeIcon icon={faComments} className="w-4 h-4" />;
+    }
+
+    return <FontAwesomeIcon icon={icon} className="w-4 h-4" />;
   };
 
   // Enhanced stats with icons

@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -11,10 +11,10 @@ import { motion } from 'framer-motion';
 import { useAccountsPayable } from '@/hooks/useAccountsPayable';
 import { 
   CreditCard, Plus, Search, Filter, Download, Calendar, Send, RefreshCw, Activity, FileText,
-  DollarSign, Building2, CheckCircle, TrendingUp
+ Building2, CheckCircle
 } from 'lucide-react';
 import { useState } from 'react';
-import { PayableInvoice, Vendor } from '@/types/accountsPayable';
+import { PayableInvoice, Vendor, BulkPaymentRequest } from '@/types/accountsPayable';
 
 // Import components
 import { PayableInvoiceCard } from '@/components/finance/accounts-payable/PayableInvoiceCard';
@@ -25,7 +25,20 @@ import { CreatePayableDialog } from '@/components/finance/accounts-payable/dialo
 import { PaymentDialog } from '@/components/finance/accounts-payable/dialogs/PaymentDialog';
 import { VendorDetailsDialog } from '@/components/finance/accounts-payable/dialogs/VendorDetailsDialog';
 import { BulkPaymentDialog } from '@/components/finance/accounts-payable/dialogs/BulkPaymentDialog';
-import { StatsCard } from '@/components/shared/StatsCard';
+
+// Define proper types for payment data
+interface PaymentData {
+  amount: number;
+  paymentMethod: string;
+  paymentDate: string;
+  notes?: string;
+}
+
+interface SchedulePaymentData {
+  scheduledDate: string;
+  amount: number;
+  notes?: string;
+}
 
 const AccountsPayablePage = () => {
   const {
@@ -45,29 +58,29 @@ const AccountsPayablePage = () => {
   });
 
   const handlers = {
-    createPayable: async (data: any) => {
+    createPayable: async (data: Partial<PayableInvoice>) => {
       try {
         await createPayableInvoice(data);
         setDialogs(prev => ({ ...prev, createPayable: false }));
         alert('Payable invoice created successfully!');
       } catch { alert('Error creating payable invoice.'); }
     },
-    processPayment: async (invoiceId: string, data: any) => {
+    processPayment: async (invoiceId: string, data: PaymentData) => {
       try {
         await processPayment(invoiceId, data);
         setDialogs(prev => ({ ...prev, payment: false }));
         alert('Payment processed successfully!');
       } catch { alert('Error processing payment.'); }
     },
-    bulkPayment: async (invoiceIds: string[], data: any) => {
-      try {
-        await bulkPayment(invoiceIds, data);
+    bulkPayment: async (data: BulkPaymentRequest) => {
+  try {
+    await bulkPayment(data.invoiceIds, data);
         setDialogs(prev => ({ ...prev, bulkPayment: false }));
         setSelected(prev => ({ ...prev, invoices: [] }));
         alert('Bulk payment processed successfully!');
       } catch { alert('Error processing bulk payment.'); }
     },
-    schedulePayment: async (invoiceId: string, data: any) => {
+    schedulePayment: async (invoiceId: string, data: SchedulePaymentData) => {
       try {
         await schedulePayment(invoiceId, data);
         alert('Payment scheduled successfully!');
@@ -491,7 +504,11 @@ const AccountsPayablePage = () => {
       <VendorDetailsDialog isOpen={dialogs.vendorDetails} onClose={() => setDialogs(prev => ({ ...prev, vendorDetails: false }))}
         vendor={selected.vendor} payableInvoices={payableInvoices.filter(inv => inv.vendorId === selected.vendor?.id)} />
       <BulkPaymentDialog isOpen={dialogs.bulkPayment} onClose={() => setDialogs(prev => ({ ...prev, bulkPayment: false }))}
-        selectedInvoices={payableInvoices.filter(inv => selected.invoices.includes(inv.id))} onProcessBulkPayment={handlers.bulkPayment} isProcessing={isProcessing} />
+        selectedInvoices={payableInvoices.filter(inv => selected.invoices.includes(inv.id))} 
+        onProcessBulkPayment={(invoiceIds: string[], paymentData: BulkPaymentRequest) => 
+  handlers.bulkPayment(paymentData)
+}
+        isProcessing={isProcessing} />
     </div>
   );
 };

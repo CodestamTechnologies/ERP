@@ -16,6 +16,19 @@ import { useTasks } from '@/hooks/useTasks';
 import { useAuth } from '@/context/authContext';
 import { Task, TaskType, TaskPriority, TaskStatus, UserRole } from '@/types/todos';
 
+// Define interfaces for task data
+interface TaskFormData {
+  title: string;
+  description: string;
+  category: string;
+  priority: TaskPriority;
+  assignedTo?: string;
+  department?: string;
+  dueDate: string;
+  tags?: string;
+  estimatedHours?: string;
+}
+
 const Todo = () => {
   const [activeTab, setActiveTab] = useState<TaskType>('business');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -98,7 +111,7 @@ const Todo = () => {
     }
   };
 
-  const handleAddTask = async (taskData: any) => {
+  const handleAddTask = async (taskData: TaskFormData) => {
     try {
       if (!currentUser) throw new Error('User not authenticated');
 
@@ -116,7 +129,7 @@ const Todo = () => {
         updatedAt: new Date().toISOString(),
         tags: taskData.tags ? taskData.tags.split(',').map((tag: string) => tag.trim()) : [],
         progress: 0,
-        estimatedHours: parseInt(taskData.estimatedHours) || 1,
+        estimatedHours: parseInt(taskData.estimatedHours || '1') || 1,
         type: activeTab,
         createdBy: currentUser.uid,
         createdByName: currentUser.displayName || 'Unknown'
@@ -129,7 +142,7 @@ const Todo = () => {
     }
   };
 
-  const handleEditTask = async (taskData: any, taskId?: string) => {
+  const handleEditTask = async (taskData: TaskFormData, taskId?: string) => {
     if (!taskId) return;
     
     try {
@@ -143,7 +156,7 @@ const Todo = () => {
         dueDate: taskData.dueDate,
         updatedAt: new Date().toISOString(),
         tags: taskData.tags ? taskData.tags.split(',').map((tag: string) => tag.trim()) : [],
-        estimatedHours: parseInt(taskData.estimatedHours) || 1,
+        estimatedHours: parseInt(taskData.estimatedHours || '1') || 1,
       };
 
       await updateTask(taskId, updatedTask);

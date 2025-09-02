@@ -3,11 +3,40 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { Star, Download, Eye, ShoppingCart, Check, X, Crown, Sparkles, TrendingUp } from 'lucide-react';
+import { ReactNode } from 'react';
+
+// Define Tool interface for type safety
+interface Tool {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  icon: ReactNode;
+  features: string[];
+  rating: number;
+  downloads: number;
+  size: string;
+  version: string;
+  developer: string;
+  screenshots: string[];
+  isPopular?: boolean;
+  isNew?: boolean;
+  isPremium?: boolean;
+  suite?: string;
+}
 
 interface ToolCardProps {
-  tool: any; isInstalled: boolean; isInCart: boolean; price: number;
-  onAddToCart: () => void; onRemoveFromCart: () => void; onViewDetails: () => void;
-  onInstall: () => void; onUninstall: () => void; index: number; isProcessing: boolean;
+  tool: Tool;
+  isInstalled: boolean;
+  isInCart: boolean;
+  price: number;
+  onAddToCart: () => void;
+  onRemoveFromCart: () => void;
+  onViewDetails: () => void;
+  onInstall: () => void;
+  onUninstall: () => void;
+  index: number;
+  isProcessing: boolean;
 }
 
 export const ToolCard = ({

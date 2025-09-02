@@ -20,7 +20,7 @@ export default function FinancePage() {
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Finance Module Coming Soon</h2>
           <p className="text-gray-600 mb-6">
-            We're developing comprehensive financial management tools to help you track expenses, 
+            We&apos;re developing comprehensive financial management tools to help you track expenses, 
             manage budgets, generate financial reports, and monitor cash flow.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">

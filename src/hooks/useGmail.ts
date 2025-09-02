@@ -196,8 +196,27 @@ export const useGmail = () => {
     avgResponseTimeChange: '-0.5h'
   };
 
+  // Define interfaces for email operations
+  interface EmailData {
+    to: string;
+    subject: string;
+    content: string;
+    priority: 'low' | 'medium' | 'high';
+  }
+
+  interface ReplyData {
+    content: string;
+    priority: 'low' | 'medium' | 'high';
+  }
+
+  interface ForwardData {
+    to: string;
+    content: string;
+    priority: 'low' | 'medium' | 'high';
+  }
+
   // Email operations
-  const handleSendEmail = useCallback(async (emailData: any) => {
+  const handleSendEmail = useCallback(async (emailData: EmailData) => {
     const newEmail: Email = {
       id: `email-${Date.now()}`,
       sender: 'you@company.com',
@@ -217,7 +236,7 @@ export const useGmail = () => {
     setEmails(prev => [newEmail, ...prev]);
   }, []);
 
-  const handleReplyEmail = useCallback(async (emailId: string, replyData: any) => {
+  const handleReplyEmail = useCallback(async (emailId: string, replyData: ReplyData) => {
     const originalEmail = emails.find(email => email.id === emailId);
     if (!originalEmail) return;
 
@@ -240,7 +259,7 @@ export const useGmail = () => {
     setEmails(prev => [replyEmail, ...prev]);
   }, [emails]);
 
-  const handleForwardEmail = useCallback(async (emailId: string, forwardData: any) => {
+  const handleForwardEmail = useCallback(async (emailId: string, forwardData: ForwardData) => {
     const originalEmail = emails.find(email => email.id === emailId);
     if (!originalEmail) return;
 
@@ -319,8 +338,17 @@ export const useGmail = () => {
     ));
   }, []);
 
+  // Define interfaces for template operations
+  interface TemplateData {
+    name: string;
+    subject: string;
+    content: string;
+    category: string;
+    isActive: boolean;
+  }
+
   // Template operations
-  const handleCreateTemplate = useCallback(async (templateData: any) => {
+  const handleCreateTemplate = useCallback(async (templateData: TemplateData) => {
     const newTemplate: EmailTemplate = {
       id: `template-${Date.now()}`,
       name: templateData.name,
@@ -335,7 +363,7 @@ export const useGmail = () => {
     setTemplates(prev => [newTemplate, ...prev]);
   }, []);
 
-  const handleUpdateTemplate = useCallback(async (templateId: string, templateData: any) => {
+  const handleUpdateTemplate = useCallback(async (templateId: string, templateData: Partial<TemplateData>) => {
     setTemplates(prev => prev.map(template => 
       template.id === templateId 
         ? { 

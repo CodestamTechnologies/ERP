@@ -10,11 +10,43 @@ import {
   BarChart3, BookOpen, ArrowUpDown, Landmark, FileText, Target,
   Shield, Users, Package, DollarSign, Building2, Wrench
 } from 'lucide-react';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { useState } from 'react';
 
+// Define interfaces for tool and configuration data
+interface ToolOption {
+  id: string;
+  name: string;
+  badge?: string;
+}
+
+interface ToolSection {
+  id: string;
+  title: string;
+  icon: React.ReactNode;
+  options: ToolOption[];
+}
+
+interface Tool {
+  id: string;
+  name: string;
+  icon: React.ReactNode;
+}
+
+interface SectionConfig {
+  enabledSections: string[];
+  sectionOrder: string[];
+  subOptionConfigs: Record<string, string[]>;
+}
+
+interface SidebarConfig {
+  enabledTools: string[];
+  toolOrder: string[];
+  sectionConfigs?: Record<string, SectionConfig>;
+}
+
 // Mock data for Finance module sections
-const financeModuleSections = [
+const financeModuleSections: ToolSection[] = [
   {
     id: 'dashboard-overview',
     title: 'Dashboard & Overview',
@@ -143,12 +175,12 @@ const financeModuleSections = [
 ];
 
 interface AdvancedSidebarCustomizerProps {
-  availableTools: any[];
+  availableTools: Tool[];
   installedTools: string[];
-  sidebarConfig: any;
+  sidebarConfig: SidebarConfig;
   onInstall: (toolId: string) => void;
   onUninstall: (toolId: string) => void;
-  onConfigUpdate: (config: any) => void;
+  onConfigUpdate: (config: Partial<SidebarConfig>) => void;
   isProcessing: boolean;
 }
 
@@ -156,7 +188,7 @@ export const AdvancedSidebarCustomizer = ({
   availableTools, installedTools, sidebarConfig, onInstall, onUninstall, onConfigUpdate, isProcessing
 }: AdvancedSidebarCustomizerProps) => {
   const [selectedTool, setSelectedTool] = useState('finance');
-  const [sectionConfigs, setSectionConfigs] = useState<Record<string, any>>({
+  const [sectionConfigs, setSectionConfigs] = useState<Record<string, SectionConfig>>({
     finance: {
       enabledSections: ['dashboard-overview', 'accounts-management', 'reports-analytics'],
       sectionOrder: ['dashboard-overview', 'accounts-management', 'payables-receivables', 'bank-cash-management', 'invoicing-billing', 'budgeting-forecasting', 'taxation-compliance', 'payroll-expenses', 'fixed-assets', 'reports-analytics', 'settings-configurations'],
@@ -168,7 +200,7 @@ export const AdvancedSidebarCustomizer = ({
     }
   });
 
-  const handleDragEnd = (result: any) => {
+  const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
     
     const items = Array.from(sidebarConfig.toolOrder);

@@ -4,18 +4,39 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { GripVertical, Settings, Eye, Plus, Minus } from 'lucide-react';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { ReactNode } from 'react';
+
+// Define interfaces for type safety
+interface Tool {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  icon: ReactNode;
+}
+
+interface SidebarConfig {
+  enabledTools: string[];
+  toolOrder: string[];
+  customSections: unknown[];
+  sectionConfigs: Record<string, unknown>;
+}
 
 interface SidebarCustomizerProps {
-  availableTools: any[]; installedTools: string[]; sidebarConfig: any;
-  onInstall: (toolId: string) => void; onUninstall: (toolId: string) => void;
-  onConfigUpdate: (config: any) => void; isProcessing: boolean;
+  availableTools: Tool[];
+  installedTools: string[];
+  sidebarConfig: SidebarConfig;
+  onInstall: (toolId: string) => void;
+  onUninstall: (toolId: string) => void;
+  onConfigUpdate: (config: Partial<SidebarConfig>) => void;
+  isProcessing: boolean;
 }
 
 export const SidebarCustomizer = ({
   availableTools, installedTools, sidebarConfig, onInstall, onUninstall, onConfigUpdate, isProcessing
 }: SidebarCustomizerProps) => {
-  const handleDragEnd = (result: any) => {
+  const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
     
     const items = Array.from(sidebarConfig.toolOrder);

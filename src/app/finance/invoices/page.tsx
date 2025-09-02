@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -11,21 +11,10 @@ import {
   FileText,
   Plus,
   Search,
-  Filter,
-  Download,
-  Upload,
-  Send,
-  Eye,
-  Edit,
-  Copy,
-  Trash2,
+  Download, 
   DollarSign,
   Calendar,
-  Users,
   TrendingUp,
-  Settings,
-  Mail,
-  Printer,
   CreditCard
 } from 'lucide-react';
 import { useState } from 'react';
@@ -58,8 +47,7 @@ const InvoicesPage = () => {
     isProcessing,
     updateFilters,
     createInvoice,
-    createBill,
-    updateInvoice,
+    createBill, 
     updateBill,
     sendInvoice,
     duplicateInvoice,
@@ -67,10 +55,8 @@ const InvoicesPage = () => {
     recordPayment,
     exportData,
     generateReport,
-    addCustomer,
-    updateCustomer,
+    addCustomer,   
     addTemplate,
-    updateTemplate,
     deleteBill
   } = useInvoices();
 
@@ -84,9 +70,9 @@ const InvoicesPage = () => {
   const [isCreateTemplateOpen, setIsCreateTemplateOpen] = useState(false);
   const [isEditBillOpen, setIsEditBillOpen] = useState(false);
   const [isTemplatePreviewOpen, setIsTemplatePreviewOpen] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
-  const [selectedBill, setSelectedBill] = useState<any>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<typeof invoices[0] | null>(null);
+  const [selectedBill, setSelectedBill] = useState<typeof bills[0] | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<typeof templates[0] | null>(null);
 
   const STATS_CARDS = [
     {
@@ -128,12 +114,27 @@ const InvoicesPage = () => {
   ];
 
   // Event Handlers with proper error handling and success messages
-  const handleViewInvoiceDetails = (invoice: any) => {
+  const handleViewInvoiceDetails = (invoice: typeof invoices[0]) => {
     setSelectedInvoice(invoice);
     setIsInvoiceDetailsOpen(true);
   };
 
-  const handleSendInvoice = (invoice: any) => {
+  const handleViewBillDetails = (bill: typeof bills[0]) => {
+    // Convert bill to invoice-like structure for the details dialog
+    const invoiceFromBill = {
+      ...bill,
+      invoiceNumber: bill.billNumber || bill.id,
+      customerId: bill.vendorId || '',
+      customerName: bill.vendorName || '',
+      customerEmail: bill.vendorEmail || '',
+      dueDate: bill.dueDate || new Date().toISOString(),
+      balanceAmount: bill.totalAmount || 0
+    };
+    setSelectedInvoice(invoiceFromBill as unknown as typeof invoices[0]);
+    setIsInvoiceDetailsOpen(true);
+  };
+
+  const handleSendInvoice = (invoice: typeof invoices[0]) => {
     setSelectedInvoice(invoice);
     setIsSendInvoiceOpen(true);
   };
@@ -158,7 +159,7 @@ const InvoicesPage = () => {
     }
   };
 
-  const handleRecordPayment = async (invoiceId: string, paymentData: any) => {
+  const handleRecordPayment = async (invoiceId: string, paymentData: Parameters<typeof recordPayment>[1]) => {
     try {
       await recordPayment(invoiceId, paymentData);
       alert('Payment recorded successfully!');
@@ -185,7 +186,7 @@ const InvoicesPage = () => {
     }
   };
 
-  const handleCreateInvoice = async (invoiceData: any) => {
+  const handleCreateInvoice = async (invoiceData: Parameters<typeof createInvoice>[0]) => {
     try {
       await createInvoice(invoiceData);
       alert('Invoice created successfully!');
@@ -195,7 +196,7 @@ const InvoicesPage = () => {
     }
   };
 
-  const handleCreateBill = async (billData: any) => {
+  const handleCreateBill = async (billData: Parameters<typeof createBill>[0]) => {
     try {
       await createBill(billData);
       alert('Bill created successfully!');
@@ -205,7 +206,7 @@ const InvoicesPage = () => {
     }
   };
 
-  const handleSendInvoiceEmail = async (invoiceId: string, emailData: any) => {
+  const handleSendInvoiceEmail = async (invoiceId: string, emailData: Parameters<typeof sendInvoice>[1]) => {
     try {
       await sendInvoice(invoiceId, emailData);
       alert('Invoice sent successfully!');
@@ -215,7 +216,7 @@ const InvoicesPage = () => {
     }
   };
 
-  const handleUpdateBill = async (billId: string, updates: any) => {
+  const handleUpdateBill = async (billId: string, updates: Parameters<typeof updateBill>[1]) => {
     try {
       await updateBill(billId, updates);
       alert('Bill updated successfully!');
@@ -225,7 +226,7 @@ const InvoicesPage = () => {
     }
   };
 
-  const handleAddCustomer = async (customerData: any) => {
+  const handleAddCustomer = async (customerData: Parameters<typeof addCustomer>[0]) => {
     try {
       await addCustomer(customerData);
       alert('Customer added successfully!');
@@ -235,7 +236,7 @@ const InvoicesPage = () => {
     }
   };
 
-  const handleCreateTemplate = async (templateData: any) => {
+  const handleCreateTemplate = async (templateData: Parameters<typeof addTemplate>[0]) => {
     try {
       await addTemplate(templateData);
       alert('Template created successfully!');
@@ -245,12 +246,15 @@ const InvoicesPage = () => {
     }
   };
 
-  const handleEditBill = (bill: any) => {
-    setSelectedBill(bill);
-    setIsEditBillOpen(true);
+  const handleEditBill = (billId: string, updates: Parameters<typeof updateBill>[1]) => {
+    const bill = bills.find(b => b.id === billId);
+    if (bill) {
+      setSelectedBill(bill);
+      setIsEditBillOpen(true);
+    }
   };
 
-  const handlePreviewTemplate = (template: any) => {
+  const handlePreviewTemplate = (template: typeof templates[0]) => {
     setSelectedTemplate(template);
     setIsTemplatePreviewOpen(true);
   };
@@ -509,7 +513,7 @@ const InvoicesPage = () => {
                   <BillCard
                     key={bill.id}
                     bill={bill}
-                    onViewDetails={handleViewInvoiceDetails}
+                    onViewDetails={handleViewBillDetails}
                     onEdit={handleEditBill}
                     onDelete={handleDeleteBill}
                     isProcessing={isProcessing}

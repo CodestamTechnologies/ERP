@@ -35,8 +35,8 @@ export interface CalendarEvent {
   isRecurring: boolean;
   recurringType?: 'daily' | 'weekly' | 'monthly' | 'yearly';
   reminderMinutes: number;
-  createdAt: any;
-  updatedAt: any;
+  createdAt: Timestamp | Date | string;
+  updatedAt: Timestamp | Date | string;
 }
 
 export interface CalendarActivity {
@@ -47,7 +47,7 @@ export interface CalendarActivity {
   eventTitle: string;
   time: string;
   priority: 'low' | 'medium' | 'high';
-  createdAt: any;
+  createdAt: Timestamp | Date | string;
 }
 
 // Firestore Collections

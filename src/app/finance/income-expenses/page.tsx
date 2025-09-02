@@ -17,7 +17,6 @@ import {
   formatIndianCurrency, 
   formatCompactCurrency, 
   getStatusColor, 
-  getCategoryColor,
   getVarianceColor,
   getVarianceIcon,
   getGrowthColor,
@@ -34,21 +33,14 @@ import {
   BarChart3,
   Plus,
   Download,
-  Filter,
   Search,
   AlertTriangle,
-  CheckCircle,
-  Clock,
-  Target,
-  Activity,
   ArrowUpRight,
   ArrowDownRight,
   Calendar,
-  Tag,
   Building,
   User,
   CreditCard,
-  FileText,
   Eye,
   Edit,
   Trash2
@@ -478,7 +470,7 @@ const IncomeExpensesPage = () => {
                           outerRadius={80}
                           fill="#8884d8"
                           dataKey="value"
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          label={({ name, percent = 0 }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                         >
                           {categoryData.filter(item => item.type === 'income').map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -506,7 +498,7 @@ const IncomeExpensesPage = () => {
                           outerRadius={80}
                           fill="#8884d8"
                           dataKey="value"
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          label={({ name, percent = 0 }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                         >
                           {categoryData.filter(item => item.type === 'expense').map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

@@ -11,10 +11,31 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Trash2, Upload, Calculator } from 'lucide-react';
 import { Vendor, PayableLineItem } from '@/types/accountsPayable';
 
+interface CreatePayableData {
+  vendorId: string;
+  vendorName: string;
+  vendorEmail: string;
+  invoiceNumber: string;
+  invoiceDate: string;
+  dueDate: string;
+  description: string;
+  paymentTerms: string;
+  priority: string;
+  currency: string;
+  exchangeRate: number;
+  notes: string;
+  tags: string[];
+  attachments: string[];
+  subtotal: number;
+  taxAmount: number;
+  totalAmount: number;
+  lineItems: PayableLineItem[];
+}
+
 interface CreatePayableDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreatePayable: (payableData: any) => void;
+  onCreatePayable: (payableData: CreatePayableData) => void;
   vendors: Vendor[];
   isProcessing: boolean;
 }
@@ -69,7 +90,7 @@ export const CreatePayableDialog = ({
 
   const { subtotal, totalTax, total } = calculateTotals();
 
-  const updateLineItem = (index: number, field: keyof PayableLineItem, value: any) => {
+  const updateLineItem = (index: number, field: keyof PayableLineItem, value: string | number) => {
     const updatedItems = [...lineItems];
     updatedItems[index] = { ...updatedItems[index], [field]: value };
     

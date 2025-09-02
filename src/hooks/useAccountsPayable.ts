@@ -149,7 +149,23 @@ export const useAccountsPayable = () => {
     } finally { setIsProcessing(false); }
   };
 
-  const processPayment = async (invoiceId: string, paymentData: any) => {
+  // Define interfaces for payment operations
+  interface PaymentData {
+    amount: number;
+    paymentMethod: string;
+    referenceNumber?: string;
+    notes?: string;
+  }
+
+  interface ScheduleData {
+    amount: number;
+    scheduledDate: string;
+    paymentMethod: string;
+    notes?: string;
+    approvalRequired?: boolean;
+  }
+
+  const processPayment = async (invoiceId: string, paymentData: PaymentData) => {
     setIsProcessing(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -181,7 +197,7 @@ export const useAccountsPayable = () => {
     } finally { setIsProcessing(false); }
   };
 
-  const schedulePayment = async (invoiceId: string, scheduleData: any) => {
+  const schedulePayment = async (invoiceId: string, scheduleData: ScheduleData) => {
     setIsProcessing(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 500));

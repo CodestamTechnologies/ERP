@@ -172,7 +172,29 @@ export const useAccountsReceivable = () => {
     }
   }, [invoices.length, customers]);
 
-  const recordPayment = useCallback(async (invoiceId: string, paymentData: any) => {
+  // Define interfaces for payment and reminder operations
+  interface PaymentData {
+    amount: number;
+    paymentMethod: string;
+    paymentDate: string;
+    reference?: string;
+    notes?: string;
+  }
+
+  interface ReminderData {
+    type: 'email' | 'sms' | 'phone';
+    message?: string;
+    scheduledDate?: string;
+  }
+
+  interface FollowUpData {
+    type: 'call' | 'email' | 'meeting';
+    notes: string;
+    scheduledDate: string;
+    assignedTo?: string;
+  }
+
+  const recordPayment = useCallback(async (invoiceId: string, paymentData: PaymentData) => {
     setIsProcessing(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -211,7 +233,7 @@ export const useAccountsReceivable = () => {
     }
   }, []);
 
-  const bulkReminder = useCallback(async (invoiceIds: string[], reminderData: any) => {
+  const bulkReminder = useCallback(async (invoiceIds: string[], reminderData: ReminderData) => {
     setIsProcessing(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -224,7 +246,7 @@ export const useAccountsReceivable = () => {
     }
   }, []);
 
-  const followUp = useCallback(async (invoiceId: string, followUpData: any) => {
+  const followUp = useCallback(async (invoiceId: string, followUpData: FollowUpData) => {
     setIsProcessing(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));

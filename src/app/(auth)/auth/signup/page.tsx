@@ -9,6 +9,24 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 
+// Define Firebase error type
+interface FirebaseError {
+  code: string;
+  message: string;
+}
+
+// Type guard to check if error is a Firebase error
+const isFirebaseError = (error: unknown): error is FirebaseError => {
+  return (
+    error !== null &&
+    typeof error === 'object' &&
+    'code' in error &&
+    'message' in error &&
+    typeof (error as FirebaseError).code === 'string' &&
+    typeof (error as FirebaseError).message === 'string'
+  );
+};
+
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -51,16 +69,20 @@ export default function Signup() {
       setLoading(true);
       await signUp(email, password, displayName);
       // The redirect will be handled by the useEffect when user state changes
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Sign up error:', error);
       
       // More specific error messages
-      if (error.code === 'auth/email-already-in-use') {
-        setError('This email is already registered');
-      } else if (error.code === 'auth/weak-password') {
-        setError('Password is too weak');
+      if (isFirebaseError(error)) {
+        if (error.code === 'auth/email-already-in-use') {
+          setError('This email is already registered');
+        } else if (error.code === 'auth/weak-password') {
+          setError('Password is too weak');
+        } else {
+          setError('Failed to create an account: ' + error.message);
+        }
       } else {
-        setError('Failed to create an account: ' + error.message);
+        setError('An unexpected error occurred. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -73,13 +95,17 @@ export default function Signup() {
       setLoading(true);
       await signInWithGoogle();
       // The redirect will be handled by the useEffect when user state changes
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Google sign up error:', error);
       
-      if (error.code === 'auth/popup-closed') {
-        setError('Google sign up was canceled');
+      if (isFirebaseError(error)) {
+        if (error.code === 'auth/popup-closed') {
+          setError('Google sign up was canceled');
+        } else {
+          setError('Failed to sign up with Google: ' + error.message);
+        }
       } else {
-        setError('Failed to sign up with Google: ' + error.message);
+        setError('An unexpected error occurred during Google sign up. Please try again.');
       }
     } finally {
       setLoading(false);

@@ -16,11 +16,11 @@ const documentCategories = [
     color: 'bg-blue-50 text-blue-600',
     borderColor: 'border-blue-200',
     documents: [
-      { name: 'Letters of Intent (LOI)', href: '/documents/brd/loi', badge: 'Popular' },
-      { name: 'Memorandum of Understanding (MOU)', href: '/documents/brd/mou', badge: 'New' },
-      { name: 'Partnership Agreements', href: '/documents/brd/partnership', badge: null },
-      { name: 'Business Proposals', href: '/documents/brd/proposals', badge: null },
-      { name: 'Non-Disclosure Agreements (NDA)', href: '/documents/brd/nda', badge: null },
+      { name: 'Letters of Intent (LOI)', href: '/documents/loi', badge: 'Popular' },
+      { name: 'Memorandum of Understanding (MOU)', href: '/documents/mou', badge: 'New' },
+      { name: 'Partnership Agreements', href: '/documents/partnership', badge: null },
+      { name: 'Business Proposals', href: '/documents/proposals', badge: null },
+      { name: 'Non-Disclosure Agreements (NDA)', href: '/documents/nda', badge: null },
     ]
   },
   {
@@ -31,11 +31,11 @@ const documentCategories = [
     color: 'bg-green-50 text-green-600',
     borderColor: 'border-green-200',
     documents: [
-      { name: 'Quotation/Estimate', href: '/documents/sales/quotation', badge: 'Popular' },
-      { name: 'Purchase Order (PO)', href: '/documents/sales/purchase-order', badge: null },
-      { name: 'Sales Order (SO)', href: '/documents/sales/sales-order', badge: null },
-      { name: 'Invoice', href: '/documents/sales/invoice', badge: null },
-      { name: 'Receipt', href: '/documents/sales/receipt', badge: null },
+      { name: 'Quotation/Estimate', href: '/documents/quotation', badge: 'Popular' },
+      { name: 'Purchase Order (PO)', href: '/documents/purchase-order', badge: null },
+      { name: 'Sales Order (SO)', href: '/documents/sales-order', badge: null },
+      { name: 'Invoice', href: '/documents/invoice', badge: null },
+      { name: 'Receipt', href: '/documents/receipt', badge: null },
     ]
   },
   {
@@ -46,10 +46,10 @@ const documentCategories = [
     color: 'bg-red-50 text-red-600',
     borderColor: 'border-red-200',
     documents: [
-      { name: 'Service Agreement', href: '/documents/legal/service-agreement', badge: null },
-      { name: 'Employment Contract', href: '/documents/legal/employment-contract', badge: null },
-      { name: 'Vendor/Supplier Agreement', href: '/documents/legal/vendor-agreement', badge: null },
-      { name: 'Lease Agreement', href: '/documents/legal/lease-agreement', badge: null },
+      { name: 'Service Agreement', href: '/documents/service-agreement', badge: null },
+      { name: 'Employment Contract', href: '/documents/employment-contract', badge: null },
+      { name: 'Vendor/Supplier Agreement', href: '/documents/vendor-agreement', badge: null },
+      { name: 'Lease Agreement', href: '/documents/lease-agreement', badge: null },
     ]
   },
   {
@@ -60,10 +60,10 @@ const documentCategories = [
     color: 'bg-orange-50 text-orange-600',
     borderColor: 'border-orange-200',
     documents: [
-      { name: 'Offer Letter / Appointment Letter', href: '/documents/hr/offer-letter', badge: null },
-      { name: 'Employee Handbook / HR Policy', href: '/documents/hr/handbook', badge: null },
-      { name: 'Payslips & Salary Registers', href: '/documents/hr/payslips', badge: null },
-      { name: 'Performance Appraisals', href: '/documents/hr/performance', badge: null },
+      { name: 'Offer Letter / Appointment Letter', href: '/documents/offer-letter', badge: 'Featured' },
+      { name: 'Employee Handbook / HR Policy', href: '/documents/handbook', badge: null },
+      { name: 'Payslips & Salary Registers', href: '/documents/payslips', badge: null },
+      { name: 'Performance Appraisals', href: '/documents/performance', badge: null },
     ]
   },
   {
@@ -74,10 +74,10 @@ const documentCategories = [
     color: 'bg-indigo-50 text-indigo-600',
     borderColor: 'border-indigo-200',
     documents: [
-      { name: 'Bill of Lading (BOL)', href: '/documents/operations/bill-of-lading', badge: null },
-      { name: 'Consignment Note / Waybill', href: '/documents/operations/consignment', badge: null },
-      { name: 'Stock Register / Inventory Sheets', href: '/documents/operations/stock-register', badge: null },
-      { name: 'Quality Assurance Certificates', href: '/documents/operations/quality-certificates', badge: null },
+      { name: 'Bill of Lading (BOL)', href: '/documents/bill-of-lading', badge: null },
+      { name: 'Consignment Note / Waybill', href: '/documents/consignment', badge: null },
+      { name: 'Stock Register / Inventory Sheets', href: '/documents/stock-register', badge: null },
+      { name: 'Quality Assurance Certificates', href: '/documents/quality-certificates', badge: null },
     ]
   },
   {
@@ -88,10 +88,10 @@ const documentCategories = [
     color: 'bg-teal-50 text-teal-600',
     borderColor: 'border-teal-200',
     documents: [
-      { name: 'Business Registration Certificates', href: '/documents/compliance/registration', badge: null },
-      { name: 'Licenses & Permits', href: '/documents/compliance/licenses', badge: null },
-      { name: 'Insurance Policies', href: '/documents/compliance/insurance', badge: null },
-      { name: 'Board Resolutions & Meeting Minutes', href: '/documents/compliance/board-resolutions', badge: null },
+      { name: 'Business Registration Certificates', href: '/documents/registration', badge: null },
+      { name: 'Licenses & Permits', href: '/documents/licenses', badge: null },
+      { name: 'Insurance Policies', href: '/documents/insurance', badge: null },
+      { name: 'Board Resolutions & Meeting Minutes', href: '/documents/board-resolutions', badge: null },
     ]
   }
 ];
@@ -153,7 +153,7 @@ export default function DocumentsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Categories</p>
-                <p className="text-2xl font-bold text-purple-600">8</p>
+                <p className="text-2xl font-bold text-purple-600">6</p>
               </div>
               <div className="p-2 bg-purple-50 rounded-lg">
                 <Megaphone size={20} className="text-purple-600" />

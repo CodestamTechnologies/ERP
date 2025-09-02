@@ -48,18 +48,14 @@ const FinanceDashboard = () => {
     accounts,
     transactions,
     budgets,
-    invoices,
     stats,
     loading,
     isProcessing,
     addAccount,
-    updateAccount,
     deleteAccount,
     addTransaction,
-    updateTransaction,
     deleteTransaction,
     addBudget,
-    updateBudget,
     deleteBudget,
     syncAccounts,
     exportReport,
@@ -116,8 +112,8 @@ const FinanceDashboard = () => {
     };
   });
 
-  // Event handlers
-  const handleAddAccount = async (accountData: any) => {
+  // Event handlers - using proper types that match the dialog components
+  const handleAddAccount = async (accountData: Parameters<typeof addAccount>[0]) => {
     try {
       await addAccount(accountData);
       alert('Account added successfully!');
@@ -126,7 +122,7 @@ const FinanceDashboard = () => {
     }
   };
 
-  const handleAddTransaction = async (transactionData: any) => {
+  const handleAddTransaction = async (transactionData: Parameters<typeof addTransaction>[0]) => {
     try {
       await addTransaction(transactionData);
       alert('Transaction added successfully!');
@@ -135,7 +131,7 @@ const FinanceDashboard = () => {
     }
   };
 
-  const handleCreateBudget = async (budgetData: any) => {
+  const handleCreateBudget = async (budgetData: Parameters<typeof addBudget>[0]) => {
     try {
       await addBudget(budgetData);
       alert('Budget created successfully!');

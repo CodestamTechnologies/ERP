@@ -20,7 +20,7 @@ export default function SettingsPage() {
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Settings Panel Coming Soon</h2>
           <p className="text-gray-600 mb-6">
-            We're building a comprehensive settings panel where you can configure system preferences, 
+            We&apos;re building a comprehensive settings panel where you can configure system preferences, 
             manage user accounts, set up integrations, and customize your ERP experience.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">

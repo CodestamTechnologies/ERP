@@ -1,8 +1,21 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
+interface BalanceSheet {
+  totalAssets: number;
+  totalLiabilities: number;
+  totalEquity: number;
+  currentAssets: number;
+  nonCurrentAssets: number;
+  currentLiabilities: number;
+  nonCurrentLiabilities: number;
+  shareCapital: number;
+  retainedEarnings: number;
+}
+
 interface BalanceSheetChartProps {
-  data: any; formatCurrency: (amount: number) => string;
+  data: BalanceSheet;
+  formatCurrency: (amount: number) => string;
 }
 
 export const BalanceSheetChart = ({ data, formatCurrency }: BalanceSheetChartProps) => {
@@ -31,7 +44,7 @@ export const BalanceSheetChart = ({ data, formatCurrency }: BalanceSheetChartPro
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie data={pieData} cx="50%" cy="50%" outerRadius={80} dataKey="value"
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}>
+                  label={({ name, percent }) => `${name}: ${(percent || 0).toFixed(1)}%`}>
                   {pieData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}

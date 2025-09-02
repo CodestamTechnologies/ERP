@@ -6,24 +6,16 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { useReimbursements } from '@/hooks/useReimbursements';
+import { useReimbursements, type Reimbursement } from '@/hooks/useReimbursements';
 import { 
   CreditCard,
   Plus,
   Search,
-  Filter,
   Download,
-  Upload,
-  CheckCircle,
   Clock,
-  AlertTriangle,
-  XCircle,
   DollarSign,
-  Calendar,
-  Users,
   FileText,
   TrendingUp,
-  Eye,
   Settings,
   Send,
   Banknote
@@ -54,7 +46,6 @@ const ReimbursementsPage = () => {
     isProcessing,
     updateFilters,
     createReimbursement,
-    updateReimbursement,
     approveReimbursement,
     rejectReimbursement,
     processPayment,
@@ -71,7 +62,7 @@ const ReimbursementsPage = () => {
   const [isProcessPaymentOpen, setIsProcessPaymentOpen] = useState(false);
   const [isBulkPaymentOpen, setIsBulkPaymentOpen] = useState(false);
   const [isPaymentMethodOpen, setIsPaymentMethodOpen] = useState(false);
-  const [selectedReimbursement, setSelectedReimbursement] = useState<any>(null);
+  const [selectedReimbursement, setSelectedReimbursement] = useState<Reimbursement | null>(null);
 
   const STATS_CARDS = [
     {
@@ -112,12 +103,12 @@ const ReimbursementsPage = () => {
     }
   ];
 
-  const handleViewReimbursementDetails = (reimbursement: any) => {
+  const handleViewReimbursementDetails = (reimbursement: Reimbursement) => {
     setSelectedReimbursement(reimbursement);
     setIsReimbursementDetailsOpen(true);
   };
 
-  const handleProcessPayment = (reimbursement: any) => {
+  const handleProcessPayment = (reimbursement: Reimbursement) => {
     setSelectedReimbursement(reimbursement);
     setIsProcessPaymentOpen(true);
   };

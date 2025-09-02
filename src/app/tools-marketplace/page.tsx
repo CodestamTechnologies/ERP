@@ -25,6 +25,26 @@ import { SidebarCustomizer } from '@/components/tools-marketplace/SidebarCustomi
 import { AdvancedSidebarCustomizer } from '@/components/tools-marketplace/AdvancedSidebarCustomizer';
 import { PricingCard } from '@/components/tools-marketplace/PricingCard';
 
+// Define the Tool interface to match the one from the hook
+interface Tool {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  icon: React.ReactNode;
+  features: string[];
+  rating: number;
+  downloads: number;
+  size: string;
+  version: string;
+  developer: string;
+  screenshots: string[];
+  isPopular?: boolean;
+  isNew?: boolean;
+  isPremium?: boolean;
+  suite?: string; // Added for the extended tool type
+}
+
 const ToolsMarketplacePage = () => {
   const {
     availableTools, installedTools, sidebarConfig, hubTrackTools, gokuTools, gamaTools,
@@ -35,7 +55,7 @@ const ToolsMarketplacePage = () => {
   const [activeTab, setActiveTab] = useState('sidebar');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedTool, setSelectedTool] = useState<any>(null);
+  const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false);
   const [cart, setCart] = useState<string[]>([]);
 
@@ -192,7 +212,7 @@ const ToolsMarketplacePage = () => {
                   <div className="space-y-6">
                     <div className="text-center space-y-2">
                       <h2 className="text-2xl font-bold text-gray-900">Advanced Sidebar Customization</h2>
-                      <p className="text-gray-600">Customize individual sections and sub-options within each tool's secondary sidebar</p>
+                      <p className="text-gray-600">Customize individual sections and sub-options within each tool&apos;s secondary sidebar</p>
                     </div>
                     
                     <AdvancedSidebarCustomizer 

@@ -7,10 +7,33 @@ import {
   Edit, CreditCard, Download, Mail, Phone 
 } from 'lucide-react';
 
+interface VendorBill {
+  id: string;
+  billNumber: string;
+  vendorName: string;
+  amount: number;
+  paidAmount: number;
+  remainingAmount: number;
+  taxAmount: number;
+  discountAmount: number;
+  status: string;
+  priority: string;
+  billDate: string;
+  dueDate: string;
+  paymentTerms: string;
+  reference?: string;
+  category: string;
+  description?: string;
+  createdAt: string;
+  approvedBy?: string;
+  approvedAt?: string;
+  attachments?: string[];
+}
+
 interface VendorBillDetailsDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  bill: any;
+  bill: VendorBill | null;
   onEdit: () => void;
   onProcessPayment: () => void;
   formatCurrency: (amount: number) => string;
@@ -235,7 +258,7 @@ export const VendorBillDetailsDialog = ({
                 </div>
                 <div>
                   <span className="text-gray-500">Approved On:</span>
-                  <div className="font-medium">{formatDate(bill.approvedAt)}</div>
+                  <div className="font-medium">{formatDate(bill.approvedAt!)}</div>
                 </div>
               </div>
             </div>

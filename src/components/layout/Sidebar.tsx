@@ -36,6 +36,12 @@ interface Tool {
   href?: string;
 }
 
+interface User {
+  displayName?: string;
+  email?: string;
+  photoURL?: string;
+}
+
 interface SidebarState {
   showNotifications: boolean;
   showMyTools: boolean;
@@ -237,7 +243,7 @@ const UserProfile = ({
   onSignOut, 
   profileMenuRef 
 }: {
-  user: any;
+  user: User | null;
   showProfileMenu: boolean;
   onToggleMenu: () => void;
   onSignOut: () => void;

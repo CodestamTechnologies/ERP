@@ -5,9 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { useBankAccounts } from '@/hooks/useBankAccounts';
 import { useReconciliation } from '@/hooks/useReconciliation';
 import { getAlertSeverityColor } from '@/lib/utils/bankAccountUtils';
@@ -40,6 +39,67 @@ import { StatsCard } from '@/components/finance/bank-accounts/StatsCard';
 import { ProviderConnectionDialog } from '@/components/finance/bank-accounts/dialogs/ProviderConnectionDialog';
 import { AddAccountDialog } from '@/components/finance/bank-accounts/dialogs/AddAccountDialog';
 import { AccountDetailDialog } from '@/components/finance/bank-accounts/dialogs/AccountDetailDialog';
+
+// Define proper types
+interface ConnectionData {
+  username?: string;
+  password?: string;
+  apiKey?: string;
+  clientId?: string;
+  clientSecret?: string;
+  environment?: 'sandbox' | 'production';
+}
+
+interface DiscoveredAccount {
+  id: string;
+  name: string;
+  accountNumber: string;
+  bankName: string;
+  accountType: string;
+  balance: number;
+  currency: string;
+}
+
+interface AccountFormData {
+  accountName: string;
+  accountNumber: string;
+  accountType: 'checking' | 'savings' | 'business' | 'credit' | 'investment';
+  bankName: string;
+  bankCode: string;
+  swiftCode?: string;
+  iban?: string;
+  routingNumber?: string;
+  sortCode?: string;
+  bsb?: string;
+  ifsc?: string;
+  branchCode?: string;
+  currency: string;
+  balance: number;
+  availableBalance: number;
+  country: string;
+  region: 'domestic' | 'international';
+  status: 'active' | 'inactive' | 'pending' | 'suspended' | 'closed';
+  connectionStatus: 'connected' | 'disconnected' | 'error';
+  isDefault: boolean;
+  bankWebsite?: string;
+  features: {
+    realTimeSync: boolean;
+    transactionHistory: boolean;
+    balanceInquiry: boolean;
+    transferSupport: boolean;
+    billPayment: boolean;
+  };
+  limits?: {
+    dailyTransferLimit?: number;
+    monthlyTransferLimit?: number;
+    minimumBalance?: number;
+  };
+  fees?: {
+    monthlyFee?: number;
+    transactionFee?: number;
+    internationalTransferFee?: number;
+  };
+}
 
 const BankAccountsPage = () => {
   const {
@@ -90,16 +150,14 @@ const BankAccountsPage = () => {
   
   // Provider connection states
   const [connectionStep, setConnectionStep] = useState(1);
-  const [connectionData, setConnectionData] = useState<any>({});
+  const [connectionData, setConnectionData] = useState<ConnectionData>({});
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
-  const [discoveredAccounts, setDiscoveredAccounts] = useState<any[]>([]);
+  const [discoveredAccounts, setDiscoveredAccounts] = useState<DiscoveredAccount[]>([]);
   const [selectedAccountsToAdd, setSelectedAccountsToAdd] = useState<string[]>([]);
 
   // Reconciliation states
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
-  const [isReconciliationDetailOpen, setIsReconciliationDetailOpen] = useState(false);
-  const [selectedReconciliationItem, setSelectedReconciliationItem] = useState<ReconciliationItem | null>(null);
   const [uploadingFile, setUploadingFile] = useState<File | null>(null);
 
   // Stats cards configuration
@@ -217,7 +275,7 @@ const BankAccountsPage = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      const mockAccounts = [
+      const mockAccounts: DiscoveredAccount[] = [
         {
           id: 'discovered-1',
           name: 'Business Checking Account',
@@ -257,7 +315,7 @@ const BankAccountsPage = () => {
           const newAccount = {
             accountName: discoveredAccount.name,
             accountNumber: discoveredAccount.accountNumber.replace('****', Math.random().toString().slice(2, 10)),
-            accountType: discoveredAccount.accountType as any,
+            accountType: discoveredAccount.accountType as AccountFormData['accountType'],
             bankName: discoveredAccount.bankName,
             bankCode: selectedProvider?.id.toUpperCase() || 'BANK',
             currency: discoveredAccount.currency,
@@ -300,25 +358,25 @@ const BankAccountsPage = () => {
     const accountData = {
       accountName: formData.get('accountName') as string,
       accountNumber: formData.get('accountNumber') as string,
-      accountType: formData.get('accountType') as 'checking' | 'savings' | 'business' | 'credit' | 'investment',
+      accountType: formData.get('accountType') as AccountFormData['accountType'],
       bankName: formData.get('bankName') as string,
       bankCode: formData.get('bankCode') as string,
-      swiftCode: formData.get('swiftCode') as string,
-      iban: formData.get('iban') as string,
-      routingNumber: formData.get('routingNumber') as string,
-      sortCode: formData.get('sortCode') as string,
-      bsb: formData.get('bsb') as string,
-      ifsc: formData.get('ifsc') as string,
-      branchCode: formData.get('branchCode') as string,
+      swiftCode: formData.get('swiftCode') as string || undefined,
+      iban: formData.get('iban') as string || undefined,
+      routingNumber: formData.get('routingNumber') as string || undefined,
+      sortCode: formData.get('sortCode') as string || undefined,
+      bsb: formData.get('bsb') as string || undefined,
+      ifsc: formData.get('ifsc') as string || undefined,
+      branchCode: formData.get('branchCode') as string || undefined,
       currency: formData.get('currency') as string,
-      balance: Number(formData.get('balance')),
-      availableBalance: Number(formData.get('availableBalance')),
+      balance: Number(formData.get('balance')) || 0,
+      availableBalance: Number(formData.get('availableBalance')) || 0,
       country: formData.get('country') as string,
-      region: formData.get('region') as 'domestic' | 'international',
-      status: formData.get('status') as 'active' | 'inactive' | 'pending' | 'suspended' | 'closed',
+      region: formData.get('region') as AccountFormData['region'],
+      status: formData.get('status') as AccountFormData['status'],
       connectionStatus: 'disconnected' as const,
       isDefault: formData.get('isDefault') === 'on',
-      bankWebsite: formData.get('bankWebsite') as string,
+      bankWebsite: formData.get('bankWebsite') as string || undefined,
       features: {
         realTimeSync: formData.get('realTimeSync') === 'on',
         transactionHistory: formData.get('transactionHistory') === 'on',
@@ -370,8 +428,8 @@ const BankAccountsPage = () => {
   };
 
   const handleViewReconciliationDetails = (item: ReconciliationItem) => {
-    setSelectedReconciliationItem(item);
-    setIsReconciliationDetailOpen(true);
+    console.log('Viewing reconciliation details for:', item);
+    // Implementation would open a detailed view dialog
   };
 
   if (loading || reconciliationLoading) {
@@ -526,7 +584,7 @@ const BankAccountsPage = () => {
                     className="pl-10"
                   />
                 </div>
-                <Select value={filters.sortBy} onValueChange={(value) => updateFilters({ sortBy: value as any })}>
+                <Select value={filters.sortBy} onValueChange={(value) => updateFilters({ sortBy: value as typeof filters.sortBy })}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>

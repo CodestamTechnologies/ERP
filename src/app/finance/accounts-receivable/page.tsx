@@ -1,10 +1,10 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,7 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { 
   FileText, Plus, Search, Download, Send, RefreshCw, Building2, Clock, 
   AlertTriangle, Eye, CreditCard, ArrowUpDown, ArrowUp, ArrowDown, 
-  CalendarDays, Receipt, DollarSign, TrendingUp
+  CalendarDays, Receipt, DollarSign
 } from 'lucide-react';
 import { useState, useMemo, useCallback } from 'react';
 import { useAccountsReceivable } from '@/hooks/useAccountsReceivable';
@@ -26,10 +26,44 @@ import { InvoiceCard } from '@/components/finance/accounts-receivable/InvoiceCar
 import { OverdueCard } from '@/components/finance/accounts-receivable/OverdueCard';
 import { CustomerSummaryCard } from '@/components/finance/accounts-receivable/CustomerSummaryCard';
 
+// Define proper types
+interface InvoiceData {
+  customerName: string;
+  amount: number;
+  dueDate: string;
+  description: string;
+  items: Array<{
+    name: string;
+    quantity: number;
+    rate: number;
+    amount: number;
+  }>;
+}
+
+interface PaymentData {
+  amount: number;
+  paymentMethod: string;
+  paymentDate: string;
+  notes?: string;
+}
+
+interface ReminderData {
+  message: string;
+  reminderType: 'email' | 'sms' | 'phone';
+  scheduledDate?: string;
+}
+
+interface FollowUpData {
+  type: 'call' | 'email' | 'meeting';
+  scheduledDate: string;
+  notes: string;
+  priority: 'low' | 'medium' | 'high';
+}
+
 const AccountsReceivablePage = () => {
   const {
     invoices, overdueInvoices, customers, summary, loading, filters, isProcessing,
-    updateFilters, createInvoice, recordPayment, sendReminder, bulkReminder,
+    updateFilters, createInvoice, recordPayment, bulkReminder,
     followUp, exportData, refreshData
   } = useAccountsReceivable();
 
@@ -41,7 +75,7 @@ const AccountsReceivablePage = () => {
     createInvoice: false, recordPayment: false, bulkReminder: false,
     invoiceDetails: false, followUp: false
   });
-  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<typeof invoices[0] | null>(null);
 
   const statsData = useMemo(() => [
     {
@@ -71,7 +105,7 @@ const AccountsReceivablePage = () => {
   ], [summary]);
 
   const filteredInvoices = useMemo(() => {
-    let filtered = invoices.filter(invoice => {
+    const filtered = invoices.filter(invoice => {
       const matchesSearch = !filters.search || 
         invoice.invoiceNumber.toLowerCase().includes(filters.search.toLowerCase()) ||
         invoice.customerName.toLowerCase().includes(filters.search.toLowerCase());
@@ -83,6 +117,12 @@ const AccountsReceivablePage = () => {
     filtered.sort((a, b) => {
       const aValue = a[sortConfig.key as keyof typeof a];
       const bValue = b[sortConfig.key as keyof typeof b];
+      
+      // Handle undefined values
+      if (aValue === undefined && bValue === undefined) return 0;
+      if (aValue === undefined) return sortConfig.direction === 'asc' ? 1 : -1;
+      if (bValue === undefined) return sortConfig.direction === 'asc' ? -1 : 1;
+      
       if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
@@ -107,27 +147,27 @@ const AccountsReceivablePage = () => {
   }, [filteredInvoices]);
 
   const handlers = {
-    createInvoice: async (data: any) => {
+    createInvoice: async (data: InvoiceData) => {
       try {
         await createInvoice(data);
         setDialogs(prev => ({ ...prev, createInvoice: false }));
       } catch (error) { console.error('Error creating invoice:', error); }
     },
-    recordPayment: async (invoiceId: string, data: any) => {
+    recordPayment: async (invoiceId: string, data: PaymentData) => {
       try {
         await recordPayment(invoiceId, data);
         setDialogs(prev => ({ ...prev, recordPayment: false }));
         setSelectedInvoice(null);
       } catch (error) { console.error('Error recording payment:', error); }
     },
-    bulkReminder: async (invoiceIds: string[], data: any) => {
+    bulkReminder: async (invoiceIds: string[], data: ReminderData) => {
       try {
         await bulkReminder(invoiceIds, data);
         setDialogs(prev => ({ ...prev, bulkReminder: false }));
         setSelectedInvoices([]);
       } catch (error) { console.error('Error sending reminders:', error); }
     },
-    followUp: async (invoiceId: string, data: any) => {
+    followUp: async (invoiceId: string, data: FollowUpData) => {
       try {
         await followUp(invoiceId, data);
         setDialogs(prev => ({ ...prev, followUp: false }));

@@ -20,7 +20,7 @@ interface ApprovalCardProps {
   approval: Approval;
   onApprove: (claimId: string, comments?: string) => void;
   onReject: (claimId: string, reason: string) => void;
-  onViewDetails: (approval: any) => void;
+  onViewDetails: (approval: Approval) => void;
   isProcessing: boolean;
 }
 

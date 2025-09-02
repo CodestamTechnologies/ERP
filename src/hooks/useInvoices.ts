@@ -660,7 +660,15 @@ export const useInvoices = () => {
     ));
   }, []);
 
-  const sendInvoice = useCallback(async (invoiceId: string, emailData?: any) => {
+  // Define interface for email data
+  interface EmailData {
+    to: string;
+    subject?: string;
+    message?: string;
+    attachPDF?: boolean;
+  }
+
+  const sendInvoice = useCallback(async (invoiceId: string, emailData?: EmailData) => {
     setIsProcessing(true);
     
     try {

@@ -13,10 +13,17 @@ interface Tool {
   isPopular?: boolean; isNew?: boolean; isPremium?: boolean;
 }
 
+interface CustomSection {
+  id: string;
+  name: string;
+  tools: string[];
+  order: number;
+}
+
 interface SidebarConfig {
   enabledTools: string[]; 
   toolOrder: string[]; 
-  customSections: any[];
+  customSections: CustomSection[];
   sectionConfigs: Record<string, {
     enabledSections: string[];
     sectionOrder: string[];

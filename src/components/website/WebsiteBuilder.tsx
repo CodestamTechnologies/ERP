@@ -14,10 +14,25 @@ import {
   Play, Download, Eye, Settings, Plus, X
 } from 'lucide-react';
 
+// Define interfaces for type safety
+interface WebsiteData {
+  name: string;
+  domain: string;
+  template: string;
+  templateName?: string;
+  category: string;
+  features: string[];
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+  };
+}
+
 interface WebsiteBuilderProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateWebsite: (websiteData: any) => void;
+  onCreateWebsite: (websiteData: WebsiteData) => void;
 }
 
 const WebsiteBuilder = ({ isOpen, onClose, onCreateWebsite }: WebsiteBuilderProps) => {

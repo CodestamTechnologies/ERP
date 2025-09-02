@@ -24,8 +24,9 @@ export default function ForgotPassword() {
       setLoading(true);
       await resetPassword(email);
       setMessage('Check your inbox for further instructions');
-    } catch (error: any) {
-      setError('Failed to reset password: ' + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      setError('Failed to reset password: ' + errorMessage);
     } finally {
       setLoading(false);
     }

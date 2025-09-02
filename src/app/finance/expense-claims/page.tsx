@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -11,19 +11,13 @@ import {
   Receipt,
   Plus,
   Search,
-  Filter,
   Download,
-  Upload,
   CheckCircle,
   Clock,
-  AlertTriangle,
-  XCircle,
   DollarSign,
-  Calendar,
   Users,
   FileText,
   TrendingUp,
-  Eye,
   Settings
 } from 'lucide-react';
 import { useState } from 'react';
@@ -58,7 +52,6 @@ const ExpenseClaimsPage = () => {
     bulkApprove,
     generateReport,
     exportData,
-    uploadReceipts
   } = useExpenseClaims();
 
   const [activeTab, setActiveTab] = useState('overview');
@@ -66,7 +59,7 @@ const ExpenseClaimsPage = () => {
   const [isClaimDetailsOpen, setIsClaimDetailsOpen] = useState(false);
   const [isBulkApprovalOpen, setIsBulkApprovalOpen] = useState(false);
   const [isPolicyManagementOpen, setIsPolicyManagementOpen] = useState(false);
-  const [selectedClaim, setSelectedClaim] = useState<any>(null);
+  const [selectedClaim, setSelectedClaim] = useState<typeof claims[0] | null>(null);
 
   const STATS_CARDS = [
     {
@@ -107,7 +100,7 @@ const ExpenseClaimsPage = () => {
     }
   ];
 
-  const handleViewClaimDetails = (claim: any) => {
+  const handleViewClaimDetails = (claim: typeof claims[0]) => {
     setSelectedClaim(claim);
     setIsClaimDetailsOpen(true);
   };

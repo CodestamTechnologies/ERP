@@ -299,7 +299,7 @@ export const useReconciliationPage = () => {
 
       return matchesSearch && matchesAccount && matchesStatus && matchesType && matchesPriority;
     }).sort((a, b) => {
-      let aValue: any, bValue: any;
+      let aValue: string | number, bValue: string | number;
       
       switch (filters.sortBy) {
         case 'amount':
@@ -322,12 +322,12 @@ export const useReconciliationPage = () => {
       
       if (typeof aValue === 'string') {
         return filters.sortOrder === 'asc' ? 
-          aValue.localeCompare(bValue) : 
-          bValue.localeCompare(aValue);
+          aValue.localeCompare(bValue as string) : 
+          (bValue as string).localeCompare(aValue);
       } else {
         return filters.sortOrder === 'asc' ? 
-          aValue - bValue : 
-          bValue - aValue;
+          (aValue as number) - (bValue as number) : 
+          (bValue as number) - (aValue as number);
       }
     });
   }, [reconciliationItems, filters]);

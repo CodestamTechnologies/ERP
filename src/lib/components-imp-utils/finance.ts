@@ -83,7 +83,41 @@ export const generateMockData = () => {
   return { accounts, transactions, invoices, budgets };
 };
 
-export const calculateFinanceStats = (accounts: any[], transactions: any[], invoices: any[]) => {
+// Define interfaces for type safety
+interface Account {
+  id: string;
+  name: string;
+  type: string;
+  balance: number;
+  currency: string;
+  status: string;
+  lastTransaction: string;
+}
+
+interface Transaction {
+  id: string;
+  type: 'income' | 'expense';
+  category: string;
+  amount: number;
+  description: string;
+  date: string;
+  status: 'completed' | 'pending' | 'failed';
+  account: string;
+  reference?: string;
+  tags: string[];
+}
+
+interface Invoice {
+  id: string;
+  customer: string;
+  amount: number;
+  status: 'paid' | 'sent' | 'overdue' | 'draft';
+  dueDate: string;
+  issueDate: string;
+  items: number;
+}
+
+export const calculateFinanceStats = (accounts: Account[], transactions: Transaction[], invoices: Invoice[]) => {
   const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0);
   const totalIncome = transactions.filter(t => t.type === 'income' && t.status === 'completed').reduce((sum, t) => sum + t.amount, 0);
   const totalExpenses = transactions.filter(t => t.type === 'expense' && t.status === 'completed').reduce((sum, t) => sum + t.amount, 0);

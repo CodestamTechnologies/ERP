@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent,  CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -25,14 +24,11 @@ export default function CalendarPage() {
     setSelectedFilter,
     selectedDepartment,
     setSelectedDepartment,
-    selectedPriority,
-    setSelectedPriority,
     events,
     activities,
     upcomingEvents,
     loading,
     stats,
-    calendarDays,
     currentMonth,
     currentYear,
     handleAddEvent,
@@ -646,7 +642,7 @@ export default function CalendarPage() {
                               <span className="text-xl">📅</span>
                             </div>
                             <h4 className="text-sm font-medium text-gray-900 mb-1">No events for this date</h4>
-                            <p className="text-xs text-gray-500">Click "Add Event" to create one</p>
+                            <p className="text-xs text-gray-500">Click Add Event to create one</p>
                           </div>
                         )}
                       </div>

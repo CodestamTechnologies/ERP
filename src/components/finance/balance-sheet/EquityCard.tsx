@@ -71,7 +71,7 @@ export const EquityCard = ({ equity, viewMode, formatCurrency, index }: EquityCa
 
           <div className="pt-2 border-t">
             <div className="flex justify-between text-xs text-gray-500">
-              <span>Type: Owner's Equity</span>
+              <span>Type: Owner&apos;s Equity</span>
               <span>Growth: Positive</span>
             </div>
           </div>

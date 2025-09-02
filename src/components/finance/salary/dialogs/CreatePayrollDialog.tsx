@@ -12,10 +12,19 @@ import { Employee } from '@/hooks/useSalaryDisbursement';
 import { Calendar, Users, DollarSign } from 'lucide-react';
 import { useState } from 'react';
 
+interface PayrollData {
+  batchName: string;
+  payPeriod: string;
+  startDate: string;
+  endDate: string;
+  notes: string;
+  employees: string[];
+}
+
 interface CreatePayrollDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreatePayroll: (payrollData: any) => Promise<void>;
+  onCreatePayroll: (payrollData: PayrollData) => Promise<void>;
   employees: Employee[];
   isProcessing: boolean;
 }
@@ -63,7 +72,7 @@ export const CreatePayrollDialog = ({
       return;
     }
 
-    const payrollData = {
+    const payrollData: PayrollData = {
       batchName,
       payPeriod,
       startDate,

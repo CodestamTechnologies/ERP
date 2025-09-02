@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { useSalaryDisbursement } from '@/hooks/useSalaryDisbursement';
+import { useSalaryDisbursement, Employee, PayrollBatch } from '@/hooks/useSalaryDisbursement';
 import { 
   Users,
   DollarSign,
@@ -65,8 +65,8 @@ const SalaryDisbursementPage = () => {
   const [isProcessDisbursementOpen, setIsProcessDisbursementOpen] = useState(false);
   const [isEmployeeDetailsOpen, setIsEmployeeDetailsOpen] = useState(false);
   const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
-  const [selectedBatch, setSelectedBatch] = useState<any>(null);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [selectedBatch, setSelectedBatch] = useState<PayrollBatch | null>(null);
 
   const STATS_CARDS = [
     {
@@ -107,12 +107,12 @@ const SalaryDisbursementPage = () => {
     }
   ];
 
-  const handleViewEmployeeDetails = (employee: any) => {
+  const handleViewEmployeeDetails = (employee: Employee) => {
     setSelectedEmployee(employee);
     setIsEmployeeDetailsOpen(true);
   };
 
-  const handleProcessBatch = (batch: any) => {
+  const handleProcessBatch = (batch: PayrollBatch) => {
     setSelectedBatch(batch);
     setIsProcessDisbursementOpen(true);
   };

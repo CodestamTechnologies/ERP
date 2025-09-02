@@ -53,7 +53,7 @@ interface SecondarySidebarProps {
 }
 
 // Custom hook for click outside
-const useClickOutside = (ref: React.RefObject<HTMLElement>, callback: () => void, active = true) => {
+const useClickOutside = (ref: React.RefObject<HTMLElement | null>, callback: () => void, active = true) => {
   useEffect(() => {
     if (!active) return;
     

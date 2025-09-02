@@ -38,6 +38,10 @@ interface CashFlowSummary {
   runway: number;
 }
 
+interface ForecastDataItem extends CashFlowData {
+  isProjected?: boolean;
+}
+
 interface CashFlowForecastProps {
   historicalData: CashFlowData[];
   summary: CashFlowSummary;
@@ -48,9 +52,9 @@ const CashFlowForecast = ({ historicalData, summary }: CashFlowForecastProps) =>
   const [scenario, setScenario] = useState('realistic');
 
   // Generate forecast data based on historical trends
-  const generateForecast = (period: string, scenarioType: string) => {
+  const generateForecast = (period: string, scenarioType: string): ForecastDataItem[] => {
     const days = period === '30days' ? 30 : period === '90days' ? 90 : 180;
-    const forecastData = [];
+    const forecastData: ForecastDataItem[] = [];
     
     // Calculate trends from historical data
     const avgInflow = historicalData.reduce((sum, item) => sum + item.inflow, 0) / historicalData.length;
@@ -86,6 +90,9 @@ const CashFlowForecast = ({ historicalData, summary }: CashFlowForecastProps) =>
         outflow: projectedOutflow,
         netFlow,
         cumulativeFlow,
+        operatingFlow: projectedInflow * 0.8 - projectedOutflow * 0.7,
+        investingFlow: projectedInflow * 0.1 - projectedOutflow * 0.2,
+        financingFlow: projectedInflow * 0.1 - projectedOutflow * 0.1,
         isProjected: true
       });
     }
@@ -96,7 +103,7 @@ const CashFlowForecast = ({ historicalData, summary }: CashFlowForecastProps) =>
   const forecastData = generateForecast(forecastPeriod, scenario);
   
   // Combine historical and forecast data
-  const combinedData = [
+  const combinedData: ForecastDataItem[] = [
     ...historicalData.slice(-30).map(item => ({ ...item, isProjected: false })),
     ...forecastData
   ];
@@ -304,7 +311,7 @@ const CashFlowForecast = ({ historicalData, summary }: CashFlowForecastProps) =>
                   dataKey="cumulativeFlow"
                   stroke="#8b5cf6"
                   strokeWidth={3}
-                  strokeDasharray={(item: any) => item?.isProjected ? "5 5" : "0"}
+                  strokeDasharray={(item: ForecastDataItem) => item?.isProjected ? "5 5" : "0"}
                   dot={false}
                   name="Cash Balance"
                 />

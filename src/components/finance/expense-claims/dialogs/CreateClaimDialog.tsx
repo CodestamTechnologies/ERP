@@ -11,10 +11,19 @@ import { ExpensePolicy, ExpenseItem } from '@/hooks/useExpenseClaims';
 import { Plus, Trash2, Upload, Receipt } from 'lucide-react';
 import { useState } from 'react';
 
+interface ClaimFormData {
+  title: string;
+  description: string;
+  category: string;
+  department: string;
+  amount: number;
+  expenses: Array<ExpenseItem & { id: string }>;
+}
+
 interface CreateClaimDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateClaim: (claimData: any) => Promise<void>;
+  onCreateClaim: (claimData: ClaimFormData) => Promise<void>;
   policies: ExpensePolicy[];
   isProcessing: boolean;
 }
@@ -71,15 +80,23 @@ export const CreateClaimDialog = ({
 
     const totalAmount = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
 
-    const claimData = {
+    const claimData: ClaimFormData = {
       title,
       description,
       category,
       department,
       amount: totalAmount,
       expenses: expenses.map((exp, index) => ({
-        ...exp,
-        id: `exp-${Date.now()}-${index}`
+        id: `exp-${Date.now()}-${index}`,
+        date: exp.date || '',
+        description: exp.description || '',
+        category: exp.category || '',
+        amount: exp.amount || 0,
+        currency: exp.currency || 'USD',
+        isReimbursable: exp.isReimbursable ?? true,
+        receiptUrl: exp.receiptUrl,
+        merchant: exp.merchant,
+        notes: exp.notes
       }))
     };
 

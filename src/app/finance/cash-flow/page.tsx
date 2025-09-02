@@ -48,6 +48,23 @@ interface CashFlowSummary {
   burnRate: number;
 }
 
+interface MetricCardProps {
+  title: string;
+  value: string;
+  change: string;
+  changeType: 'positive' | 'negative';
+  icon: React.ReactNode;
+  description: string;
+}
+
+interface InsightCardProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  recommendation: string;
+  priority: 'high' | 'medium' | 'low';
+}
+
 // Constants
 const CASH_FLOW_TABS = [
   { id: 'overview', name: 'Overview', icon: <Activity size={16} className="text-blue-600" /> },
@@ -91,7 +108,7 @@ const generateTransactions = (): Transaction[] => [
 ];
 
 // Components
-const MetricCard = ({ title, value, change, changeType, icon, description }: any) => (
+const MetricCard = ({ title, value, change, changeType, icon, description }: MetricCardProps) => (
   <Card className="hover:shadow-md transition-shadow">
     <CardContent className="p-4">
       <div className="flex items-center justify-between mb-3">
@@ -107,7 +124,7 @@ const MetricCard = ({ title, value, change, changeType, icon, description }: any
   </Card>
 );
 
-const InsightCard = ({ icon, title, description, recommendation, priority }: any) => (
+const InsightCard = ({ icon, title, description, recommendation, priority }: InsightCardProps) => (
   <Card className={`border-l-4 ${priority === 'high' ? 'border-red-500' : priority === 'medium' ? 'border-yellow-500' : 'border-green-500'}`}>
     <CardContent className="p-4">
       <div className="flex items-start gap-3">

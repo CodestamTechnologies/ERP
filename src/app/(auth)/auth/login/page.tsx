@@ -9,6 +9,24 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 
+// Define Firebase error type
+interface FirebaseError {
+  code: string;
+  message: string;
+}
+
+// Type guard to check if error is a Firebase error
+const isFirebaseError = (error: unknown): error is FirebaseError => {
+  return (
+    error !== null &&
+    typeof error === 'object' &&
+    'code' in error &&
+    'message' in error &&
+    typeof (error as FirebaseError).code === 'string' &&
+    typeof (error as FirebaseError).message === 'string'
+  );
+};
+
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -41,16 +59,20 @@ export default function Login() {
       setLoading(true);
       await signIn(email, password);
       // The redirect will be handled by the useEffect when user state changes
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Sign in error:', error);
       
       // More specific error messages
-      if (error.code === 'auth/invalid-credential') {
-        setError('Invalid email or password');
-      } else if (error.code === 'auth/too-many-requests') {
-        setError('Too many failed attempts. Please try again later.');
+      if (isFirebaseError(error)) {
+        if (error.code === 'auth/invalid-credential') {
+          setError('Invalid email or password');
+        } else if (error.code === 'auth/too-many-requests') {
+          setError('Too many failed attempts. Please try again later.');
+        } else {
+          setError('Failed to sign in: ' + error.message);
+        }
       } else {
-        setError('Failed to sign in: ' + error.message);
+        setError('An unexpected error occurred. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -63,13 +85,17 @@ export default function Login() {
       setLoading(true);
       await signInWithGoogle();
       // The redirect will be handled by the useEffect when user state changes
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Google sign in error:', error);
       
-      if (error.code === 'auth/popup-closed') {
-        setError('Google sign in was canceled');
+      if (isFirebaseError(error)) {
+        if (error.code === 'auth/popup-closed') {
+          setError('Google sign in was canceled');
+        } else {
+          setError('Failed to sign in with Google: ' + error.message);
+        }
       } else {
-        setError('Failed to sign in with Google: ' + error.message);
+        setError('An unexpected error occurred during Google sign in. Please try again.');
       }
     } finally {
       setLoading(false);

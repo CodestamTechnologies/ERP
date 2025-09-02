@@ -10,10 +10,26 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, Upload } from 'lucide-react';
 import { format } from 'date-fns';
 
+interface VendorBillData {
+  vendorId: string;
+  vendorName: string;
+  billDate: string;
+  dueDate: string;
+  amount: number;
+  taxAmount: number;
+  discountAmount: number;
+  description: string;
+  category: string;
+  priority: string;
+  paymentTerms: string;
+  reference: string;
+  attachments: string[];
+}
+
 interface CreateVendorBillDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateBill: (billData: any) => Promise<void>;
+  onCreateBill: (billData: VendorBillData) => Promise<void>;
   vendors: Array<{ id: string; name: string; paymentTerms: string }>;
   isProcessing: boolean;
 }
@@ -76,14 +92,19 @@ export const CreateVendorBillDialog = ({
     e.preventDefault();
     
     const vendor = vendors.find(v => v.id === formData.vendorId);
-    const billData = {
-      ...formData,
+    const billData: VendorBillData = {
+      vendorId: formData.vendorId,
       vendorName: vendor?.name || '',
       billDate: format(formData.billDate, 'yyyy-MM-dd'),
       dueDate: format(formData.dueDate, 'yyyy-MM-dd'),
       amount: parseFloat(formData.amount) || 0,
       taxAmount: parseFloat(formData.taxAmount) || 0,
       discountAmount: parseFloat(formData.discountAmount) || 0,
+      description: formData.description,
+      category: formData.category,
+      priority: formData.priority,
+      paymentTerms: formData.paymentTerms,
+      reference: formData.reference,
       attachments: []
     };
 

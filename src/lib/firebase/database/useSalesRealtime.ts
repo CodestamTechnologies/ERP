@@ -22,6 +22,16 @@ const ORDERS_PATH = 'sales/orders';
 const TEAM_PATH = 'sales/team';
 const ACTIVITIES_PATH = 'sales/activities';
 
+// Define interface for analytics data
+interface OrdersAnalytics {
+  totalRevenue: number;
+  totalOrders: number;
+  avgOrderValue: number;
+  statusCounts: Record<string, number>;
+  channelRevenue: Record<string, number>;
+  lastUpdated: number;
+}
+
 // Utility function for currency formatting
 export const formatIndianCurrency = (amount: number): string => {
   return new Intl.NumberFormat('en-IN', {
@@ -447,7 +457,7 @@ export const batchUpdateOrdersRealtime = async (updates: { [orderId: string]: Pa
 };
 
 // Analytics helpers for realtime data
-export const getOrdersAnalyticsRealtime = (callback: (analytics: any) => void) => {
+export const getOrdersAnalyticsRealtime = (callback: (analytics: OrdersAnalytics) => void) => {
   try {
     const ordersRef = ref(realtimeDb, ORDERS_PATH);
     
@@ -473,7 +483,7 @@ export const getOrdersAnalyticsRealtime = (callback: (analytics: any) => void) =
           return acc;
         }, {} as Record<string, number>);
         
-        const analytics = {
+        const analytics: OrdersAnalytics = {
           totalRevenue,
           totalOrders,
           avgOrderValue,
@@ -484,38 +494,41 @@ export const getOrdersAnalyticsRealtime = (callback: (analytics: any) => void) =
         
         callback(analytics);
       } else {
-        callback({
+        const emptyAnalytics: OrdersAnalytics = {
           totalRevenue: 0,
           totalOrders: 0,
           avgOrderValue: 0,
           statusCounts: {},
           channelRevenue: {},
           lastUpdated: Date.now()
-        });
+        };
+        callback(emptyAnalytics);
       }
     }, (error) => {
       console.error('Error fetching orders analytics:', error);
-      callback({
+      const errorAnalytics: OrdersAnalytics = {
         totalRevenue: 0,
         totalOrders: 0,
         avgOrderValue: 0,
         statusCounts: {},
         channelRevenue: {},
         lastUpdated: Date.now()
-      });
+      };
+      callback(errorAnalytics);
     });
     
     return () => off(ordersRef, 'value', unsubscribe);
   } catch (error) {
     console.error('Error setting up analytics listener:', error);
-    callback({
+    const errorAnalytics: OrdersAnalytics = {
       totalRevenue: 0,
       totalOrders: 0,
       avgOrderValue: 0,
       statusCounts: {},
       channelRevenue: {},
       lastUpdated: Date.now()
-    });
+    };
+    callback(errorAnalytics);
     return () => {};
   }
 };

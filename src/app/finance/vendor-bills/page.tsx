@@ -17,6 +17,48 @@ import {
 } from 'lucide-react';
 import { useState, useMemo, useCallback } from 'react';
 import { useVendorBills } from '@/hooks/useVendorBills';
+
+// Import the VendorBill type and define additional interfaces
+interface VendorBill {
+  id: string; billNumber: string; vendorId: string; vendorName: string;
+  billDate: string; dueDate: string; amount: number; paidAmount: number;
+  remainingAmount: number; status: 'draft' | 'pending' | 'approved' | 'paid' | 'overdue' | 'cancelled';
+  priority: 'high' | 'medium' | 'low'; description?: string; category: string;
+  taxAmount: number; discountAmount: number; attachments: string[];
+  createdAt: string; updatedAt: string; approvedBy?: string; approvedAt?: string;
+  paymentTerms: string; reference?: string;
+}
+
+interface CreateBillData {
+  vendorId: string;
+  vendorName: string;
+  billDate: string;
+  dueDate: string;
+  amount: number;
+  priority: 'high' | 'medium' | 'low';
+  description?: string;
+  category: string;
+  taxAmount: number;
+  discountAmount: number;
+  attachments?: string[];
+  paymentTerms: string;
+  reference?: string;
+}
+
+interface PaymentData {
+  amount: number;
+  paymentMethod: string;
+  paymentDate: string;
+  reference?: string;
+  notes?: string;
+}
+
+interface ScheduleData {
+  scheduledDate: string;
+  amount: number;
+  notes?: string;
+  reminderDays?: number;
+}
 import { CreateVendorBillDialog } from '@/components/finance/vendor-bills/dialogs/CreateVendorBillDialog';
 import { PaymentDialog } from '@/components/finance/vendor-bills/dialogs/PaymentDialog';
 import { BulkPaymentDialog } from '@/components/finance/vendor-bills/dialogs/BulkPaymentDialog';
@@ -64,7 +106,7 @@ const VendorBillsPage = () => {
     schedulePayment: false
   });
   
-  const [selectedBill, setSelectedBill] = useState<any>(null);
+  const [selectedBill, setSelectedBill] = useState<VendorBill | null>(null);
 
   // Computed values
   const statsData = useMemo(() => [
@@ -112,7 +154,7 @@ const VendorBillsPage = () => {
 
   // Filter and sort bills
   const filteredBills = useMemo(() => {
-    let filtered = bills.filter(bill => {
+    const filtered = bills.filter(bill => {
       const matchesSearch = !filters.search || 
         bill.billNumber.toLowerCase().includes(filters.search.toLowerCase()) ||
         bill.vendorName.toLowerCase().includes(filters.search.toLowerCase()) ||
@@ -127,8 +169,12 @@ const VendorBillsPage = () => {
 
     // Apply sorting
     filtered.sort((a, b) => {
-      const aValue = a[sortConfig.key as keyof typeof a];
-      const bValue = b[sortConfig.key as keyof typeof b];
+      const aValue = a[sortConfig.key as keyof VendorBill];
+      const bValue = b[sortConfig.key as keyof VendorBill];
+      
+      if (aValue == null && bValue == null) return 0;
+      if (aValue == null) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (bValue == null) return sortConfig.direction === 'asc' ? 1 : -1;
       
       if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
@@ -169,7 +215,7 @@ const VendorBillsPage = () => {
     setSelectedBills(selected ? filteredBills.map(bill => bill.id) : []);
   }, [filteredBills]);
 
-  const handleCreateBill = async (billData: any) => {
+  const handleCreateBill = async (billData: CreateBillData) => {
     try {
       await createBill(billData);
       setDialogs(prev => ({ ...prev, createBill: false }));
@@ -178,7 +224,7 @@ const VendorBillsPage = () => {
     }
   };
 
-  const handleProcessPayment = async (billId: string, paymentData: any) => {
+  const handleProcessPayment = async (billId: string, paymentData: PaymentData) => {
     try {
       await processPayment(billId, paymentData);
       setDialogs(prev => ({ ...prev, payment: false }));
@@ -188,7 +234,7 @@ const VendorBillsPage = () => {
     }
   };
 
-  const handleBulkPayment = async (billIds: string[], paymentData: any) => {
+  const handleBulkPayment = async (billIds: string[], paymentData: PaymentData) => {
     try {
       await bulkPayment(billIds, paymentData);
       setDialogs(prev => ({ ...prev, bulkPayment: false }));
@@ -198,7 +244,7 @@ const VendorBillsPage = () => {
     }
   };
 
-  const handleSchedulePayment = async (billId: string, scheduleData: any) => {
+  const handleSchedulePayment = async (billId: string, scheduleData: ScheduleData) => {
     try {
       await schedulePayment(billId, scheduleData);
       setDialogs(prev => ({ ...prev, schedulePayment: false }));

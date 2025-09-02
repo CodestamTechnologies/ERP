@@ -17,7 +17,7 @@ import { ProfitLossChart } from '@/components/finance/profit-loss/ProfitLossChar
 import { RevenueCard } from '@/components/finance/profit-loss/RevenueCard';
 import { ExpenseCard } from '@/components/finance/profit-loss/ExpenseCard';
 import { ProfitabilityCard } from '@/components/finance/profit-loss/ProfitabilityCard';
-import { TrendAnalysisChart } from '@/components/finance/balance-sheet/TrendAnalysisChart';
+import { ProfitLossTrendChart } from '@/components/finance/profit-loss/ProfitLossTrendChart';
 import { RatioAnalysisCard } from '@/components/finance/balance-sheet/RatioAnalysisCard';
 
 const ProfitLossPage = () => {
@@ -389,7 +389,7 @@ const ProfitLossPage = () => {
 
               {activeTab === 'trends' && (
                 <div className="space-y-6">
-                  <TrendAnalysisChart trends={trends} formatCurrency={formatCurrency} />
+                  <ProfitLossTrendChart trends={trends} formatCurrency={formatCurrency} />
                   
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <Card>
