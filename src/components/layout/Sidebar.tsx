@@ -97,7 +97,7 @@ const MOCK_NOTIFICATIONS: Notification[] = [
 ];
 
 // Custom Hooks
-const useClickOutside = (ref: React.RefObject<HTMLElement>, callback: () => void, active = true) => {
+const useClickOutside = (ref: React.RefObject<HTMLElement | null>, callback: () => void, active = true) => {
   useEffect(() => {
     if (!active) return;
     
@@ -128,8 +128,8 @@ const useRouteActive = () => {
   };
 };
 
-const useSmartPosition = (triggerRef: React.RefObject<HTMLElement>, isOpen: boolean) => {
-  const [position, setPosition] = useState({ top: 0, left: 0, right: 'auto' });
+const useSmartPosition = (triggerRef: React.RefObject<HTMLElement | null>, isOpen: boolean) => {
+  const [position, setPosition] = useState<{ top: number; left: number | string; right: string }>({ top: 0, left: 0, right: 'auto' });
 
   useEffect(() => {
     if (!isOpen || !triggerRef.current) return;
@@ -142,13 +142,13 @@ const useSmartPosition = (triggerRef: React.RefObject<HTMLElement>, isOpen: bool
       const panelHeight = 500;
 
       let top = triggerRect.bottom + 8;
-      let left = triggerRect.left;
+      let left: number | string = triggerRect.left;
       let right = 'auto';
 
       // Handle horizontal overflow
       if (left + panelWidth > viewportWidth - 20) {
-        right = viewportWidth - triggerRect.right;
-        left = 'auto' as any;
+        right = `${viewportWidth - triggerRect.right}px`;
+        left = 'auto';
       }
       if (typeof left === 'number' && left < 20) left = 20;
 
@@ -158,7 +158,11 @@ const useSmartPosition = (triggerRef: React.RefObject<HTMLElement>, isOpen: bool
         if (top < 20) top = 20;
       }
 
-      setPosition({ top, left: left as number, right: right as string });
+      setPosition({ 
+        top, 
+        left, 
+        right 
+      });
     };
 
     updatePosition();
@@ -220,7 +224,7 @@ const NotificationBell = ({
 }: { 
   unreadCount: number; 
   onClick: () => void; 
-  triggerRef: React.RefObject<HTMLButtonElement>; 
+  triggerRef: React.RefObject<HTMLButtonElement | null>; 
 }) => (
   <button
     ref={triggerRef}
@@ -247,7 +251,7 @@ const UserProfile = ({
   showProfileMenu: boolean;
   onToggleMenu: () => void;
   onSignOut: () => void;
-  profileMenuRef: React.RefObject<HTMLDivElement>;
+  profileMenuRef: React.RefObject<HTMLDivElement | null>;
 }) => (
   <div className="p-4 border-t border-white/20 relative" style={{ backgroundColor: '#1e2155' }} ref={profileMenuRef}>
     <div className="flex items-center space-x-3 cursor-pointer" onClick={onToggleMenu}>
@@ -525,8 +529,8 @@ const Sidebar = () => {
           className="fixed z-[9999]"
           style={{
             top: `${notificationPosition.top}px`,
-            left: notificationPosition.left !== 'auto' ? `${notificationPosition.left}px` : 'auto',
-            right: notificationPosition.right !== 'auto' ? `${notificationPosition.right}px` : 'auto',
+            left: typeof notificationPosition.left === 'number' ? `${notificationPosition.left}px` : notificationPosition.left,
+            right: notificationPosition.right !== 'auto' ? notificationPosition.right : 'auto',
             maxHeight: 'calc(100vh - 100px)',
           }}
           data-notification-dropdown
@@ -600,7 +604,10 @@ const Sidebar = () => {
       {secondarySidebarConfig && typeof window !== 'undefined' && createPortal(
         <SecondarySidebar
           isOpen={state.showSecondarySidebar}
-          onClose={() => updateState({ showSecondarySidebar: false, secondarySidebarConfig: null })}
+          onClose={() => {
+            updateState({ showSecondarySidebar: false });
+            setSecondarySidebarConfig(null);
+          }}
           config={secondarySidebarConfig}
         />,
         document.body

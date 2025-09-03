@@ -1,6 +1,9 @@
 // Role-based access control logic
 import { PERMISSIONS, ROLE_PERMISSIONS } from '@/hooks/usePermissions';
 
+// Define permission type from PERMISSIONS constant
+type PermissionType = typeof PERMISSIONS[keyof typeof PERMISSIONS];
+
 export interface Role {
   id: string;
   name: string;
@@ -89,7 +92,7 @@ export const validateRolePermissions = (permissions: string[]): {
   isValid: boolean;
   invalidPermissions: string[];
 } => {
-  const validPermissions = Object.values(PERMISSIONS);
+  const validPermissions = Object.values(PERMISSIONS) as string[];
   const invalidPermissions = permissions.filter(
     permission => !validPermissions.includes(permission)
   );

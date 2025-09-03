@@ -44,7 +44,7 @@ export const ProfitLossChart = ({ data, formatCurrency }: ProfitLossChartProps) 
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie data={pieData} cx="50%" cy="50%" outerRadius={80} dataKey="value"
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}>
+                  label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(1)}%`}>
                   {pieData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}

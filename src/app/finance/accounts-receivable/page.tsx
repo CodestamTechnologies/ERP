@@ -48,16 +48,16 @@ interface PaymentData {
 }
 
 interface ReminderData {
-  type: 'email' | 'sms' | 'phone';
-  message?: string;
-  scheduledDate?: string;
+  template: string;
+  customMessage: string;
+  includeInvoiceDetails: boolean;
 }
 
 interface FollowUpData {
-  type: 'call' | 'email' | 'meeting';
+  type: string;
   scheduledDate: string;
+  priority: string;
   notes: string;
-  priority: 'low' | 'medium' | 'high';
 }
 
 const AccountsReceivablePage = () => {
@@ -160,16 +160,31 @@ const AccountsReceivablePage = () => {
         setSelectedInvoice(null);
       } catch (error) { console.error('Error recording payment:', error); }
     },
+    // Wrapper function for BulkReminderDialog that converts dialog ReminderData to hook ReminderData
     bulkReminder: async (invoiceIds: string[], data: ReminderData) => {
       try {
-        await bulkReminder(invoiceIds, data);
+        // Convert dialog ReminderData to hook ReminderData
+        const hookReminderData = {
+          type: 'email' as const, // Default to email since dialog doesn't specify type
+          message: data.customMessage || `Reminder: ${data.template}`,
+          scheduledDate: new Date().toISOString().split('T')[0]
+        };
+        await bulkReminder(invoiceIds, hookReminderData);
         setDialogs(prev => ({ ...prev, bulkReminder: false }));
         setSelectedInvoices([]);
       } catch (error) { console.error('Error sending reminders:', error); }
     },
+    // Wrapper function for FollowUpDialog that converts dialog FollowUpData to hook FollowUpData
     followUp: async (invoiceId: string, data: FollowUpData) => {
       try {
-        await followUp(invoiceId, data);
+        // Convert dialog FollowUpData to hook FollowUpData
+        const hookFollowUpData = {
+          type: (data.type as 'call' | 'email' | 'meeting') || 'call',
+          notes: data.notes,
+          scheduledDate: data.scheduledDate,
+          assignedTo: 'current-user'
+        };
+        await followUp(invoiceId, hookFollowUpData);
         setDialogs(prev => ({ ...prev, followUp: false }));
         setSelectedInvoice(null);
       } catch (error) { console.error('Error creating follow-up:', error); }
@@ -502,10 +517,16 @@ const AccountsReceivablePage = () => {
 
       {/* Dialogs */}
       <CreateInvoiceDialog isOpen={dialogs.createInvoice} onClose={() => setDialogs(prev => ({ ...prev, createInvoice: false }))} onCreateInvoice={handlers.createInvoice} customers={customers} isProcessing={isProcessing} />
-      <PaymentRecordDialog isOpen={dialogs.recordPayment} onClose={() => setDialogs(prev => ({ ...prev, recordPayment: false }))} invoice={selectedInvoice} onRecordPayment={handlers.recordPayment} isProcessing={isProcessing} />
+      {selectedInvoice && (
+        <PaymentRecordDialog isOpen={dialogs.recordPayment} onClose={() => setDialogs(prev => ({ ...prev, recordPayment: false }))} invoice={selectedInvoice} onRecordPayment={handlers.recordPayment} isProcessing={isProcessing} />
+      )}
       <BulkReminderDialog isOpen={dialogs.bulkReminder} onClose={() => setDialogs(prev => ({ ...prev, bulkReminder: false }))} selectedInvoices={invoices.filter(invoice => selectedInvoices.includes(invoice.id))} onSendReminders={handlers.bulkReminder} isProcessing={isProcessing} />
-      <InvoiceDetailsDialog isOpen={dialogs.invoiceDetails} onClose={() => setDialogs(prev => ({ ...prev, invoiceDetails: false }))} invoice={selectedInvoice} onEdit={() => setDialogs(prev => ({ ...prev, invoiceDetails: false, createInvoice: true }))} onRecordPayment={() => setDialogs(prev => ({ ...prev, invoiceDetails: false, recordPayment: true }))} formatCurrency={formatCurrency} formatDate={formatDate} />
-      <FollowUpDialog isOpen={dialogs.followUp} onClose={() => setDialogs(prev => ({ ...prev, followUp: false }))} invoice={selectedInvoice} onCreateFollowUp={handlers.followUp} isProcessing={isProcessing} />
+      {selectedInvoice && (
+        <InvoiceDetailsDialog isOpen={dialogs.invoiceDetails} onClose={() => setDialogs(prev => ({ ...prev, invoiceDetails: false }))} invoice={selectedInvoice} onEdit={() => setDialogs(prev => ({ ...prev, invoiceDetails: false, createInvoice: true }))} onRecordPayment={() => setDialogs(prev => ({ ...prev, invoiceDetails: false, recordPayment: true }))} formatCurrency={formatCurrency} formatDate={formatDate} />
+      )}
+      {selectedInvoice && (
+        <FollowUpDialog isOpen={dialogs.followUp} onClose={() => setDialogs(prev => ({ ...prev, followUp: false }))} invoice={selectedInvoice} onCreateFollowUp={handlers.followUp} isProcessing={isProcessing} />
+      )}
     </div>
   );
 };

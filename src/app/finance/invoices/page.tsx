@@ -186,9 +186,62 @@ const InvoicesPage = () => {
     }
   };
 
-  const handleCreateInvoice = async (invoiceData: Parameters<typeof createInvoice>[0]) => {
+  const handleCreateInvoice = async (invoiceData: {
+    customerId: string;
+    customerName?: string;
+    customerEmail?: string;
+    customerAddress?: string;
+    issueDate: string;
+    dueDate: string;
+    templateId?: string;
+    notes: string;
+    terms: string;
+    subtotal: number;
+    taxAmount: number;
+    discountAmount: number;
+    totalAmount: number;
+    lineItems: Array<Partial<{
+      id: string;
+      description: string;
+      quantity: number;
+      unitPrice: number;
+      taxRate: number;
+      discountRate: number;
+      totalAmount: number;
+      productId?: string;
+      productName?: string;
+    }> & { id: string }>;
+  }) => {
     try {
-      await createInvoice(invoiceData);
+      // Convert dialog InvoiceData to hook's expected Partial<Invoice>
+      const hookInvoiceData = {
+        customerId: invoiceData.customerId,
+        customerName: invoiceData.customerName,
+        customerEmail: invoiceData.customerEmail,
+        customerAddress: invoiceData.customerAddress,
+        issueDate: invoiceData.issueDate,
+        dueDate: invoiceData.dueDate,
+        templateId: invoiceData.templateId,
+        notes: invoiceData.notes,
+        terms: invoiceData.terms,
+        subtotal: invoiceData.subtotal,
+        taxAmount: invoiceData.taxAmount,
+        discountAmount: invoiceData.discountAmount,
+        totalAmount: invoiceData.totalAmount,
+        lineItems: invoiceData.lineItems.map(item => ({
+          id: item.id,
+          description: item.description || '',
+          quantity: item.quantity || 0,
+          unitPrice: item.unitPrice || 0,
+          taxRate: item.taxRate || 0,
+          discountRate: item.discountRate || 0,
+          totalAmount: item.totalAmount || 0,
+          productId: item.productId,
+          productName: item.productName
+        }))
+      };
+      
+      await createInvoice(hookInvoiceData);
       alert('Invoice created successfully!');
       setIsCreateInvoiceOpen(false);
     } catch (error) {

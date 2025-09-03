@@ -325,7 +325,6 @@ export const AdvancedSidebarCustomizer = ({
                                       )}
                                     </div>
                                     <Switch
-                                      size="sm"
                                       checked={sectionConfigs[tool.id]?.subOptionConfigs?.[section.id]?.includes(option.id) || false}
                                       onCheckedChange={(checked) => toggleSubOption(tool.id, section.id, option.id, checked)}
                                     />

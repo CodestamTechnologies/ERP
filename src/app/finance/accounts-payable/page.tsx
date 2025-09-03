@@ -37,8 +37,9 @@ interface PaymentData {
 interface SchedulePaymentData {
   scheduledDate: string;
   amount: number;
-  paymentMethod: string;
+  paymentMethod: 'bank_transfer' | 'check' | 'cash' | 'credit_card' | 'online';
   notes?: string;
+  approvalRequired?: boolean;
 }
 
 // Define the CreatePayableData interface to match what the dialog sends
@@ -111,6 +112,48 @@ const AccountsPayablePage = () => {
     schedulePayment: async (invoiceId: string, data: SchedulePaymentData) => {
       try {
         await schedulePayment(invoiceId, data);
+        alert('Payment scheduled successfully!');
+      } catch { alert('Error scheduling payment.'); }
+    },
+    // Wrapper function for PayableInvoiceCard that converts partial data to full SchedulePaymentData
+    schedulePaymentFromCard: async (invoiceId: string, scheduleData: { amount?: number; scheduledDate?: string; paymentMethod?: string; notes?: string; approvalRequired?: boolean; }) => {
+      try {
+        const fullScheduleData: SchedulePaymentData = {
+          scheduledDate: scheduleData.scheduledDate || new Date().toISOString().split('T')[0],
+          amount: scheduleData.amount || 0,
+          paymentMethod: (scheduleData.paymentMethod as 'bank_transfer' | 'check' | 'cash' | 'credit_card' | 'online') || 'bank_transfer',
+          notes: scheduleData.notes,
+          approvalRequired: scheduleData.approvalRequired
+        };
+        await schedulePayment(invoiceId, fullScheduleData);
+        alert('Payment scheduled successfully!');
+      } catch { alert('Error scheduling payment.'); }
+    },
+    // Wrapper function for PaymentScheduleCard that converts RescheduleData to SchedulePaymentData
+    reschedulePayment: async (paymentId: string, rescheduleData: { amount?: number; scheduledDate?: string; paymentMethod?: string; notes?: string; approvalRequired?: boolean; }) => {
+      try {
+        const fullScheduleData: SchedulePaymentData = {
+          scheduledDate: rescheduleData.scheduledDate || new Date().toISOString().split('T')[0],
+          amount: rescheduleData.amount || 0,
+          paymentMethod: (rescheduleData.paymentMethod as 'bank_transfer' | 'check' | 'cash' | 'credit_card' | 'online') || 'bank_transfer',
+          notes: rescheduleData.notes,
+          approvalRequired: rescheduleData.approvalRequired
+        };
+        await schedulePayment(paymentId, fullScheduleData);
+        alert('Payment rescheduled successfully!');
+      } catch { alert('Error rescheduling payment.'); }
+    },
+    // Wrapper function for PaymentDialog that converts ScheduleData to SchedulePaymentData
+    schedulePaymentFromDialog: async (invoiceId: string, scheduleData: { amount: number; scheduledDate: string; paymentMethod: string; bankAccount: string; notes: string; approvalRequired: boolean; recurringPayment: boolean; recurringFrequency: string; recurringEndDate: string; }) => {
+      try {
+        const fullScheduleData: SchedulePaymentData = {
+          scheduledDate: scheduleData.scheduledDate,
+          amount: scheduleData.amount,
+          paymentMethod: (scheduleData.paymentMethod as 'bank_transfer' | 'check' | 'cash' | 'credit_card' | 'online'),
+          notes: scheduleData.notes,
+          approvalRequired: scheduleData.approvalRequired
+        };
+        await schedulePayment(invoiceId, fullScheduleData);
         alert('Payment scheduled successfully!');
       } catch { alert('Error scheduling payment.'); }
     },
@@ -428,7 +471,7 @@ const AccountsPayablePage = () => {
                     onSelect={(isSelected) => handlers.invoiceSelection(invoice.id, isSelected)}
                     onViewDetails={(inv) => { setSelected(prev => ({ ...prev, invoice: inv })); setDialogs(prev => ({ ...prev, payment: true })); }}
                     onProcessPayment={(inv) => { setSelected(prev => ({ ...prev, invoice: inv })); setDialogs(prev => ({ ...prev, payment: true })); }}
-                    onSchedulePayment={handlers.schedulePayment} onSendReminder={handlers.sendReminder}
+                    onSchedulePayment={handlers.schedulePaymentFromCard} onSendReminder={handlers.sendReminder}
                     onApprove={handlers.approvePayment} onReject={handlers.rejectPayment} isProcessing={isProcessing} />
                 ))}
               </div>
@@ -470,7 +513,7 @@ const AccountsPayablePage = () => {
                       const invoice = payableInvoices.find(inv => inv.invoiceNumber === p.invoiceNumber);
                       if (invoice) { setSelected(prev => ({ ...prev, invoice })); setDialogs(prev => ({ ...prev, payment: true })); }
                     }}
-                    onReschedule={handlers.schedulePayment} isProcessing={isProcessing} />
+                    onReschedule={handlers.reschedulePayment} isProcessing={isProcessing} />
                 ))}
               </div>
             </TabsContent>
@@ -528,7 +571,7 @@ const AccountsPayablePage = () => {
       <CreatePayableDialog isOpen={dialogs.createPayable} onClose={() => setDialogs(prev => ({ ...prev, createPayable: false }))}
         onCreatePayable={handlers.createPayable} vendors={vendors} isProcessing={isProcessing} />
       <PaymentDialog isOpen={dialogs.payment} onClose={() => setDialogs(prev => ({ ...prev, payment: false }))}
-        invoice={selected.invoice} onProcessPayment={handlers.processPayment} onSchedulePayment={handlers.schedulePayment} isProcessing={isProcessing} />
+        invoice={selected.invoice} onProcessPayment={handlers.processPayment} onSchedulePayment={handlers.schedulePaymentFromDialog} isProcessing={isProcessing} />
       <VendorDetailsDialog isOpen={dialogs.vendorDetails} onClose={() => setDialogs(prev => ({ ...prev, vendorDetails: false }))}
         vendor={selected.vendor} payableInvoices={payableInvoices.filter(inv => inv.vendorId === selected.vendor?.id)} />
       <BulkPaymentDialog isOpen={dialogs.bulkPayment} onClose={() => setDialogs(prev => ({ ...prev, bulkPayment: false }))}

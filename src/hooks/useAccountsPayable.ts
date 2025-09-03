@@ -160,7 +160,7 @@ export const useAccountsPayable = () => {
   interface ScheduleData {
     amount: number;
     scheduledDate: string;
-    paymentMethod: string;
+    paymentMethod: 'bank_transfer' | 'check' | 'cash' | 'credit_card' | 'online';
     notes?: string;
     approvalRequired?: boolean;
   }
@@ -232,7 +232,7 @@ export const useAccountsPayable = () => {
         if (invoice.status !== 'paid') {
           const daysDiff = Math.floor((currentDate.getTime() - new Date(invoice.dueDate).getTime()) / (1000 * 60 * 60 * 24));
           totalAmount += invoice.balanceAmount;
-          let bucketIndex = daysDiff <= 0 ? 0 : daysDiff <= 30 ? 1 : daysDiff <= 60 ? 2 : 3;
+          const bucketIndex = daysDiff <= 0 ? 0 : daysDiff <= 30 ? 1 : daysDiff <= 60 ? 2 : 3;
           buckets[bucketIndex].amount += invoice.balanceAmount;
           buckets[bucketIndex].count += 1;
 
