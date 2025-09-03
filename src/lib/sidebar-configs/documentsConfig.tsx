@@ -133,7 +133,7 @@ export const documentsServicesConfig: SecondarySidebarConfig = {
           badge: null,
           color: 'text-blue-600',
           bgColor: 'hover:bg-blue-50',
-          href: '/documents/legal/service-agreement'
+          href: '/documents/contracts/service-agreement'
         },
         {
           id: 'employment-contract',
@@ -142,7 +142,7 @@ export const documentsServicesConfig: SecondarySidebarConfig = {
           badge: null,
           color: 'text-green-600',
           bgColor: 'hover:bg-green-50',
-          href: '/documents/legal/employment-contract'
+          href: '/documents/contracts/employment-contract'
         },
         {
           id: 'vendor-agreement',
@@ -151,7 +151,7 @@ export const documentsServicesConfig: SecondarySidebarConfig = {
           badge: null,
           color: 'text-purple-600',
           bgColor: 'hover:bg-purple-50',
-          href: '/documents/legal/vendor-agreement'
+          href: '/documents/contracts/vendor-agreement'
         }
       ]
     },

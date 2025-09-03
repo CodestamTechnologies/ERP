@@ -16,9 +16,9 @@ const documentCategories = [
     color: 'bg-blue-50 text-blue-600',
     borderColor: 'border-blue-200',
     documents: [
-      { name: 'Letters of Intent (LOI)', href: '/documents/loi', badge: 'Popular' },
-      { name: 'Memorandum of Understanding (MOU)', href: '/documents/mou', badge: 'New' },
-      { name: 'Partnership Agreements', href: '/documents/partnership', badge: null },
+      { name: 'Letters of Intent (LOI)', href: '/documents/brd/loi', badge: 'Popular' },
+      { name: 'Memorandum of Understanding (MOU)', href: '/documents/brd/mou', badge: 'New' },
+      { name: 'Partnership Agreements', href: '/documents/brd/partnership', badge: null },
       { name: 'Business Proposals', href: '/documents/proposals', badge: null },
       { name: 'Non-Disclosure Agreements (NDA)', href: '/documents/nda', badge: null },
     ]

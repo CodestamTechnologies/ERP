@@ -8,7 +8,16 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Download, FileText, Mail, Printer, Save } from 'lucide-react';
+import { Calendar, Download, FileText, Mail, Printer, Save, CheckCircle } from 'lucide-react';
+import { useDocumentManager } from '@/hooks/useDocumentManager';
+import { DocumentHistoryDialog } from './DocumentHistoryDialog';
+import { DocumentDraftsDialog } from './DocumentDraftsDialog';
+
+// Simple toast replacement
+const toast = {
+  success: (message: string) => alert(`✅ ${message}`),
+  error: (message: string) => alert(`❌ ${message}`),
+};
 
 interface PartyInfo {
   company: string;
@@ -194,6 +203,20 @@ const LOIComponent = () => {
   });
 
   const [activeView, setActiveView] = useState<'form' | 'preview'>('form');
+  
+  const {
+    drafts,
+    history,
+    isLoading,
+    saveDraft,
+    saveToHistory,
+    loadDraft,
+    loadFromHistory,
+    deleteDraft,
+    deleteFromHistory,
+    clearAllDrafts,
+    clearAllHistory,
+  } = useDocumentManager('loi');
 
   const updateLOI = (field: keyof LOIData, value: string) => {
     setData(prev => ({ ...prev, loi: { ...prev.loi, [field]: value } }));
@@ -314,12 +337,70 @@ const LOIComponent = () => {
     </div>
   );
 
+  // Document management handlers
+  const handleSaveDraft = async () => {
+    const result = await saveDraft(data as unknown as Record<string, unknown>);
+    if (result.success) {
+      toast.success('Draft saved successfully!');
+    } else {
+      toast.error('Failed to save draft');
+    }
+  };
+
+  const handleSaveToHistory = async () => {
+    const result = await saveToHistory(data as unknown as Record<string, unknown>);
+    if (result.success) {
+      toast.success('Document saved to history!');
+    } else {
+      toast.error('Failed to save to history');
+    }
+  };
+
+  const handleLoadDraft = (draftId: string) => {
+    const draft = loadDraft(draftId);
+    if (draft) {
+      setData(draft.data as unknown as AgreementData);
+      toast.success('Draft loaded successfully!');
+    } else {
+      toast.error('Failed to load draft');
+    }
+  };
+
+  const handleLoadFromHistory = (historyId: string) => {
+    const historyItem = loadFromHistory(historyId);
+    if (historyItem) {
+      setData(historyItem.data as unknown as AgreementData);
+      toast.success('Document loaded from history!');
+    } else {
+      toast.error('Failed to load from history');
+    }
+  };
+
+  const handleDeleteDraft = async (draftId: string) => {
+    const result = await deleteDraft(draftId);
+    if (result.success) {
+      toast.success('Draft deleted successfully!');
+    } else {
+      toast.error('Failed to delete draft');
+    }
+  };
+
+  const handleDeleteFromHistory = async (historyId: string) => {
+    const result = await deleteFromHistory(historyId);
+    if (result.success) {
+      toast.success('Document removed from history!');
+    } else {
+      toast.error('Failed to remove from history');
+    }
+  };
+
   const handleAction = (action: string) => {
     const actions = {
       generate: () => setActiveView('preview'),
       download: () => alert('PDF download functionality would be implemented here'),
       email: () => alert('Email functionality would be implemented here'),
-      save: () => alert('Draft saved successfully!'),
+      save: handleSaveDraft,
+      saveToHistory: handleSaveToHistory,
     };
     actions[action as keyof typeof actions]?.();
   };
@@ -337,6 +418,22 @@ const LOIComponent = () => {
         </div>
         
         <div className="flex space-x-2">
+          <DocumentDraftsDialog
+            drafts={drafts}
+            isLoading={isLoading}
+            onLoad={handleLoadDraft}
+            onDelete={handleDeleteDraft}
+            onClearAll={clearAllDrafts}
+            documentType="loi"
+          />
+          <DocumentHistoryDialog
+            history={history}
+            isLoading={isLoading}
+            onLoad={handleLoadFromHistory}
+            onDelete={handleDeleteFromHistory}
+            onClearAll={clearAllHistory}
+            documentType="loi"
+          />
           {['form', 'preview'].map(view => (
             <Button
               key={view}
@@ -442,10 +539,16 @@ const LOIComponent = () => {
                 </Button>
               ))}
             </div>
-            <Button onClick={() => handleAction('save')} variant="outline" className="flex items-center">
-              <Save className="w-4 h-4 mr-2" />
-              Save Draft
-            </Button>
+            <div className="flex space-x-2">
+              <Button onClick={() => handleAction('saveToHistory')} className="flex items-center">
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Save to History
+              </Button>
+              <Button onClick={() => handleAction('save')} variant="outline" className="flex items-center">
+                <Save className="w-4 h-4 mr-2" />
+                Save Draft
+              </Button>
+            </div>
           </div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>

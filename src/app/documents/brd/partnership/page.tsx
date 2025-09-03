@@ -2,6 +2,6 @@
 
 import PartnershipAgreementComponent from '@/components/documents/PartnershipAgreementComponent';
 
-export default function PartnershipAgreementPage() {
+export default function PartnershipPage() {
   return <PartnershipAgreementComponent />;
 }
