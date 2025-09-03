@@ -187,12 +187,11 @@ export const CreateVendorBillDialog = ({
                     mode="single"
                     selected={formData.billDate}
                     onSelect={(date) => {
-                      if (date) {
+                      if (date instanceof Date) {
                         setFormData(prev => ({ ...prev, billDate: date }));
                         setShowBillDatePicker(false);
                       }
                     }}
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -216,12 +215,11 @@ export const CreateVendorBillDialog = ({
                     mode="single"
                     selected={formData.dueDate}
                     onSelect={(date) => {
-                      if (date) {
+                      if (date instanceof Date) {
                         setFormData(prev => ({ ...prev, dueDate: date }));
                         setShowDueDatePicker(false);
                       }
                     }}
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>

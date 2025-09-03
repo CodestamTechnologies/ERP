@@ -24,7 +24,13 @@ interface BulkPaymentDialogProps {
     dueDate: string;
     status: string;
   }>;
-  onProcessBulkPayment: (billIds: string[], paymentData: any) => Promise<void>;
+  onProcessBulkPayment: (billIds: string[], paymentData: {
+    paymentMethod: string;
+    paymentDate: string;
+    reference: string;
+    notes: string;
+    totalAmount: number;
+  }) => Promise<void>;
   isProcessing: boolean;
 }
 
@@ -220,12 +226,11 @@ export const BulkPaymentDialog = ({
                     mode="single"
                     selected={paymentData.paymentDate}
                     onSelect={(date) => {
-                      if (date) {
+                      if (date instanceof Date) {
                         setPaymentData(prev => ({ ...prev, paymentDate: date }));
                         setShowDatePicker(false);
                       }
                     }}
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>

@@ -108,8 +108,6 @@ export default function CalendarPage() {
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
   const handleSubmitEvent = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
@@ -536,7 +534,11 @@ export default function CalendarPage() {
                     <ShadcnCalendar
                       mode="single"
                       selected={selectedDate}
-                      onSelect={(date) => date && setSelectedDate(date)}
+                      onSelect={(date) => {
+                        if (date instanceof Date) {
+                          setSelectedDate(date);
+                        }
+                      }}
                       className="rounded-md border shadow-sm"
                       captionLayout="dropdown"
                     />

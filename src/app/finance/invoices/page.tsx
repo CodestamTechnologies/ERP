@@ -540,7 +540,14 @@ const InvoicesPage = () => {
                     onSend={handleSendInvoice}
                     onDuplicate={handleDuplicateInvoice}
                     onDelete={handleDeleteInvoice}
-                    onRecordPayment={handleRecordPayment}
+                    onRecordPayment={(invoiceId, paymentData) => {
+                      // Convert PaymentData to the expected format
+                      const convertedPaymentData = {
+                        ...paymentData,
+                        paymentMethod: paymentData.paymentMethod as 'bank_transfer' | 'check' | 'cash' | 'credit_card' | 'online' | undefined
+                      };
+                      return handleRecordPayment(invoiceId, convertedPaymentData);
+                    }}
                     isProcessing={isProcessing}
                   />
                 ))}

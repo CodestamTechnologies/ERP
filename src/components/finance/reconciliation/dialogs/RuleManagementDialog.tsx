@@ -200,7 +200,7 @@ export const RuleManagementDialog = ({
                       <Label>Field</Label>
                       <Select 
                         value={condition.field} 
-                        onValueChange={(value) => updateCondition(index, { field: value as any })}
+                        onValueChange={(value) => updateCondition(index, { field: value as RuleCondition['field'] })}
                       >
                         <SelectTrigger>
                           <SelectValue />
@@ -219,7 +219,7 @@ export const RuleManagementDialog = ({
                       <Label>Operator</Label>
                       <Select 
                         value={condition.operator} 
-                        onValueChange={(value) => updateCondition(index, { operator: value as any })}
+                        onValueChange={(value) => updateCondition(index, { operator: value as RuleCondition['operator'] })}
                       >
                         <SelectTrigger>
                           <SelectValue />
@@ -279,7 +279,7 @@ export const RuleManagementDialog = ({
                       <Label>Action Type</Label>
                       <Select 
                         value={action.type} 
-                        onValueChange={(value) => updateAction(index, { type: value as any })}
+                        onValueChange={(value) => updateAction(index, { type: value as RuleAction['type'] })}
                       >
                         <SelectTrigger>
                           <SelectValue />

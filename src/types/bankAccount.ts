@@ -88,7 +88,7 @@ export interface BankIntegrationProvider {
 
 export interface BankConnectionConfig {
   providerId: string;
-  credentials: Record<string, any>;
+  credentials: Record<string, unknown>;
   settings: {
     syncFrequency: 'real-time' | 'hourly' | 'daily' | 'weekly' | 'manual';
     autoReconcile: boolean;

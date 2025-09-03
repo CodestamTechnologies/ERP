@@ -311,7 +311,7 @@ const CashFlowForecast = ({ historicalData, summary }: CashFlowForecastProps) =>
                   dataKey="cumulativeFlow"
                   stroke="#8b5cf6"
                   strokeWidth={3}
-                  strokeDasharray={(item: ForecastDataItem) => item?.isProjected ? "5 5" : "0"}
+                  strokeDasharray="5 5"
                   dot={false}
                   name="Cash Balance"
                 />

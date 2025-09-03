@@ -149,7 +149,7 @@ export const PaymentMethodDialog = ({
             </div>
             <div className="space-y-2">
               <Label htmlFor="type">Payment Type</Label>
-              <Select value={type} onValueChange={(value: any) => setType(value)} required>
+              <Select value={type} onValueChange={(value) => setType(value as typeof type)} required>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

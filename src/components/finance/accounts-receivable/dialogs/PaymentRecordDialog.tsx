@@ -130,11 +130,11 @@ export const PaymentRecordDialog = ({ isOpen, onClose, invoice, onRecordPayment,
                 <PopoverContent className="w-auto p-0">
                   <Calendar mode="single" selected={paymentData.paymentDate}
                     onSelect={(date) => {
-                      if (date) {
+                      if (date instanceof Date) {
                         setPaymentData(prev => ({ ...prev, paymentDate: date }));
                         setShowDatePicker(false);
                       }
-                    }} initialFocus />
+                    }} />
                 </PopoverContent>
               </Popover>
             </div>

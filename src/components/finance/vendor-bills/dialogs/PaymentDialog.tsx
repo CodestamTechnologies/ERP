@@ -12,11 +12,31 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, CreditCard, Building2, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 
+interface Bill {
+  id: string;
+  billNumber: string;
+  vendorName: string;
+  amount: number;
+  paidAmount: number;
+  remainingAmount: number;
+  billDate: string;
+  dueDate: string;
+  status: string;
+}
+
+interface PaymentData {
+  amount: number;
+  paymentMethod: string;
+  paymentDate: string;
+  reference: string;
+  notes: string;
+}
+
 interface PaymentDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  bill: any;
-  onProcessPayment: (billId: string, paymentData: any) => Promise<void>;
+  bill: Bill | null;
+  onProcessPayment: (billId: string, paymentData: PaymentData) => Promise<void>;
   isProcessing: boolean;
 }
 
@@ -238,12 +258,11 @@ export const PaymentDialog = ({
                     mode="single"
                     selected={paymentData.paymentDate}
                     onSelect={(date) => {
-                      if (date) {
+                      if (date instanceof Date) {
                         setPaymentData(prev => ({ ...prev, paymentDate: date }));
                         setShowDatePicker(false);
                       }
                     }}
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>

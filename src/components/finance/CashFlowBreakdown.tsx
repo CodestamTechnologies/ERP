@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
-  Tooltip, Legend, ResponsiveContainer, TreeMap
+  Tooltip, Legend, ResponsiveContainer, Treemap
 } from 'recharts';
 import { 
   Building2, TrendingUp, CreditCard, PiggyBank, Users, 
@@ -161,7 +161,7 @@ const CashFlowBreakdown = ({ data, summary }: CashFlowBreakdownProps) => {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, value }) => `${name}: ${formatIndianCurrency(value)}`}
+                    label={({ name, value }) => `${name}: ${formatIndianCurrency(value || 0)}`}
                     outerRadius={100}
                     fill="#8884d8"
                     dataKey="value"

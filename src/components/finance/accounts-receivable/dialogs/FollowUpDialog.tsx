@@ -168,11 +168,11 @@ export const FollowUpDialog = ({ isOpen, onClose, invoice, onCreateFollowUp, isP
                 <PopoverContent className="w-auto p-0">
                   <Calendar mode="single" selected={followUpData.scheduledDate}
                     onSelect={(date) => {
-                      if (date) {
+                      if (date instanceof Date) {
                         setFollowUpData(prev => ({ ...prev, scheduledDate: date }));
                         setShowDatePicker(false);
                       }
-                    }} initialFocus />
+                    }} />
                 </PopoverContent>
               </Popover>
             </div>

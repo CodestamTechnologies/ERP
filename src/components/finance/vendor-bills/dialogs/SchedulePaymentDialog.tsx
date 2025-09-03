@@ -11,11 +11,29 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, CalendarDays, Building2, FileText, Clock } from 'lucide-react';
 import { format, addDays, addWeeks, addMonths } from 'date-fns';
 
+interface Bill {
+  id: string;
+  billNumber: string;
+  vendorName: string;
+  remainingAmount: number;
+  dueDate: string;
+  status: string;
+}
+
+interface ScheduleData {
+  amount: number;
+  scheduledDate: string;
+  frequency: string;
+  paymentMethod: string;
+  autoProcess: boolean;
+  notes: string;
+}
+
 interface SchedulePaymentDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  bill: any;
-  onSchedulePayment: (billId: string, scheduleData: any) => Promise<void>;
+  bill: Bill | null;
+  onSchedulePayment: (billId: string, scheduleData: ScheduleData) => Promise<void>;
   isProcessing: boolean;
 }
 
@@ -284,12 +302,11 @@ export const SchedulePaymentDialog = ({
                     mode="single"
                     selected={scheduleData.scheduledDate}
                     onSelect={(date) => {
-                      if (date) {
+                      if (date instanceof Date) {
                         setScheduleData(prev => ({ ...prev, scheduledDate: date }));
                         setShowDatePicker(false);
                       }
                     }}
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -386,7 +403,7 @@ export const SchedulePaymentDialog = ({
                 <span className="font-semibold">Late Payment Notice</span>
               </div>
               <p className="text-sm text-yellow-600">
-                The scheduled payment date is after the bill's due date. 
+                The scheduled payment date is after the bill&apos;s due date. 
                 This may result in late fees or impact vendor relationships.
               </p>
             </div>

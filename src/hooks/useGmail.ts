@@ -333,7 +333,7 @@ export const useGmail = () => {
   const handleMoveToFolder = useCallback(async (emailId: string, folder: string) => {
     setEmails(prev => prev.map(email => 
       email.id === emailId 
-        ? { ...email, folder }
+        ? { ...email, folder: folder as Email['folder'] }
         : email
     ));
   }, []);
@@ -354,7 +354,7 @@ export const useGmail = () => {
       name: templateData.name,
       subject: templateData.subject,
       content: templateData.content,
-      category: templateData.category,
+      category: templateData.category as EmailTemplate['category'],
       isActive: templateData.isActive,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -369,6 +369,7 @@ export const useGmail = () => {
         ? { 
             ...template, 
             ...templateData,
+            category: templateData.category ? templateData.category as EmailTemplate['category'] : template.category,
             updatedAt: new Date().toISOString()
           }
         : template

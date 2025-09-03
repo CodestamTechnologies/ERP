@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 // GET /api/reports/[id] - Get report by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     // TODO: Implement actual database query
     const report = {
@@ -56,10 +56,10 @@ export async function GET(
 // PUT /api/reports/[id] - Update report
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     
     // TODO: Validate input data
@@ -88,10 +88,10 @@ export async function PUT(
 // DELETE /api/reports/[id] - Delete report
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     // TODO: Implement actual database deletion
     // TODO: Also delete associated files

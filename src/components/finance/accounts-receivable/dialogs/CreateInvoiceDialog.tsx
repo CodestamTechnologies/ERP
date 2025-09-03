@@ -137,11 +137,11 @@ export const CreateInvoiceDialog = ({
                 <PopoverContent className="w-auto p-0">
                   <Calendar mode="single" selected={formData.invoiceDate}
                     onSelect={(date) => {
-                      if (date) {
+                      if (date instanceof Date) {
                         setFormData(prev => ({ ...prev, invoiceDate: date }));
                         setShowInvoiceDatePicker(false);
                       }
-                    }} initialFocus />
+                    }} />
                 </PopoverContent>
               </Popover>
             </div>
@@ -158,11 +158,11 @@ export const CreateInvoiceDialog = ({
                 <PopoverContent className="w-auto p-0">
                   <Calendar mode="single" selected={formData.dueDate}
                     onSelect={(date) => {
-                      if (date) {
+                      if (date instanceof Date) {
                         setFormData(prev => ({ ...prev, dueDate: date }));
                         setShowDueDatePicker(false);
                       }
-                    }} initialFocus />
+                    }} />
                 </PopoverContent>
               </Popover>
             </div>

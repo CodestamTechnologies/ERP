@@ -445,7 +445,14 @@ const ReimbursementsPage = () => {
       <CreateReimbursementDialog
         isOpen={isCreateReimbursementOpen}
         onClose={() => setIsCreateReimbursementOpen(false)}
-        onCreateReimbursement={createReimbursement}
+        onCreateReimbursement={async (reimbursementData) => {
+          const convertedData = {
+            ...reimbursementData,
+            type: reimbursementData.type as 'expense' | 'travel' | 'advance' | 'other',
+            priority: reimbursementData.priority as 'low' | 'medium' | 'high' | 'urgent'
+          };
+          await createReimbursement(convertedData);
+        }}
         paymentMethods={paymentMethods}
         isProcessing={isProcessing}
       />

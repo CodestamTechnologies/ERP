@@ -4,14 +4,13 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { motion } from 'framer-motion';
 import { 
-  Settings, Eye, Plus, Minus, ChevronRight, ChevronDown, 
+  Settings, Eye, 
   BarChart3, BookOpen, ArrowUpDown, Landmark, FileText, Target,
-  Shield, Users, Package, DollarSign, Building2, Wrench
+  Shield, Users, Package, Wrench
 } from 'lucide-react';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { useState } from 'react';
+import type { Tool, SidebarConfig } from '@/hooks/useToolsMarketplace';
 
 // Define interfaces for tool and configuration data
 interface ToolOption {
@@ -27,30 +26,10 @@ interface ToolSection {
   options: ToolOption[];
 }
 
-interface Tool {
-  id: string;
-  name: string;
-  icon: React.ReactNode;
-}
-
-interface CustomSection {
-  id: string;
-  name: string;
-  tools: string[];
-  order: number;
-}
-
 interface SectionConfig {
   enabledSections: string[];
   sectionOrder: string[];
   subOptionConfigs: Record<string, string[]>;
-}
-
-interface SidebarConfig {
-  enabledTools: string[];
-  toolOrder: string[];
-  customSections: CustomSection[];
-  sectionConfigs: Record<string, SectionConfig>;
 }
 
 // Mock data for Finance module sections
@@ -193,7 +172,7 @@ interface AdvancedSidebarCustomizerProps {
 }
 
 export const AdvancedSidebarCustomizer = ({
-  availableTools, installedTools, sidebarConfig, onInstall, onUninstall, onConfigUpdate, isProcessing
+  availableTools, installedTools, onConfigUpdate, isProcessing
 }: AdvancedSidebarCustomizerProps) => {
   const [selectedTool, setSelectedTool] = useState('finance');
   const [sectionConfigs, setSectionConfigs] = useState<Record<string, SectionConfig>>({
@@ -208,24 +187,7 @@ export const AdvancedSidebarCustomizer = ({
     }
   });
 
-  const handleDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
-    
-    const items = Array.from(sidebarConfig.toolOrder);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    
-    onConfigUpdate({ toolOrder: items });
-  };
-
-  const toggleTool = (toolId: string, enabled: boolean) => {
-    const newEnabledTools = enabled 
-      ? [...sidebarConfig.enabledTools, toolId]
-      : sidebarConfig.enabledTools.filter((id: string) => id !== toolId);
-    
-    onConfigUpdate({ enabledTools: newEnabledTools });
-  };
-
+  
   const toggleSection = (toolId: string, sectionId: string, enabled: boolean) => {
     setSectionConfigs(prev => {
       const toolConfig = prev[toolId] || { enabledSections: [], sectionOrder: [], subOptionConfigs: {} };
@@ -298,7 +260,7 @@ export const AdvancedSidebarCustomizer = ({
                     </CardHeader>
                     <CardContent className="p-4 max-h-96 overflow-y-auto">
                       <Accordion type="multiple" className="space-y-2">
-                        {(tool.id === 'finance' ? financeModuleSections : []).map((section, index) => (
+                        {(tool.id === 'finance' ? financeModuleSections : []).map((section) => (
                           <AccordionItem key={section.id} value={section.id} className="border rounded-lg">
                             <div className="flex items-center justify-between p-3 border-b">
                               <div className="flex items-center space-x-2">

@@ -1,21 +1,15 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Progress } from '@/components/ui/progress';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Store, Settings, Zap, Crown, Star, Check, X, Search, Filter,
-  ShoppingCart, CreditCard, Download, Users, Package, BarChart3,
-  Shield, Truck, MessageSquare, Calendar, FileText, DollarSign,
-  Building2, Wrench, Sparkles, Rocket, Globe, Lock, Eye, Heart,
-  Plus, Minus, RefreshCw, ArrowRight, ChevronRight, Activity
+  Store, Settings, Zap, Crown, Search, Filter,
+  ShoppingCart, CreditCard, Package,
+  Wrench, Sparkles, Rocket
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useToolsMarketplace } from '@/hooks/useToolsMarketplace';
@@ -23,47 +17,6 @@ import { ToolCard } from '@/components/tools-marketplace/ToolCard';
 import { PurchaseDialog } from '@/components/tools-marketplace/PurchaseDialog';
 import { SidebarCustomizer } from '@/components/tools-marketplace/SidebarCustomizer';
 import { AdvancedSidebarCustomizer } from '@/components/tools-marketplace/AdvancedSidebarCustomizer';
-import { PricingCard } from '@/components/tools-marketplace/PricingCard';
-
-// Define the Tool interface to match the one from the hook
-interface Tool {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  icon: React.ReactNode;
-  features: string[];
-  rating: number;
-  downloads: number;
-  size: string;
-  version: string;
-  developer: string;
-  screenshots: string[];
-  isPopular?: boolean;
-  isNew?: boolean;
-  isPremium?: boolean;
-  suite?: string; // Added for the extended tool type
-}
-
-// Define CustomSection interface to match the hook
-interface CustomSection {
-  id: string;
-  name: string;
-  tools: string[];
-  order: number;
-}
-
-// Define SidebarConfig interface to match the hook
-interface SidebarConfig {
-  enabledTools: string[];
-  toolOrder: string[];
-  customSections: CustomSection[];
-  sectionConfigs: Record<string, {
-    enabledSections: string[];
-    sectionOrder: string[];
-    subOptionConfigs: Record<string, string[]>;
-  }>;
-}
 
 const ToolsMarketplacePage = () => {
   const {
@@ -75,7 +28,6 @@ const ToolsMarketplacePage = () => {
   const [activeTab, setActiveTab] = useState('sidebar');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false);
   const [cart, setCart] = useState<string[]>([]);
 
@@ -362,7 +314,7 @@ const ToolsMarketplacePage = () => {
                             price={getToolPrice(tool.id)}
                             onAddToCart={() => addToCart(tool.id)}
                             onRemoveFromCart={() => removeFromCart(tool.id)}
-                            onViewDetails={() => setSelectedTool(tool)}
+                            onViewDetails={() => {}}
                             onInstall={() => installTool(tool.id)}
                             onUninstall={() => uninstallTool(tool.id)}
                             index={index}

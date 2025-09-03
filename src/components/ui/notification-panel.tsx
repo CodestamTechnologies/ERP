@@ -39,7 +39,7 @@ export interface Notification {
   department: string;
   priority: 'high' | 'medium' | 'low';
   actionUrl?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 interface NotificationPanelProps {

@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 // GET /api/suppliers/[id] - Get supplier by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     // TODO: Implement actual database query
     const supplier = {
@@ -50,10 +50,10 @@ export async function GET(
 // PUT /api/suppliers/[id] - Update supplier
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     
     // TODO: Validate input data
@@ -82,10 +82,10 @@ export async function PUT(
 // DELETE /api/suppliers/[id] - Delete supplier
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     // TODO: Implement actual database deletion
     // TODO: Check if supplier has pending orders before deletion

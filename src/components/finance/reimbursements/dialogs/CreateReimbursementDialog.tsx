@@ -11,10 +11,20 @@ import { PaymentMethod, ReimbursementLineItem } from '@/hooks/useReimbursements'
 import { Plus, Trash2, Upload, CreditCard } from 'lucide-react';
 import { useState } from 'react';
 
+interface ReimbursementData {
+  title: string;
+  description: string;
+  type: string;
+  department: string;
+  priority: string;
+  amount: number;
+  lineItems: (ReimbursementLineItem & { id: string })[];
+}
+
 interface CreateReimbursementDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateReimbursement: (reimbursementData: any) => Promise<void>;
+  onCreateReimbursement: (reimbursementData: ReimbursementData) => Promise<void>;
   paymentMethods: PaymentMethod[];
   isProcessing: boolean;
 }
@@ -76,8 +86,14 @@ export const CreateReimbursementDialog = ({
       priority,
       amount: totalAmount,
       lineItems: lineItems.map((item, index) => ({
-        ...item,
-        id: `line-${Date.now()}-${index}`
+        id: `line-${Date.now()}-${index}`,
+        description: item.description || '',
+        category: item.category || '',
+        amount: item.amount || 0,
+        date: item.date || new Date().toISOString().split('T')[0],
+        receiptId: item.receiptId,
+        taxAmount: item.taxAmount,
+        notes: item.notes
       }))
     };
 

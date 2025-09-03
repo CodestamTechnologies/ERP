@@ -28,7 +28,14 @@ export const useSalesFirestore = () => {
   const [orders, setOrders] = useState<SalesOrder[]>([]);
   const [teamMembers, setTeamMembers] = useState<SalesTeamMember[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [analytics, setAnalytics] = useState<any>({
+  const [analytics, setAnalytics] = useState<{
+    totalRevenue: number;
+    totalOrders: number;
+    avgOrderValue: number;
+    statusCounts: Record<string, number>;
+    channelRevenue: Record<string, number>;
+    lastUpdated: number;
+  }>({
     totalRevenue: 0,
     totalOrders: 0,
     avgOrderValue: 0,

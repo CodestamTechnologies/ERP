@@ -496,7 +496,7 @@ export const StartupHandbookTemplate: React.FC<TemplateProps> = ({
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
           <span className="text-2xl mr-3">✍️</span>
-          Let's Make It Official!
+          Let&apos;s Make It Official!
         </h2>
         <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-8 rounded-xl border-2 border-yellow-300">
           <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">
@@ -510,7 +510,7 @@ export const StartupHandbookTemplate: React.FC<TemplateProps> = ({
         <div className="bg-gradient-to-r from-purple-100 to-pink-100 p-6 rounded-xl">
           <h3 className="text-lg font-bold text-gray-800 mb-2">Welcome to the Team! 🎉</h3>
           <p className="text-gray-600 text-sm mb-4">
-            This handbook is a living document that grows with us. Have suggestions? We'd love to hear them!
+            This handbook is a living document that grows with us. Have suggestions? We&apos;d love to hear them!
           </p>
           <div className="text-xs text-gray-500">
             <p>{data.company.name} • Version {data.handbookVersion}</p>

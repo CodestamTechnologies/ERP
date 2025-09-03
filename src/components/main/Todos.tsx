@@ -16,18 +16,8 @@ import { useTasks } from '@/hooks/useTasks';
 import { useAuth } from '@/context/authContext';
 import { Task, TaskType, TaskPriority, TaskStatus, UserRole } from '@/types/todos';
 
-// Define interfaces for task data
-interface TaskFormData {
-  title: string;
-  description: string;
-  category: string;
-  priority: TaskPriority;
-  assignedTo?: string;
-  department?: string;
-  dueDate: string;
-  tags?: string;
-  estimatedHours?: string;
-}
+// Import TaskFormData from types instead of defining locally
+import { TaskFormData } from '@/types/todos';
 
 const Todo = () => {
   const [activeTab, setActiveTab] = useState<TaskType>('business');
@@ -129,7 +119,7 @@ const Todo = () => {
         updatedAt: new Date().toISOString(),
         tags: taskData.tags ? taskData.tags.split(',').map((tag: string) => tag.trim()) : [],
         progress: 0,
-        estimatedHours: parseInt(taskData.estimatedHours || '1') || 1,
+        estimatedHours: taskData.estimatedHours || 1,
         type: activeTab,
         createdBy: currentUser.uid,
         createdByName: currentUser.displayName || 'Unknown'
@@ -156,7 +146,7 @@ const Todo = () => {
         dueDate: taskData.dueDate,
         updatedAt: new Date().toISOString(),
         tags: taskData.tags ? taskData.tags.split(',').map((tag: string) => tag.trim()) : [],
-        estimatedHours: parseInt(taskData.estimatedHours || '1') || 1,
+        estimatedHours: taskData.estimatedHours || 1,
       };
 
       await updateTask(taskId, updatedTask);

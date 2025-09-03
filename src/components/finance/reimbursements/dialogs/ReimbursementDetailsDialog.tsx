@@ -296,7 +296,7 @@ export const ReimbursementDetailsDialog = ({
                       </div>
                       <p className="text-sm text-gray-600">by {history.approverName}</p>
                       {history.comments && (
-                        <p className="text-sm text-gray-700 mt-1 italic">"{history.comments}"</p>
+                        <p className="text-sm text-gray-700 mt-1 italic">&quot;{history.comments}&quot;</p>
                       )}
                     </div>
                   </div>

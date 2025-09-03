@@ -54,16 +54,16 @@ export const getOrdersRealtime = (callback: (orders: SalesOrder[]) => void, filt
   endDate?: Date;
 }) => {
   try {
-    let ordersRef = ref(realtimeDb, ORDERS_PATH);
+    let ordersQuery;
     
     // If filtering by status, use query
     if (filters?.status && filters.status !== 'all') {
-      ordersRef = query(ref(realtimeDb, ORDERS_PATH), orderByChild('status'), equalTo(filters.status));
+      ordersQuery = query(ref(realtimeDb, ORDERS_PATH), orderByChild('status'), equalTo(filters.status));
     } else {
-      ordersRef = query(ref(realtimeDb, ORDERS_PATH), orderByChild('date'));
+      ordersQuery = query(ref(realtimeDb, ORDERS_PATH), orderByChild('date'));
     }
     
-    const unsubscribe = onValue(ordersRef, (snapshot) => {
+    const unsubscribe = onValue(ordersQuery, (snapshot) => {
       const ordersData: SalesOrder[] = [];
       
       if (snapshot.exists()) {
@@ -95,7 +95,7 @@ export const getOrdersRealtime = (callback: (orders: SalesOrder[]) => void, filt
       callback([]);
     });
     
-    return () => off(ordersRef, 'value', unsubscribe);
+    return () => off(ordersQuery, 'value', unsubscribe);
   } catch (error) {
     console.error('Error setting up orders listener:', error);
     callback([]);

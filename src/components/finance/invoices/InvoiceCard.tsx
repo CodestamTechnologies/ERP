@@ -18,13 +18,21 @@ import {
   CheckCircle
 } from 'lucide-react';
 
+interface PaymentData {
+  amount: number;
+  paymentMethod?: string;
+  paymentDate?: string;
+  reference?: string;
+  notes?: string;
+}
+
 interface InvoiceCardProps {
   invoice: Invoice;
   onViewDetails: (invoice: Invoice) => void;
   onSend: (invoice: Invoice) => void;
   onDuplicate: (invoiceId: string) => void;
   onDelete: (invoiceId: string) => void;
-  onRecordPayment: (invoiceId: string, paymentData: any) => void;
+  onRecordPayment: (invoiceId: string, paymentData: PaymentData) => void;
   isProcessing: boolean;
 }
 

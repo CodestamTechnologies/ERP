@@ -270,9 +270,23 @@ const VendorBillsPage = () => {
     }
   };
 
-  const handleBulkPayment = async (billIds: string[], paymentData: PaymentData) => {
+  const handleBulkPayment = async (billIds: string[], paymentData: {
+    paymentMethod: string;
+    paymentDate: string;
+    reference: string;
+    notes: string;
+    totalAmount: number;
+  }) => {
     try {
-      await bulkPayment(billIds, paymentData);
+      // Convert to PaymentData format expected by the hook
+      const convertedPaymentData: PaymentData = {
+        amount: paymentData.totalAmount,
+        paymentMethod: paymentData.paymentMethod,
+        paymentDate: paymentData.paymentDate,
+        reference: paymentData.reference,
+        notes: paymentData.notes
+      };
+      await bulkPayment(billIds, convertedPaymentData);
       setDialogs(prev => ({ ...prev, bulkPayment: false }));
       setSelectedBills([]);
     } catch (error) {

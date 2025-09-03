@@ -5,34 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { GripVertical, Settings, Eye, Plus, Minus } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
-import { ReactNode } from 'react';
-
-// Define interfaces for type safety
-interface Tool {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  icon: ReactNode;
-}
-
-interface CustomSection {
-  id: string;
-  name: string;
-  tools: string[];
-  order: number;
-}
-
-interface SidebarConfig {
-  enabledTools: string[];
-  toolOrder: string[];
-  customSections: CustomSection[];
-  sectionConfigs: Record<string, {
-    enabledSections: string[];
-    sectionOrder: string[];
-    subOptionConfigs: Record<string, string[]>;
-  }>;
-}
+import type { Tool, SidebarConfig } from '@/hooks/useToolsMarketplace';
 
 interface SidebarCustomizerProps {
   availableTools: Tool[];

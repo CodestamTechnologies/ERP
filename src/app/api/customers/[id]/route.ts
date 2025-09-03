@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 // GET /api/customers/[id] - Get customer by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     // TODO: Implement actual database query
     const customer = {
@@ -50,10 +50,10 @@ export async function GET(
 // PUT /api/customers/[id] - Update customer
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     
     // TODO: Validate input data
@@ -82,10 +82,10 @@ export async function PUT(
 // DELETE /api/customers/[id] - Delete customer
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     // TODO: Implement actual database deletion
     // TODO: Check if customer has pending orders before deletion
