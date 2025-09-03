@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET /api/customers - Get all customers
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // TODO: Implement actual database query
     const customers = [
