@@ -191,22 +191,32 @@ const MenuItemComponent = ({ item, isActive, onSecondaryClick }: {
   isActive: boolean;
   onSecondaryClick?: (item: MenuItem, e: React.MouseEvent) => void;
 }) => {
+  const isComingSoon = item.badge === 'Coming Soon';
   const baseClasses = "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors";
   const activeClasses = isActive ? "bg-white/10 text-white border-r-2 border-white" : "text-white/80 hover:bg-white/5 hover:text-white";
+  const disabledClasses = "text-white/40 cursor-not-allowed";
   
   const content = (
     <>
       <div className="flex items-center space-x-3">
-        <span>{item.icon}</span>
-        <span>{item.name}</span>
+        <span className={isComingSoon ? "opacity-50" : ""}>{item.icon}</span>
+        <span className={isComingSoon ? "opacity-50" : ""}>{item.name}</span>
       </div>
       {item.badge && (
-        <span className={`px-2 py-1 text-xs rounded-full ${item.badge === 'NEW' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+        <span className={`px-1.5 py-0.5 text-xs rounded-full ${
+          item.badge === 'NEW' ? 'bg-green-100 text-green-800' : 
+          item.badge === 'Coming Soon' ? 'bg-yellow-100 text-yellow-800 text-xs' : 
+          'bg-red-100 text-red-800'
+        }`}>
           {item.badge}
         </span>
       )}
     </>
   );
+
+  if (isComingSoon) {
+    return <div className={`${baseClasses} ${disabledClasses}`}>{content}</div>;
+  }
 
   if (item.hasSecondary) {
     return <button onClick={(e) => onSecondaryClick?.(item, e)} className={`${baseClasses} ${activeClasses}`}>{content}</button>;
@@ -321,18 +331,17 @@ const Sidebar = () => {
   // Menu Items
   const [menuItems, setMenuItems] = useState<MenuItem[]>([
     { id: 'dashboard', name: 'Dashboard', icon: <DashboardIcon size={20} />, badge: null, href: '/dashboard' },
-    { id: 'sales', name: 'Sales', icon: <SalesIcon size={20} />, badge: '12', href: '/sales' },
-    { id: 'inventory', name: 'Inventory', icon: <InventoryIcon size={20} />, badge: null, href: '/inventory' },
-    { id: 'customers', name: 'Customers', icon: <CustomersIcon size={20} />, badge: '3', href: '/customers' },
+    { id: 'sales', name: 'Sales', icon: <SalesIcon size={20} />, badge: 'Coming Soon', href: '#' },
+    { id: 'inventory', name: 'Inventory', icon: <InventoryIcon size={20} />, badge: 'Coming Soon', href: '#' },
+    { id: 'customers', name: 'Customers', icon: <CustomersIcon size={20} />, badge: 'Coming Soon', href: '#' },
     { id: 'suppliers', name: 'Suppliers', icon: <SuppliersIcon size={20} />, badge: null, href: '/suppliers' },
-    { id: 'finance', name: 'Finance', icon: <FinanceIcon size={20} />, badge: null, href: '/finance', hasSecondary: true },
+    { id: 'finance', name: 'Finance', icon: <FinanceIcon size={20} />, badge: 'Coming Soon', href: '#' },
     { id: 'documents', name: 'Documents', icon: <ReportsIcon size={20} />, badge: null, href: '/documents', hasSecondary: true },
     { id: 'ai-insights', name: 'AI Insights', icon: <AIInsightsIcon size={20} />, badge: 'NEW', href: '/ai-insights', hasSecondary: true },
     { id: 'whatsapp', name: 'WhatsApp', icon: <FontAwesomeIcon icon={faWhatsapp} className="w-5 h-5 text-green-400" />, badge: null, href: '#', onClick: () => handleOpenSecondarySidebar(messagingServicesConfig) },
     { id: 'email', name: 'Email', icon: <Mail className="w-5 h-5 text-red-400" />, badge: null, href: '#', onClick: () => handleOpenSecondarySidebar(emailServicesConfig) },
     { id: 'todo', name: 'TODO', icon: <CheckSquare className="w-5 h-5 text-purple-400" />, badge: null, href: '/todo' },
     { id: 'calendar', name: 'Calendar', icon: <Calendar className="w-5 h-5 text-orange-400" />, badge: null, href: '/calendar' },
-    { id: 'connect-domain', name: 'Connect Domain', icon: <Globe className="w-5 h-5 text-blue-400" />, badge: null, href: '/settings/domain' },
     { id: 'website', name: 'Website', icon: <WebsiteIcon size={20} />, badge: null, href: '/website' },
   ]);
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,6 +35,8 @@ import {
   getActivityIconColor 
 } from '@/lib/components-imp-utils/supplier';
 import { SuppliersIcon, UserIcon } from '@/components/Icons';
+import SupplierDialog from '@/components/suppliers/SupplierDialog';
+import { Supplier } from '@/types/supplier';
 
 export default function SuppliersPage() {
   const {
@@ -50,7 +53,13 @@ export default function SuppliersPage() {
     handleExport
   } = useSuppliers();
 
-  const filteredSuppliers = SUPPLIERS.filter(supplier => {
+  // Dialog state
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'add' | 'edit' | 'view'>('add');
+  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
+  const [suppliers, setSuppliers] = useState<Supplier[]>(SUPPLIERS);
+
+  const filteredSuppliers = suppliers.filter(supplier => {
     const matchesSearch = supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          supplier.contactPerson.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          supplier.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -58,6 +67,47 @@ export default function SuppliersPage() {
                            supplier.category.toLowerCase().replace(' ', '-') === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // Dialog handlers
+  const handleAddSupplier = () => {
+    setDialogMode('add');
+    setSelectedSupplier(null);
+    setDialogOpen(true);
+  };
+
+  const handleEditSupplier = (supplier: Supplier) => {
+    setDialogMode('edit');
+    setSelectedSupplier(supplier);
+    setDialogOpen(true);
+  };
+
+  const handleViewSupplier = (supplier: Supplier) => {
+    setDialogMode('view');
+    setSelectedSupplier(supplier);
+    setDialogOpen(true);
+  };
+
+  const handleSaveSupplier = (supplierData: Partial<Supplier>) => {
+    if (dialogMode === 'add') {
+      const newSupplier: Supplier = {
+        ...supplierData as Supplier,
+        id: Date.now().toString(),
+        totalOrders: 0,
+        totalPaid: 0,
+        pendingAmount: 0,
+        lastOrder: new Date().toISOString().split('T')[0],
+        joinDate: new Date().toISOString().split('T')[0],
+        rating: 0
+      };
+      setSuppliers(prev => [...prev, newSupplier]);
+    } else if (dialogMode === 'edit' && selectedSupplier) {
+      setSuppliers(prev => prev.map(supplier => 
+        supplier.id === selectedSupplier.id 
+          ? { ...supplier, ...supplierData }
+          : supplier
+      ));
+    }
+  };
 
   if (isLoading) {
     return (
@@ -136,7 +186,7 @@ export default function SuppliersPage() {
               'Export Data'
             )}
           </Button>
-          <Button>
+          <Button onClick={handleAddSupplier}>
             Add New Supplier
           </Button>
         </div>
@@ -293,14 +343,14 @@ export default function SuppliersPage() {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Supplier</TableHead>
-                            <TableHead>Contact</TableHead>
-                            <TableHead>Category</TableHead>
-                            <TableHead>Orders</TableHead>
-                            <TableHead>Total Paid</TableHead>
-                            <TableHead>Pending</TableHead>
-                            <TableHead>Rating</TableHead>
-                            <TableHead>Status</TableHead>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Number</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Company</TableHead>
+                            <TableHead>Location</TableHead>
+                            <TableHead>Capacity</TableHead>
+                            <TableHead>Active Hours</TableHead>
+                            <TableHead>Market</TableHead>
                             <TableHead>Actions</TableHead>
                           </TableRow>
                         </TableHeader>
@@ -309,53 +359,53 @@ export default function SuppliersPage() {
                             <TableRow key={supplier.id} className="hover:bg-gray-50">
                               <TableCell>
                                 <div className="flex items-center">
-                                  <div className="h-12 w-12 bg-indigo-500 rounded-full flex items-center justify-center mr-3">
+                                  <div className="h-10 w-10 bg-indigo-500 rounded-full flex items-center justify-center mr-3">
                                     <span className="text-white text-sm font-medium">
                                       {getInitials(supplier.name)}
                                     </span>
                                   </div>
-                                  <div>
-                                    <div className="font-medium">{supplier.name}</div>
-                                    <div className="text-sm text-gray-500">{supplier.contactPerson}</div>
-                                    <div className="text-xs text-gray-400">{supplier.location}</div>
-                                  </div>
+                                  <div className="font-medium">{supplier.name}</div>
                                 </div>
+                              </TableCell>
+                              <TableCell>
+                                <span className="font-medium text-blue-600">{supplier.number}</span>
                               </TableCell>
                               <TableCell>
                                 <div className="text-sm text-gray-900">{supplier.email}</div>
-                                <div className="text-sm text-gray-500">{supplier.phone}</div>
                               </TableCell>
                               <TableCell>
-                                <Badge variant="outline" className={getCategoryColor(supplier.category)}>
-                                  {supplier.category}
-                                </Badge>
+                                <div className="font-medium">{supplier.company}</div>
                               </TableCell>
                               <TableCell>
-                                <div className="text-sm text-gray-900">{supplier.totalOrders}</div>
-                                <div className="text-xs text-gray-500">Last: {formatDate(supplier.lastOrder)}</div>
-                              </TableCell>
-                              <TableCell className="font-medium">
-                                {formatIndianCurrency(supplier.totalPaid)}
+                                <div className="text-sm text-gray-900">{supplier.location}</div>
                               </TableCell>
                               <TableCell>
-                                <div className={`font-medium ${supplier.pendingAmount > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                                  {supplier.pendingAmount > 0 ? formatIndianCurrency(supplier.pendingAmount) : 'Nil'}
-                                </div>
+                                <div className="text-sm font-medium text-green-600">{supplier.capacity}</div>
                               </TableCell>
                               <TableCell>
-                                <div className={getRatingColor(supplier.rating)}>
-                                  ★ {supplier.rating}
-                                </div>
+                                <div className="text-sm text-gray-900">{supplier.activeHours}</div>
                               </TableCell>
                               <TableCell>
-                                <Badge variant="outline" className={getStatusColor(supplier.status)}>
-                                  {getStatusText(supplier.status)}
+                                <Badge variant="outline" className="text-purple-700 border-purple-200 bg-purple-50">
+                                  {supplier.market}
                                 </Badge>
                               </TableCell>
                               <TableCell>
                                 <div className="flex space-x-2">
-                                  <Button variant="ghost" size="sm">View</Button>
-                                  <Button variant="ghost" size="sm">Order</Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={() => handleViewSupplier(supplier)}
+                                  >
+                                    View
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={() => handleEditSupplier(supplier)}
+                                  >
+                                    Edit
+                                  </Button>
                                 </div>
                               </TableCell>
                             </TableRow>
@@ -382,53 +432,53 @@ export default function SuppliersPage() {
                               </div>
                               <div>
                                 <h3 className="text-sm font-medium">{supplier.name}</h3>
-                                <p className="text-xs text-gray-500">{supplier.contactPerson}</p>
+                                <p className="text-xs text-blue-600 font-medium">{supplier.number}</p>
                               </div>
                             </div>
-                            <Badge variant="outline" className={getStatusColor(supplier.status)}>
-                              {getStatusText(supplier.status)}
+                            <Badge variant="outline" className="text-purple-700 border-purple-200 bg-purple-50">
+                              {supplier.market}
                             </Badge>
                           </div>
                           
                           <div className="space-y-2 mb-4">
                             <div className="flex justify-between text-sm">
-                              <span className="text-gray-500">Category:</span>
-                              <Badge variant="outline" className={getCategoryColor(supplier.category)}>
-                                {supplier.category}
-                              </Badge>
+                              <span className="text-gray-500">Email:</span>
+                              <span className="font-medium text-gray-900">{supplier.email}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                              <span className="text-gray-500">Total Orders:</span>
-                              <span className="font-medium">{supplier.totalOrders}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                              <span className="text-gray-500">Total Paid:</span>
-                              <span className="font-medium">{formatIndianCurrency(supplier.totalPaid)}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                              <span className="text-gray-500">Pending:</span>
-                              <span className={`font-medium ${supplier.pendingAmount > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                                {supplier.pendingAmount > 0 ? formatIndianCurrency(supplier.pendingAmount) : 'Nil'}
-                              </span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                              <span className="text-gray-500">Rating:</span>
-                              <span className={getRatingColor(supplier.rating)}>
-                                ★ {supplier.rating}
-                              </span>
+                              <span className="text-gray-500">Company:</span>
+                              <span className="font-medium">{supplier.company}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-500">Location:</span>
-                              <span>{supplier.location}</span>
+                              <span className="font-medium">{supplier.location}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-500">Capacity:</span>
+                              <span className="font-medium text-green-600">{supplier.capacity}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-500">Active Hours:</span>
+                              <span className="font-medium">{supplier.activeHours}</span>
                             </div>
                           </div>
 
                           <div className="flex space-x-2">
-                            <Button variant="outline" size="sm" className="flex-1">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="flex-1"
+                              onClick={() => handleViewSupplier(supplier)}
+                            >
                               View Details
                             </Button>
-                            <Button variant="outline" size="sm" className="flex-1">
-                              Create Order
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="flex-1"
+                              onClick={() => handleEditSupplier(supplier)}
+                            >
+                              Edit
                             </Button>
                           </div>
                         </motion.div>
@@ -466,6 +516,15 @@ export default function SuppliersPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Supplier Dialog */}
+      <SupplierDialog
+        isOpen={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onSave={handleSaveSupplier}
+        supplier={selectedSupplier}
+        mode={dialogMode}
+      />
     </div>
   );
 }

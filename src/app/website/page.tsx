@@ -241,20 +241,148 @@ const WebsitePage = () => {
         onCloseTab={handleCloseTab}
       />
 
-      {/* Features */}
-      <WebsiteFeatures
-        hoveredFeature={hoveredFeature}
-        onHoverStart={setHoveredFeature}
-        onHoverEnd={() => setHoveredFeature(null)}
-      />
-
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Enhanced Connect Domain Card */}
+        {/* Build Website Card - Now First */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
+        >
+          <Card className="h-full border-0 shadow-lg bg-white">
+            <CardHeader className="pb-6">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="p-3 bg-indigo-50 rounded-xl">
+                  <Rocket className="w-8 h-8 text-indigo-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-2xl text-gray-900">Build Website</CardTitle>
+                  <CardDescription className="text-gray-600 mt-1">
+                    Create professional websites with our advanced builder
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="space-y-6">
+              {/* Quick Start Options */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  className="p-4 border-2 border-dashed border-gray-200 rounded-xl hover:border-indigo-300 hover:bg-indigo-50 transition-all cursor-pointer"
+                  onClick={() => setShowWebsiteBuilder(true)}
+                >
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <Rocket className="w-6 h-6 text-indigo-600" />
+                    </div>
+                    <h3 className="font-semibold text-gray-900 mb-1">Start from Scratch</h3>
+                    <p className="text-sm text-gray-600">Use our guided builder</p>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  className="p-4 border-2 border-dashed border-gray-200 rounded-xl hover:border-emerald-300 hover:bg-emerald-50 transition-all cursor-pointer"
+                  onClick={() => window.open('https://store.codestam.com/', '_blank')}
+                >
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <Palette className="w-6 h-6 text-emerald-600" />
+                    </div>
+                    <h3 className="font-semibold text-gray-900 mb-1">Use Template</h3>
+                    <p className="text-sm text-gray-600">Choose from 50+ designs</p>
+                    <div className="mt-2">
+                      <Badge variant="outline" className="text-xs">
+                        <ExternalLink className="w-3 h-3 mr-1" />
+                        Codestam Store
+                      </Badge>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Features Preview */}
+              <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200">
+                <div className="flex items-center space-x-3 mb-4">
+                  <Target className="w-6 h-6 text-indigo-600" />
+                  <h4 className="font-semibold text-indigo-900">What You&apos;ll Get</h4>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-sm text-indigo-800">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="w-4 h-4 text-indigo-600" />
+                    <span>Professional templates</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="w-4 h-4 text-indigo-600" />
+                    <span>Drag & drop editor</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="w-4 h-4 text-indigo-600" />
+                    <span>Mobile responsive</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="w-4 h-4 text-indigo-600" />
+                    <span>SEO optimized</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Popular Templates */}
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-3">Popular Templates</h4>
+                <div className="space-y-2">
+                  {templates.slice(0, 3).map((template, index) => (
+                    <motion.div
+                      key={template.name}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                      onClick={() => window.open('https://store.codestam.com/', '_blank')}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-lg"></div>
+                        <div>
+                          <h5 className="font-medium text-gray-900 text-sm">{template.name}</h5>
+                          <p className="text-xs text-gray-600">{template.category}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-1">
+                          <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                          <span className="text-xs font-medium">{template.rating}</span>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-gray-400" />
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              <Button
+                onClick={() => setShowWebsiteBuilder(true)}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 text-base font-medium"
+                size="lg"
+              >
+                <div className="flex items-center">
+                  <Rocket className="w-5 h-5 mr-2" />
+                  Launch Builder
+                </div>
+              </Button>
+
+              <p className="text-xs text-gray-500 text-center">
+                Professional website builder with advanced features
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Enhanced Connect Domain Card - Now Second */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
         >
           <Card className="h-full border-0 shadow-lg bg-white overflow-hidden">
             <CardHeader className="pb-6 bg-gradient-to-r from-blue-50 to-indigo-50">
@@ -578,141 +706,6 @@ const WebsitePage = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Build Website Card - Now Functional */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Card className="h-full border-0 shadow-lg bg-white">
-            <CardHeader className="pb-6">
-              <div className="flex items-center space-x-4 mb-4">
-                <div className="p-3 bg-indigo-50 rounded-xl">
-                  <Rocket className="w-8 h-8 text-indigo-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-2xl text-gray-900">Build Website</CardTitle>
-                  <CardDescription className="text-gray-600 mt-1">
-                    Create professional websites with our advanced builder
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            
-            <CardContent className="space-y-6">
-              {/* Quick Start Options */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="p-4 border-2 border-dashed border-gray-200 rounded-xl hover:border-indigo-300 hover:bg-indigo-50 transition-all cursor-pointer"
-                  onClick={() => setShowWebsiteBuilder(true)}
-                >
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                      <Rocket className="w-6 h-6 text-indigo-600" />
-                    </div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Start from Scratch</h3>
-                    <p className="text-sm text-gray-600">Use our guided builder</p>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="p-4 border-2 border-dashed border-gray-200 rounded-xl hover:border-emerald-300 hover:bg-emerald-50 transition-all cursor-pointer"
-                  onClick={() => window.open('https://store.codestam.com/', '_blank')}
-                >
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                      <Palette className="w-6 h-6 text-emerald-600" />
-                    </div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Use Template</h3>
-                    <p className="text-sm text-gray-600">Choose from 50+ designs</p>
-                    <div className="mt-2">
-                      <Badge variant="outline" className="text-xs">
-                        <ExternalLink className="w-3 h-3 mr-1" />
-                        Codestam Store
-                      </Badge>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-
-              {/* Features Preview */}
-              <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200">
-                <div className="flex items-center space-x-3 mb-4">
-                  <Target className="w-6 h-6 text-indigo-600" />
-                  <h4 className="font-semibold text-indigo-900">What You&apos;ll Get</h4>
-                </div>
-                <div className="grid grid-cols-2 gap-3 text-sm text-indigo-800">
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="w-4 h-4 text-indigo-600" />
-                    <span>Professional templates</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="w-4 h-4 text-indigo-600" />
-                    <span>Drag & drop editor</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="w-4 h-4 text-indigo-600" />
-                    <span>Mobile responsive</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="w-4 h-4 text-indigo-600" />
-                    <span>SEO optimized</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Popular Templates */}
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-3">Popular Templates</h4>
-                <div className="space-y-2">
-                  {templates.slice(0, 3).map((template, index) => (
-                    <motion.div
-                      key={template.name}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-                      onClick={() => window.open('https://store.codestam.com/', '_blank')}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-lg"></div>
-                        <div>
-                          <h5 className="font-medium text-gray-900 text-sm">{template.name}</h5>
-                          <p className="text-xs text-gray-600">{template.category}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="flex items-center space-x-1">
-                          <Star className="w-3 h-3 text-yellow-400 fill-current" />
-                          <span className="text-xs font-medium">{template.rating}</span>
-                        </div>
-                        <ArrowRight className="w-4 h-4 text-gray-400" />
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-
-              <Button
-                onClick={() => setShowWebsiteBuilder(true)}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 text-base font-medium"
-                size="lg"
-              >
-                <div className="flex items-center">
-                  <Rocket className="w-5 h-5 mr-2" />
-                  Launch Builder
-                </div>
-              </Button>
-
-              <p className="text-xs text-gray-500 text-center">
-                Professional website builder with advanced features
-              </p>
             </CardContent>
           </Card>
         </motion.div>
