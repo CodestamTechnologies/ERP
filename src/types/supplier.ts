@@ -30,6 +30,12 @@ export interface Supplier {
   joinDate: string;
   paymentTerms: string;
   tags: string[];
+  // New fields as requested
+  company: string;
+  number: string;
+  capacity: string;
+  activeHours: string;
+  market: string;
 }
 
 export interface Activity {

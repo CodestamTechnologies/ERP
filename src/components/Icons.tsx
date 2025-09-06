@@ -2,23 +2,35 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faBell,
-  faTachometerAlt,
-  faChartLine,
-  faBoxes,
-  faUsers,
-  faTruck,
-  faMoneyBillWave,
-  faFileAlt,
-  faRobot,
-  faCog,
   faClipboardList,
   faCreditCard,
   faExclamationTriangle,
   faUser,
   faSun,
   faMoon,
-  faFileInvoice
+  faFileInvoice,
+  faCog,
+  faChartLine
 } from '@fortawesome/free-solid-svg-icons';
+import {
+  LayoutDashboard,
+  TrendingUp,
+  Package,
+  Users,
+  Truck,
+  DollarSign,
+  FileText,
+  Brain,
+  Settings,
+  BarChart3,
+  Globe,
+  Bell,
+  ShoppingCart,
+  CreditCard,
+  AlertTriangle,
+  User,
+  TrendingDown
+} from 'lucide-react';
 
 interface IconProps {
   className?: string;
@@ -26,11 +38,10 @@ interface IconProps {
 }
 
 export const DashboardIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faTachometerAlt} 
+  <LayoutDashboard 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#3B82F6',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -38,11 +49,10 @@ export const DashboardIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const SalesIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faChartLine} 
+  <TrendingUp 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#10B981',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -50,11 +60,10 @@ export const SalesIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const InventoryIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faBoxes} 
+  <Package 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#8B5CF6',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -62,11 +71,10 @@ export const InventoryIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const CustomersIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faUsers} 
+  <Users 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#F59E0B',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -74,11 +82,10 @@ export const CustomersIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const SuppliersIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faTruck} 
+  <Truck 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#6366F1',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -86,11 +93,10 @@ export const SuppliersIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const FinanceIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faMoneyBillWave} 
+  <DollarSign 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#EC4899',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -98,11 +104,10 @@ export const FinanceIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const ReportsIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faFileAlt} 
+  <FileText 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#06B6D4',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -110,11 +115,10 @@ export const ReportsIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const AIInsightsIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faRobot} 
+  <Brain 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#8B5CF6',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -122,11 +126,10 @@ export const AIInsightsIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const SettingsIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faCog} 
+  <Settings 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#6B7280',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -134,11 +137,10 @@ export const SettingsIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const OrderIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faClipboardList} 
+  <ShoppingCart 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#3B82F6',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -146,11 +148,10 @@ export const OrderIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const PaymentIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faCreditCard} 
+  <CreditCard 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#10B981',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -158,11 +159,10 @@ export const PaymentIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const WarningIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faExclamationTriangle} 
+  <AlertTriangle 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#F59E0B',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -170,11 +170,10 @@ export const WarningIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const UserIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faUser} 
+  <User 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#8B5CF6',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -182,11 +181,10 @@ export const UserIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const ChartIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faChartLine} 
+  <BarChart3 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#06B6D4',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -205,12 +203,12 @@ export const InvoiceIcon = ({ className = "", size = 24 }: IconProps) => (
   />
 );
 
+// Updated to use Shadcn Bell icon
 export const NotificationIcon = ({ className = "", size = 24 }: IconProps) => (
-  <FontAwesomeIcon 
-    icon={faBell} 
+  <Bell 
     className={className}
+    size={size}
     style={{ 
-      fontSize: `${size}px`,
       color: '#F59E0B',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
@@ -224,6 +222,17 @@ export const ThemeIcon = ({ className = "", size = 24 }: IconProps) => (
     style={{ 
       fontSize: `${size}px`,
       color: '#F59E0B',
+      filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
+    }}
+  />
+);
+
+export const WebsiteIcon = ({ className = "", size = 24 }: IconProps) => (
+  <Globe 
+    className={className}
+    size={size}
+    style={{ 
+      color: '#10B981',
       filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
     }}
   />
