@@ -37,8 +37,8 @@ export interface SalesOrder {
   discount: number;
   tax: number;
   shippingCost: number;
-  createdAt?: any;
-  updatedAt?: any;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
 
 export interface SalesTeamMember {
@@ -52,8 +52,8 @@ export interface SalesTeamMember {
   conversion: number;
   rating: number;
   status: string;
-  createdAt?: any;
-  updatedAt?: any;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
 
 export interface Activity {
@@ -63,7 +63,8 @@ export interface Activity {
   time: string;
   icon: React.ReactNode;
   priority: string;
-  createdAt?: any;
+  createdAt?: Date | string;
+  timestamp?: number;
 }
 
 export interface QuickAction {
