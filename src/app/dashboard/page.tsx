@@ -5,47 +5,44 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useDashboard } from '@/hooks/useDashboard';
-import { 
+import {
   DashboardStatsSkeleton,
   DashboardActivitiesSkeleton,
   DashboardInsightsSkeleton,
   DashboardChartSkeleton,
   PageHeaderSkeleton
 } from '@/components/ui/skeletons';
-import { 
-  STATS, 
-  RECENT_ACTIVITIES, 
-  AI_INSIGHTS, 
-  INVENTORY_STATUS, 
-  QUICK_ACTIONS 
+import {
+  QUICK_ACTIONS
 } from '@/lib/components-Data/dashboard/constent';
-import { 
-  getChangeColor, 
-  getInsightColor, 
-  getStatusColor, 
-  getActivityIconColor 
+import {
+  getChangeColor,
+  getInsightColor,
+  getStatusColor,
+  getActivityIconColor
 } from '@/lib/components-imp-utils/dashboard';
 import { AIInsightsIcon, ChartIcon } from '@/components/Icons';
+import { TimeRange, useDashboardContext } from '@/context/DashboardContext/DashboardContextProvider';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 const Dashboard = () => {
   const {
     selectedTimeRange,
     setSelectedTimeRange,
-    isGeneratingReport,
     isLoading,
-    handleGenerateReport
-  } = useDashboard();
-
+    stats,
+    activities,
+    insights,
+    inventory,
+    generateReportContent,
+  } = useDashboardContext();
   if (isLoading) {
     return (
       <div className="p-6 space-y-6">
         {/* Header Skeleton */}
         <PageHeaderSkeleton />
-        
         {/* Stats Skeleton */}
         <DashboardStatsSkeleton />
-        
         {/* Main Content Grid Skeleton */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Activities Skeleton */}
@@ -59,7 +56,6 @@ const Dashboard = () => {
               </CardContent>
             </Card>
           </div>
-          
           {/* Insights Skeleton */}
           <div>
             <Card>
@@ -75,7 +71,6 @@ const Dashboard = () => {
             </Card>
           </div>
         </div>
-        
         {/* Charts Skeleton */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
@@ -86,7 +81,6 @@ const Dashboard = () => {
               <DashboardChartSkeleton />
             </CardContent>
           </Card>
-          
           <Card>
             <CardHeader className="border-b">
               <CardTitle>Inventory Status</CardTitle>
@@ -109,7 +103,10 @@ const Dashboard = () => {
           <p className="text-gray-600 mt-1">Welcome back! Here&apos;s what&apos;s happening with your business.</p>
         </div>
         <div className="mt-4 sm:mt-0 flex space-x-3">
-          <Select value={selectedTimeRange} onValueChange={(value) => setSelectedTimeRange(value)}>
+          <Select
+            value={selectedTimeRange}
+            onValueChange={(value) => setSelectedTimeRange(value as TimeRange)}
+          >
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="Time range" />
             </SelectTrigger>
@@ -117,30 +114,35 @@ const Dashboard = () => {
               <SelectItem key="7days" value="7days">Last 7 Days</SelectItem>
               <SelectItem key="30days" value="30days">Last 30 Days</SelectItem>
               <SelectItem key="90days" value="90days">Last 90 Days</SelectItem>
-              <SelectItem key="1year" value="1year">Last Year</SelectItem>
+              <SelectItem key="1year" value="1year">Last 1 Year</SelectItem>
             </SelectContent>
           </Select>
-          <Button 
-            onClick={handleGenerateReport}
-            disabled={isGeneratingReport}
-          >
-            {isGeneratingReport ? (
-              <div className="flex items-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Generating...
+         
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                Open Report
+              </Button>
+            </DialogTrigger>
+
+            <DialogContent className="w-full max-w-[65vw] h-[90vh] p-0 overflow-auto border-none">
+              {/* Accessible title for screen readers */}
+              <DialogTitle className="sr-only">Dashboard Report</DialogTitle>
+
+              {/* Actual report content */}
+              <div className="p-4">
+                {generateReportContent()}
               </div>
-            ) : (
-              'Generate Report'
-            )}
-          </Button>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {STATS.map((stat) => (
+        {stats.map((stat, idx) => (
           <motion.div
-            key={stat.name}
+            key={idx}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
@@ -179,7 +181,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-4">
-                {RECENT_ACTIVITIES.map((activity) => (
+                {activities.map((activity) => (
                   <motion.div
                     key={activity.id}
                     initial={{ opacity: 0, x: -20 }}
@@ -212,7 +214,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-4">
-                {AI_INSIGHTS.map((insight, index) => (
+                {insights.map((insight, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 10 }}
@@ -224,7 +226,7 @@ const Dashboard = () => {
                     <p className="text-xs text-gray-600 mt-1">{insight.description}</p>
                     <div className="flex items-center mt-2">
                       <div className="flex-1 bg-gray-200 rounded-full h-2">
-                        <div 
+                        <div
                           className={getInsightColor(insight.type)}
                           style={{ width: `${insight.confidence}%` }}
                         ></div>
@@ -279,9 +281,9 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent className="p-6">
             <div className="space-y-4">
-              {INVENTORY_STATUS.map((status, index) => (
+              {inventory.map((status, index) => (
                 <motion.div
-                  key={status.label}
+                  key={index}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -293,7 +295,6 @@ const Dashboard = () => {
                   </span>
                 </motion.div>
               ))}
-              
               <div className="mt-6">
                 <div className="flex justify-between text-sm text-gray-600 mb-2">
                   <span>Stock Health</span>
@@ -314,9 +315,9 @@ const Dashboard = () => {
         </CardHeader>
         <CardContent className="p-6">
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
-            {QUICK_ACTIONS.map((action) => (
+            {QUICK_ACTIONS.map((action, idx) => (
               <motion.button
-                key={action.name}
+                key={idx}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors group"

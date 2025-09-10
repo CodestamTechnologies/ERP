@@ -4,6 +4,7 @@ export interface StatItem {
   change: string;
   changeType: 'positive' | 'negative';
   icon?: React.ReactNode;
+  date:string
 }
 
 export interface ActivityItem {
@@ -12,6 +13,7 @@ export interface ActivityItem {
   message: string;
   time: string;
   icon: React.ReactNode;
+   date:string
 }
 
 export interface AIInsight {
@@ -19,16 +21,19 @@ export interface AIInsight {
   description: string;
   confidence: number;
   type: 'positive' | 'warning' | 'negative';
+   date:string
 }
 
 export interface InventoryStatus {
   label: string;
   count: number;
   color: string;
+   date:string
 }
 
 export interface QuickAction {
   name: string;
   icon: React.ReactNode;
   description?: string;
+   date:string
 }
