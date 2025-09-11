@@ -17,6 +17,7 @@ import { useRef } from 'react';
 import html2pdf from 'html2pdf.js';
 import { EmailDialog } from './SendMailDialog';
 import { LOIPreviewPage } from './PreviewDoc';
+import { generatePdf } from '@/lib/utils/DocumentsAction';
 
 // Simple toast replacement
 const toast = {
@@ -130,7 +131,7 @@ const LOIComponent = () => {
     sender: initialSenderData(),
     recipient: initialRecipientData(),
   });
-  const previewRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement | null>(null);
 
   const [activeView, setActiveView] = useState<'form' | 'preview'>('form');
 
@@ -232,65 +233,65 @@ const LOIComponent = () => {
       toast.error('Failed to remove from history');
     }
   };
-  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
-
   const handleEmailSend = async (email: string) => {
-    if (!previewRef.current) return;
+    // Generate PDF as Base64 from the current previewRef
+    const base64Pdf = await generatePdf(previewRef, "base64", "Memorandom_of_understanding.pdf");
+    if (!base64Pdf) return;
 
-    // Generate PDF blob
-    const opt = {
-      margin: 0.5,
-      filename: "Letter_of_Intent.pdf",
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-    };
+    try {
+      const res = await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: email,
+          subject: `Letter of Intent from ${data.sender.company}`,
+          pdf: base64Pdf,
+        }),
+      });
 
-    const pdfBlob = await html2pdf().from(previewRef.current).set(opt).outputPdf("blob");
-
-    // Convert to Base64
-    const arrayBuffer = await pdfBlob.arrayBuffer();
-    const base64Pdf = Buffer.from(arrayBuffer).toString("base64");
-
-    // Send to API
-    const res = await fetch("/api/send-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        to: email,
-        subject: `Letter of Intent from ${data.sender.company}`,
-        pdf: base64Pdf,
-      }),
-    });
-
-    const result = await res.json();
-    if (result.success) {
-      toast.success(`PDF sent to ${email} successfully!`);
-    } else {
-      toast.error("Failed to send email");
+      const result = await res.json();
+      if (result.success) {
+        toast.success(`PDF sent to ${email} successfully!`);
+      } else {
+        toast.error("Failed to send email");
+      }
+    } catch (err) {
+      console.error("Email error:", err);
+      toast.error("Something went wrong while sending email");
     }
   };
+
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+
   const handleAction = async (action: string) => {
+    const filename = "Memorandom_of_understanding.pdf"; // Keep consistent content
+
     const actions = {
-      generate: () => setActiveView('preview'),
-      download: async () => {
-        if (previewRef.current) {
-          const opt = {
-            margin: 0.5,
-            filename: `Letter_of_Intent_${data.sender.company}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-          };
-          await html2pdf().from(previewRef.current).set(opt).save();
+      generate: () => setActiveView("preview"),
+
+      download: () => generatePdf(previewRef, "save", filename),
+
+      email: () => setEmailDialogOpen(true),
+
+      save: handleSaveDraft,
+
+      print: async () => {
+        const pdfBlob = (await generatePdf(previewRef, "blob", filename)) as Blob | null;
+        if (!pdfBlob) return;
+
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        const newWindow = window.open(pdfUrl);
+        if (newWindow) {
+          newWindow.onload = () => newWindow.print();
         }
       },
-      email: setEmailDialogOpen(true),
-      save: handleSaveDraft,
+
       saveToHistory: handleSaveToHistory,
     };
+
     actions[action as keyof typeof actions]?.();
   };
+
 
 
   return (
@@ -394,7 +395,7 @@ const LOIComponent = () => {
 
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3">
-              <Button  onClick={() => setActiveView('preview')} className="flex items-center">
+              <Button onClick={() => setActiveView('preview')} className="flex items-center">
                 <Calendar className="w-4 h-4 mr-2" />
                 Generate Preview
               </Button>
@@ -414,6 +415,7 @@ const LOIComponent = () => {
                 { label: 'Edit', action: 'form', icon: FileText },
                 { label: 'Download PDF', action: 'download', icon: Download },
                 { label: 'Send Email', action: 'email', icon: Mail, variant: 'outline' as const },
+                { label: 'Print', action: 'print', icon: Printer, variant: 'outline' as const },
               ].map(btn => (
                 <Button
                   key={btn.action}
