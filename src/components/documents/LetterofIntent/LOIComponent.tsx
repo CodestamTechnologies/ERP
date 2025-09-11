@@ -10,8 +10,11 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, Download, FileText, Mail, Printer, Save, CheckCircle } from 'lucide-react';
 import { useDocumentManager } from '@/hooks/useDocumentManager';
-import { DocumentHistoryDialog } from './DocumentHistoryDialog';
-import { DocumentDraftsDialog } from './DocumentDraftsDialog';
+import { DocumentHistoryDialog } from '../DocumentHistoryDialog';
+import { DocumentDraftsDialog } from '../DocumentDraftsDialog';
+import { AgreementData, initialLOIData, initialRecipientData, initialSenderData, LOIData, PartyInfo, RecipientInfo } from '@/types/letterofIntent';
+import { useRef } from 'react';
+import html2pdf from 'html2pdf.js';
 
 // Simple toast replacement
 const toast = {
@@ -19,76 +22,6 @@ const toast = {
   error: (message: string) => alert(`❌ ${message}`),
 };
 
-interface PartyInfo {
-  company: string;
-  address: string;
-  city: string;
-  state: string;
-  zip: string;
-  phone: string;
-  email: string;
-}
-
-interface RecipientInfo extends PartyInfo {
-  name: string;
-  title: string;
-}
-
-interface LOIData {
-  date: string;
-  subject: string;
-  projectDescription: string;
-  proposedTerms: string;
-  timeline: string;
-  budget: string;
-  nextSteps: string;
-  validityPeriod: string;
-  signerName: string;
-  signerTitle: string;
-  signerDate: string;
-}
-
-interface AgreementData {
-  loi: LOIData;
-  sender: PartyInfo;
-  recipient: RecipientInfo;
-}
-
-const initialSenderData = (): PartyInfo => ({
-  company: 'Codestam Technologies Pvt Ltd',
-  address: '123 Business Park',
-  city: 'Mumbai',
-  state: 'Maharashtra',
-  zip: '400001',
-  phone: '+91 98765 43210',
-  email: 'info@codestam.com',
-});
-
-const initialRecipientData = (): RecipientInfo => ({
-  company: '',
-  name: '',
-  title: '',
-  address: '',
-  city: '',
-  state: '',
-  zip: '',
-  phone: '',
-  email: '',
-});
-
-const initialLOIData = (): LOIData => ({
-  date: new Date().toISOString().split('T')[0],
-  subject: '',
-  projectDescription: '',
-  proposedTerms: '',
-  timeline: '',
-  budget: '',
-  nextSteps: '',
-  validityPeriod: '30 days',
-  signerName: '',
-  signerTitle: '',
-  signerDate: new Date().toISOString().split('T')[0],
-});
 
 const FormField = ({ label, id, value, onChange, type = 'text', placeholder = '', rows = 3, options = [] }: {
   label: string;
@@ -144,17 +77,17 @@ const SenderForm = ({ sender, onChange }: {
     <CardContent className="space-y-4">
       <FormField label="Company Name" id="sender-company" value={sender.company} onChange={(v) => onChange('company', v)} placeholder="Your company name" />
       <FormField label="Address" id="sender-address" value={sender.address} onChange={(v) => onChange('address', v)} placeholder="Street address" />
-      
+
       <div className="grid grid-cols-2 gap-4">
         <FormField label="City" id="sender-city" value={sender.city} onChange={(v) => onChange('city', v)} placeholder="City" />
         <FormField label="State" id="sender-state" value={sender.state} onChange={(v) => onChange('state', v)} placeholder="State" />
       </div>
-      
+
       <div className="grid grid-cols-2 gap-4">
         <FormField label="ZIP Code" id="sender-zip" value={sender.zip} onChange={(v) => onChange('zip', v)} placeholder="ZIP code" />
         <FormField label="Phone" id="sender-phone" value={sender.phone} onChange={(v) => onChange('phone', v)} placeholder="Phone number" />
       </div>
-      
+
       <FormField label="Email" id="sender-email" type="email" value={sender.email} onChange={(v) => onChange('email', v)} placeholder="Email address" />
     </CardContent>
   </Card>
@@ -170,14 +103,14 @@ const RecipientForm = ({ recipient, onChange }: {
     </CardHeader>
     <CardContent className="space-y-4">
       <FormField label="Company Name" id="recipient-company" value={recipient.company} onChange={(v) => onChange('company', v)} placeholder="Recipient company name" />
-      
+
       <div className="grid grid-cols-2 gap-4">
         <FormField label="Contact Name" id="recipient-name" value={recipient.name} onChange={(v) => onChange('name', v)} placeholder="Contact person name" />
         <FormField label="Title" id="recipient-title" value={recipient.title} onChange={(v) => onChange('title', v)} placeholder="Job title" />
       </div>
-      
+
       <FormField label="Address" id="recipient-address" value={recipient.address} onChange={(v) => onChange('address', v)} placeholder="Street address" />
-      
+
       <div className="grid grid-cols-3 gap-4">
         <FormField label="City" id="recipient-city" value={recipient.city} onChange={(v) => onChange('city', v)} placeholder="City" />
         <FormField label="State" id="recipient-state" value={recipient.state} onChange={(v) => onChange('state', v)} placeholder="State" />
@@ -187,7 +120,7 @@ const RecipientForm = ({ recipient, onChange }: {
   </Card>
 );
 
-const PreviewSection = ({ title, children, show = true }: { title: string; children: React.ReactNode; show?: boolean }) => 
+const PreviewSection = ({ title, children, show = true }: { title: string; children: React.ReactNode; show?: boolean }) =>
   show ? (
     <div>
       <h3 className="font-semibold text-gray-900 mb-2">{title}</h3>
@@ -201,9 +134,10 @@ const LOIComponent = () => {
     sender: initialSenderData(),
     recipient: initialRecipientData(),
   });
+  const previewRef = useRef<HTMLDivElement>(null);
 
   const [activeView, setActiveView] = useState<'form' | 'preview'>('form');
-  
+
   const {
     drafts,
     history,
@@ -238,10 +172,10 @@ const LOIComponent = () => {
     { value: '90 days', label: '90 days' },
   ];
 
-  const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   });
 
   const LOIPreview = () => (
@@ -287,9 +221,9 @@ const LOIComponent = () => {
       {/* Body */}
       <div className="mb-6 space-y-4 text-gray-800 leading-relaxed">
         <p>Dear {data.recipient.name},</p>
-        
+
         <p>
-          This Letter of Intent LOI&quot; serves to express {data.sender.company}&apos;s serious interest in 
+          This Letter of Intent LOI&quot; serves to express {data.sender.company}&apos;s serious interest in
           establishing a business relationship with {data.recipient.company} regarding the following opportunity:
         </p>
 
@@ -306,13 +240,13 @@ const LOIComponent = () => {
         ))}
 
         <p>
-          This Letter of Intent is non-binding and serves as a preliminary expression of interest. 
-          It is valid for {data.loi.validityPeriod} from the date above, after which it will expire 
+          This Letter of Intent is non-binding and serves as a preliminary expression of interest.
+          It is valid for {data.loi.validityPeriod} from the date above, after which it will expire
           unless renewed or superseded by a formal agreement.
         </p>
 
         <p>
-          We look forward to discussing this opportunity further and working together to develop 
+          We look forward to discussing this opportunity further and working together to develop
           a mutually beneficial partnership.
         </p>
 
@@ -394,16 +328,28 @@ const LOIComponent = () => {
     }
   };
 
-  const handleAction = (action: string) => {
+  const handleAction = async (action: string) => {
     const actions = {
       generate: () => setActiveView('preview'),
-      download: () => alert('PDF download functionality would be implemented here'),
+      download: async () => {
+        if (previewRef.current) {
+          const opt = {
+            margin: 0.5,
+            filename: `Letter_of_Intent_${data.sender.company}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+          };
+          await html2pdf().from(previewRef.current).set(opt).save();
+        }
+      },
       email: () => alert('Email functionality would be implemented here'),
       save: handleSaveDraft,
       saveToHistory: handleSaveToHistory,
     };
     actions[action as keyof typeof actions]?.();
   };
+
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -416,7 +362,7 @@ const LOIComponent = () => {
           </h1>
           <p className="text-gray-600 mt-1">Create professional letters of intent for business partnerships and collaborations</p>
         </div>
-        
+
         <div className="flex space-x-2">
           <DocumentDraftsDialog
             drafts={drafts}
@@ -463,7 +409,7 @@ const LOIComponent = () => {
               <CardContent className="space-y-4">
                 <FormField label="Date" id="date" type="date" value={data.loi.date} onChange={(v) => updateLOI('date', v)} />
                 <FormField label="Subject" id="subject" value={data.loi.subject} onChange={(v) => updateLOI('subject', v)} placeholder="Letter of Intent for..." />
-                
+
                 {[
                   { label: 'Project Description', id: 'project', field: 'projectDescription' as keyof LOIData, placeholder: 'Describe the project or opportunity in detail...', rows: 4 },
                   { label: 'Proposed Terms', id: 'terms', field: 'proposedTerms' as keyof LOIData, placeholder: 'Outline the key terms and conditions...', rows: 3 },
@@ -482,14 +428,14 @@ const LOIComponent = () => {
                     rows={field.rows}
                   />
                 ))}
-                
-                <FormField 
-                  label="Validity Period" 
-                  id="validity" 
-                  type="select" 
-                  value={data.loi.validityPeriod} 
-                  onChange={(v) => updateLOI('validityPeriod', v)} 
-                  options={validityOptions} 
+
+                <FormField
+                  label="Validity Period"
+                  id="validity"
+                  type="select"
+                  value={data.loi.validityPeriod}
+                  onChange={(v) => updateLOI('validityPeriod', v)}
+                  options={validityOptions}
                 />
               </CardContent>
             </Card>
@@ -526,7 +472,6 @@ const LOIComponent = () => {
                 { label: 'Edit', action: 'form', icon: FileText },
                 { label: 'Download PDF', action: 'download', icon: Download },
                 { label: 'Send Email', action: 'email', icon: Mail, variant: 'outline' as const },
-                { label: 'Print', action: 'print', icon: Printer, variant: 'outline' as const },
               ].map(btn => (
                 <Button
                   key={btn.action}
@@ -551,7 +496,7 @@ const LOIComponent = () => {
             </div>
           </div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+          <motion.div ref={previewRef} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
             <LOIPreview />
           </motion.div>
         </div>
