@@ -1,17 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, Download, FileText, Mail, Printer, Save } from 'lucide-react';
 import { AgreementData, MOUData, PartyInfo } from '@/types/memorandomOFUnderstanding';
+import { FormField } from './FormFiels';
+import { PartyForm } from './PartyForm';
 
-
+import html2pdf from 'html2pdf.js';
+import { EmailDialog } from '../LetterofIntent/SendMailDialog';
+const toast = {
+  success: (message: string) => alert(`✅ ${message}`),
+  error: (message: string) => alert(`❌ ${message}`),
+};
 
 const initialPartyData = (): PartyInfo => ({
   name: '',
@@ -46,90 +49,6 @@ const initialMOUData = (): MOUData => ({
   amendments: '',
 });
 
-const FormField = ({ label, id, value, onChange, type = 'text', placeholder = '', rows = 3, options = [] }: {
-  label: string;
-  id: string;
-  value: string;
-  onChange: (value: string) => void;
-  type?: 'text' | 'email' | 'date' | 'textarea' | 'select';
-  placeholder?: string;
-  rows?: number;
-  options?: { value: string; label: string }[];
-}) => (
-  <div>
-    <Label htmlFor={id}>{label}</Label>
-    {type === 'textarea' ? (
-      <Textarea
-        id={id}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        rows={rows}
-      />
-    ) : type === 'select' ? (
-      <Select value={value} onValueChange={onChange}>
-        <SelectTrigger>
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent>
-          {options.map(option => (
-            <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    ) : (
-      <Input
-        id={id}
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-      />
-    )}
-  </div>
-);
-
-const PartyForm = ({ party, onChange, title }: {
-  party: PartyInfo;
-  onChange: (field: keyof PartyInfo, value: string) => void;
-  title: string;
-}) => (
-  <Card>
-    <CardHeader>
-      <CardTitle>{title}</CardTitle>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      <FormField label="Organization Name" id={`${title}-name`} value={party.name} onChange={(v) => onChange('name', v)} placeholder="Organization name" />
-      <FormField label="Address" id={`${title}-address`} value={party.address} onChange={(v) => onChange('address', v)} placeholder="Street address" />
-      
-      <div className="grid grid-cols-2 gap-4">
-        <FormField label="City" id={`${title}-city`} value={party.city} onChange={(v) => onChange('city', v)} placeholder="City" />
-        <FormField label="State" id={`${title}-state`} value={party.state} onChange={(v) => onChange('state', v)} placeholder="State" />
-      </div>
-      
-      <div className="grid grid-cols-2 gap-4">
-        <FormField label="ZIP Code" id={`${title}-zip`} value={party.zip} onChange={(v) => onChange('zip', v)} placeholder="ZIP code" />
-        <FormField label="Phone" id={`${title}-phone`} value={party.phone} onChange={(v) => onChange('phone', v)} placeholder="Phone number" />
-      </div>
-      
-      <FormField label="Email" id={`${title}-email`} type="email" value={party.email} onChange={(v) => onChange('email', v)} placeholder="Email address" />
-      
-      <div className="grid grid-cols-2 gap-4">
-        <FormField label="Representative Name" id={`${title}-rep`} value={party.representative} onChange={(v) => onChange('representative', v)} placeholder="Representative name" />
-        <FormField label="Title" id={`${title}-title`} value={party.title} onChange={(v) => onChange('title', v)} placeholder="Job title" />
-      </div>
-      
-      <div className="border-t pt-4">
-        <h4 className="font-medium mb-3">Signature Details</h4>
-        <div className="grid grid-cols-2 gap-4">
-          <FormField label="Signer Name" id={`${title}-signer-name`} value={party.signerName} onChange={(v) => onChange('signerName', v)} placeholder="Full name" />
-          <FormField label="Signer Title" id={`${title}-signer-title`} value={party.signerTitle} onChange={(v) => onChange('signerTitle', v)} placeholder="Job title" />
-        </div>
-        <FormField label="Signature Date" id={`${title}-signer-date`} type="date" value={party.signerDate} onChange={(v) => onChange('signerDate', v)} />
-      </div>
-    </CardContent>
-  </Card>
-);
 
 const PartyPreview = ({ party, title }: { party: PartyInfo; title: string }) => (
   <div className="border border-gray-300 p-4 rounded">
@@ -158,16 +77,16 @@ const SignatureBlock = ({ party, title }: { party: PartyInfo; title: string }) =
     <div className="text-gray-700">{party.signerTitle}</div>
     <div className="text-gray-700">{party.name}</div>
     <div className="text-gray-600 text-sm mt-2">
-      Date: {new Date(party.signerDate).toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
+      Date: {new Date(party.signerDate).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
       })}
     </div>
   </div>
 );
 
-const PreviewSection = ({ title, children, show = true }: { title: string; children: React.ReactNode; show?: boolean }) => 
+const PreviewSection = ({ title, children, show = true }: { title: string; children: React.ReactNode; show?: boolean }) =>
   show ? (
     <div>
       <h3 className="font-semibold text-gray-900 mb-2">{title}</h3>
@@ -183,6 +102,8 @@ const MOUComponent = () => {
   });
 
   const [activeView, setActiveView] = useState<'form' | 'preview'>('form');
+  const previewRef = useRef<HTMLDivElement>(null);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
 
   const updateMOU = (field: keyof MOUData, value: string) => {
     setData(prev => ({ ...prev, mou: { ...prev.mou, [field]: value } }));
@@ -201,10 +122,10 @@ const MOUComponent = () => {
     { value: 'indefinite', label: 'Indefinite' },
   ];
 
-  const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   });
 
   const MOUPreview = () => (
@@ -276,9 +197,9 @@ const MOUComponent = () => {
 
         <PreviewSection title="13. GENERAL PROVISIONS">
           <p>
-            This MOU represents the entire understanding between the Parties and supersedes all prior negotiations, 
-            representations, or agreements relating to the subject matter herein. This MOU may be executed in 
-            counterparts, each of which shall be deemed an original and all of which together shall constitute 
+            This MOU represents the entire understanding between the Parties and supersedes all prior negotiations,
+            representations, or agreements relating to the subject matter herein. This MOU may be executed in
+            counterparts, each of which shall be deemed an original and all of which together shall constitute
             one and the same instrument.
           </p>
         </PreviewSection>
@@ -296,13 +217,102 @@ const MOUComponent = () => {
       </div>
     </div>
   );
+  const handleEmailSend = async (email: string) => {
+    if (!previewRef.current) return;
+
+    try {
+      // Generate PDF blob
+      const opt = {
+        margin: 0.5,
+        filename: "Memorandom_of_understanding.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+      };
+
+      const pdfBlob = await html2pdf()
+        .from(previewRef.current)
+        .set(opt)
+        .outputPdf("blob");
+
+      // Convert to Base64
+      const arrayBuffer = await pdfBlob.arrayBuffer();
+      const base64Pdf = Buffer.from(arrayBuffer).toString("base64");
+
+      // Send to API
+      const res = await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: email,
+          subject: `Letter of Intent from ${data.mou}`,
+          pdf: base64Pdf,
+        }),
+      });
+
+      const result = await res.json();
+      if (result.success) {
+        toast.success(`PDF sent to ${email} successfully!`);
+      } else {
+        toast.error("Failed to send email");
+      }
+    } catch (err) {
+      console.error("Email error:", err);
+      toast.error("Something went wrong while sending email");
+    }
+  };
 
   const handleAction = (action: string) => {
     const actions = {
       generate: () => setActiveView('preview'),
-      download: () => alert('PDF download functionality would be implemented here'),
-      email: () => alert('Email functionality would be implemented here'),
-      save: () => alert('Draft saved successfully!'),
+      download: async () => {
+        if (previewRef.current) {
+          const opt = {
+            margin: 0.5,
+            filename: `MOU_${data.mou.title || "Draft"}.pdf`,  // ✅ Correct
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+          };
+          await html2pdf().from(previewRef.current).set(opt).save();
+        } else {
+          toast.error("Nothing to download — preview is empty");
+        }
+      },
+
+      email: () => setEmailDialogOpen(true),
+      print: async () => {
+        if (previewRef.current) {
+          const opt = {
+            margin: 0.5,
+            filename: `MOU_${data.mou.title || "Draft"}.pdf`,
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+          };
+
+          // Generate PDF as Blob
+          const pdfBlob = await html2pdf()
+            .from(previewRef.current)
+            .set(opt)
+            .outputPdf("blob");
+
+          // Create blob URL
+          const pdfUrl = URL.createObjectURL(pdfBlob);
+
+          // Open in new window and trigger print
+          const newWindow = window.open(pdfUrl);
+          if (newWindow) {
+            newWindow.onload = () => {
+              newWindow.print();
+            };
+          }
+        } else {
+          toast.error("Nothing to print — preview is empty");
+        }
+      },
+
+
     };
     actions[action as keyof typeof actions]?.();
   };
@@ -318,7 +328,7 @@ const MOUComponent = () => {
           </h1>
           <p className="text-gray-600 mt-1">Create professional memorandums of understanding for business partnerships and collaborations</p>
         </div>
-        
+
         <div className="flex space-x-2">
           {['form', 'preview'].map(view => (
             <Button
@@ -354,7 +364,7 @@ const MOUComponent = () => {
                 <FormField label="Objectives" id="objectives" type="textarea" value={data.mou.objectives} onChange={(v) => updateMOU('objectives', v)} placeholder="List the key objectives and goals..." />
                 <FormField label="Scope of Work" id="scope" type="textarea" value={data.mou.scopeOfWork} onChange={(v) => updateMOU('scopeOfWork', v)} placeholder="Define the scope of work and deliverables..." rows={4} />
                 <FormField label="Responsibilities" id="responsibilities" type="textarea" value={data.mou.responsibilities} onChange={(v) => updateMOU('responsibilities', v)} placeholder="Outline responsibilities of each party..." rows={4} />
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <FormField label="Duration" id="duration" type="select" value={data.mou.duration} onChange={(v) => updateMOU('duration', v)} options={durationOptions} />
                   <FormField label="Effective Date" id="effective" type="date" value={data.mou.effectiveDate} onChange={(v) => updateMOU('effectiveDate', v)} />
@@ -384,7 +394,7 @@ const MOUComponent = () => {
                     rows={field.rows || 3}
                   />
                 ))}
-                
+
                 <FormField label="Governing Law" id="law" value={data.mou.governingLaw} onChange={(v) => updateMOU('governingLaw', v)} placeholder="Laws of India" />
               </CardContent>
             </Card>
@@ -428,9 +438,19 @@ const MOUComponent = () => {
               Save Draft
             </Button>
           </div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-            <MOUPreview />
+          <EmailDialog
+            open={emailDialogOpen}
+            onClose={() => setEmailDialogOpen(false)}
+            onSend={handleEmailSend}
+          />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div ref={previewRef}>
+              <MOUPreview />
+            </div>
           </motion.div>
         </div>
       )}
