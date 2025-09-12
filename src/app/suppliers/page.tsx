@@ -18,28 +18,17 @@ import {
   CardSkeleton
 } from '@/components/ui/skeletons';
 import { 
-  SUPPLIER_STATS, 
-  SUPPLIER_CATEGORIES, 
-  SUPPLIERS, 
-  RECENT_ACTIVITIES, 
-  QUICK_ACTIONS 
-} from '@/lib/components-Data/supplier/constent';
-import { 
-  getStatusColor, 
-  getStatusText, 
-  getCategoryColor, 
-  getRatingColor, 
-  formatIndianCurrency, 
-  formatDate, 
   getInitials,
   getActivityIconColor 
 } from '@/lib/components-imp-utils/supplier';
 import { SuppliersIcon, UserIcon } from '@/components/Icons';
 import SupplierDialog from '@/components/suppliers/SupplierDialog';
 import { Supplier } from '@/types/supplier';
+import { useSupplierContext } from '@/context/SupplierContext/SupplierContextProvider';
 
 export default function SuppliersPage() {
-  const {
+    const {
+    filteredSuppliers,
     searchTerm,
     setSearchTerm,
     selectedCategory,
@@ -50,23 +39,20 @@ export default function SuppliersPage() {
     setViewMode,
     isExporting,
     isLoading,
-    handleExport
-  } = useSuppliers();
+    handleExport,
+    dialogOpen,
+    setDialogOpen,
+    dialogMode,
+    setDialogMode,
+    selectedSupplier,
+    setSelectedSupplier,
+    handleSaveSupplier,
+    SUPPLIER_STATS,
+    SUPPLIER_CATEGORIES,
+    RECENT_ACTIVITIES,
+    QUICK_ACTIONS
+  } = useSupplierContext();
 
-  // Dialog state
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState<'add' | 'edit' | 'view'>('add');
-  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
-  const [suppliers, setSuppliers] = useState<Supplier[]>(SUPPLIERS);
-
-  const filteredSuppliers = suppliers.filter(supplier => {
-    const matchesSearch = supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         supplier.contactPerson.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         supplier.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || 
-                           supplier.category.toLowerCase().replace(' ', '-') === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
 
   // Dialog handlers
   const handleAddSupplier = () => {
@@ -87,27 +73,6 @@ export default function SuppliersPage() {
     setDialogOpen(true);
   };
 
-  const handleSaveSupplier = (supplierData: Partial<Supplier>) => {
-    if (dialogMode === 'add') {
-      const newSupplier: Supplier = {
-        ...supplierData as Supplier,
-        id: Date.now().toString(),
-        totalOrders: 0,
-        totalPaid: 0,
-        pendingAmount: 0,
-        lastOrder: new Date().toISOString().split('T')[0],
-        joinDate: new Date().toISOString().split('T')[0],
-        rating: 0
-      };
-      setSuppliers(prev => [...prev, newSupplier]);
-    } else if (dialogMode === 'edit' && selectedSupplier) {
-      setSuppliers(prev => prev.map(supplier => 
-        supplier.id === selectedSupplier.id 
-          ? { ...supplier, ...supplierData }
-          : supplier
-      ));
-    }
-  };
 
   if (isLoading) {
     return (
@@ -321,7 +286,7 @@ export default function SuppliersPage() {
                     <SelectItem key="rating" value="rating">Rating</SelectItem>
                   </SelectContent>
                 </Select>
-                <Tabs value={viewMode} onValueChange={setViewMode} className="w-auto">
+                <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "table" | "cards")} className="w-auto">
                   <TabsList>
                     <TabsTrigger value="table">Table</TabsTrigger>
                     <TabsTrigger value="cards">Cards</TabsTrigger>
