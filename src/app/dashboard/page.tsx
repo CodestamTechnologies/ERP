@@ -24,6 +24,7 @@ import {
 import { AIInsightsIcon, ChartIcon } from '@/components/Icons';
 import { TimeRange, useDashboardContext } from '@/context/DashboardContext/DashboardContextProvider';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import ChatDialog from '@/components/Company-chatbot/Chatbot';
 
 const Dashboard = () => {
   const {
@@ -117,7 +118,8 @@ const Dashboard = () => {
               <SelectItem key="1year" value="1year">Last 1 Year</SelectItem>
             </SelectContent>
           </Select>
-         
+          <ChatDialog />
+
           <Dialog>
             <DialogTrigger asChild>
               <Button className="bg-blue-600 hover:bg-blue-700 text-white">
