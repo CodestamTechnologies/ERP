@@ -9,45 +9,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, Download, FileText, Mail, Printer, Save } from 'lucide-react';
+import { AgreementData, MOUData, PartyInfo } from '@/types/memorandomOFUnderstanding';
 
-interface PartyInfo {
-  name: string;
-  address: string;
-  city: string;
-  state: string;
-  zip: string;
-  phone: string;
-  email: string;
-  representative: string;
-  title: string;
-  signerName: string;
-  signerTitle: string;
-  signerDate: string;
-}
 
-interface MOUData {
-  date: string;
-  title: string;
-  purpose: string;
-  background: string;
-  objectives: string;
-  scopeOfWork: string;
-  responsibilities: string;
-  duration: string;
-  effectiveDate: string;
-  terminationClause: string;
-  confidentiality: string;
-  intellectualProperty: string;
-  disputeResolution: string;
-  governingLaw: string;
-  amendments: string;
-}
-
-interface AgreementData {
-  mou: MOUData;
-  partyA: PartyInfo;
-  partyB: PartyInfo;
-}
 
 const initialPartyData = (): PartyInfo => ({
   name: '',
